@@ -1,0 +1,37 @@
+# 로그 파일
+logs/
+*.log
+
+# Django 설정 디렉토리
+__pycache__/
+settings/*.pyc
+settings/__pycache__/
+
+# pipenv 가상환경 관련 파일
+Pipfile.lock
+/.venv
+
+# Python 바이트코드 파일
+*.pyc
+*.pyo
+
+# 데몬과 실행 파일
+*.pid
+*.pyc
+
+# 패키지 파일
+*.egg-info/
+dist/
+build/
+
+# .DS_Store 파일 (macOS)
+.DS_Store
+
+# vscode 설정
+.vscode/
+
+# 개발 db
+db.sqlite3
+
+#.env 파일(배포 환경에서는 서버에 직접 환경변수를 설정할 것)
+.env
