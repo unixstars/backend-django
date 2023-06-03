@@ -26,7 +26,7 @@ AUTH_USER_MODEL = "user.User"
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
-SECRET_KEY = os.environ("SECRET_KEY")  # .env 파일에서 SECRET_KEY 가져오기
+SECRET_KEY = os.getenv("SECRET_KEY")  # .env 파일에서 SECRET_KEY 가져오기
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -125,10 +125,10 @@ DATABASES = {
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
-        "NAME": os.environ("NAME"),
-        "USER": os.environ("USER"),
-        "PASSWORD": os.environ("PASSWORD"),
-        "HOST": os.environ("HOST"),
+        "NAME": os.getenv("NAME"),
+        "USER": os.getenv("USER"),
+        "PASSWORD": os.getenv("PASSWORD"),
+        "HOST": os.getenv("HOST"),
         "PORT": "3306",
     }
 }
@@ -179,10 +179,10 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # AWS Access
-AWS_ACCESS_KEY_ID = os.environ("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.environ("AWS_SECRET_ACCESS_KEY")
-AWS_REGION = os.environ("AWS_REGION")
-AWS_STORAGE_BUCKET_NAME = os.environ("AWS_STORAGE_BUCKET_NAME")
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_REGION = os.getenv("AWS_REGION")
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 
 # S3 Storages
 AWS_LOCATION = "static"
