@@ -12,6 +12,7 @@ djangorestframework-simplejwt = "*"
 python-dotenv = "*"
 pillow = "*"
 wheel = "*"
+uwsgi = "*"
 
 [dev-packages]
 black = "*"
