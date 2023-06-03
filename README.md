@@ -4,6 +4,7 @@
 
 ![unistar_ERD](static/unistar_erd.png)
 
-## 6.3 DB 설계 바탕으로 배포 완료
+## 6.3
 
-aws ec2, s3, rds
+- DB 설계 바탕으로 모델 설정
+- 서버 연결 완료(EC2,RDS,S3)
