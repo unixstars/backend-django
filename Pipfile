@@ -14,7 +14,7 @@ pillow = "*"
 wheel = "*"
 boto3 = "*"
 django-storages = "*"
-uwsgi = "*"
+mysqlclient = "*"
 
 [dev-packages]
 black = "*"
