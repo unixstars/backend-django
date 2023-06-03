@@ -154,8 +154,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_DIR = os.path.join(BASE_DIR, "static")
 
+STATIC_DIR = os.path.join(BASE_DIR, "static")
 STATICFILES_DIRS = [
     STATIC_DIR,
 ]
@@ -165,12 +165,17 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# S3 Storages
-DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
-
 # AWS Access
-AWS_ACCESS_KEY_ID = "AKIAZGZBDPNP5YSV43H6"
-AWS_SECRET_ACCESS_KEY = "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"
-AWS_REGION = "ap-northeast-2"
-AWS_STORAGE_BUCKET_NAME = "unistar-s3"
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_REGION = os.getenv("AWS_REGION")
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+
+# S3 Storages
+AWS_LOCATION = "static"
+STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{AWS_LOCATION}/"
+
+MEDIA_LOCATION = "media"
+DEFAULT_FILE_STORAGE = "unistar-backend.storages.MediaStorage"
+MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{MEDIA_LOCATION}/"
