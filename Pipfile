@@ -12,9 +12,10 @@ djangorestframework-simplejwt = "*"
 python-dotenv = "*"
 pillow = "*"
 wheel = "*"
-uwsgi = "*"
 boto3 = "*"
 django-storages = "*"
+decouple = "*"
+uwsgi = "*"
 
 [dev-packages]
 black = "*"
