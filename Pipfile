@@ -13,6 +13,8 @@ python-dotenv = "*"
 pillow = "*"
 wheel = "*"
 uwsgi = "*"
+boto3 = "*"
+django-storages = "*"
 
 [dev-packages]
 black = "*"
