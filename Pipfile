@@ -15,7 +15,6 @@ wheel = "*"
 boto3 = "*"
 django-storages = "*"
 mysqlclient = "*"
-pymysql = "*"
 uwsgi = "*"
 
 [dev-packages]
