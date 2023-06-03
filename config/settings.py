@@ -177,5 +177,5 @@ STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{AWS_LOCATION}/"
 
 MEDIA_LOCATION = "media"
-DEFAULT_FILE_STORAGE = "unistar-backend.storages.MediaStorage"
+DEFAULT_FILE_STORAGE = "unistar-backend.mystorages.MediaStorage"
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{MEDIA_LOCATION}/"
