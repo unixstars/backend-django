@@ -33,6 +33,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     ".ap-northeast-2.compute.amazonaws.com",
+    ".unistar-backend.com",
 ]
 
 
@@ -47,6 +48,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "corsheaders",
+    "storages",
     "activity.apps.ActivityConfig",
     "user.apps.UserConfig",
     "authentication.apps.AuthenticationConfig",
@@ -152,9 +154,23 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# S3 Storages
+DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+
+# AWS Access
+AWS_ACCESS_KEY_ID = "deprecated"
+AWS_SECRET_ACCESS_KEY = "deprecated"
+AWS_REGION = "deprecated"
+AWS_STORAGE_BUCKET_NAME = "deprecated"
