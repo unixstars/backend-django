@@ -33,7 +33,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     ".ap-northeast-2.compute.amazonaws.com",
-    ".unistar-backend.com",
+    "unistar-backend.com",
 ]
 
 
@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "corsheaders",
     "storages",
+    "api.apps.ApiConfig",
     "activity.apps.ActivityConfig",
     "user.apps.UserConfig",
     "authentication.apps.AuthenticationConfig",
@@ -73,6 +74,12 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "DEFAULT_THROTTLE_CLASSES": [
+        "api.views.BurstRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "burst": "10/sec",
+    },
 }
 
 # JWT 토큰의 만료기간 설정

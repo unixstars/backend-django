@@ -41,11 +41,11 @@ class Activity(models.Model):
 
     title = models.CharField(max_length=20)
     kind = models.CharField(max_length=20)
-    people_number = models.CharField(max_length=3)
+    people_number = models.IntegerField()
     talent = models.TextField()
     frequency = models.TextField()
     way = models.TextField()
-    period = models.CharField(max_length=3)
+    period = models.IntegerField()
     recruit = models.BooleanField(default=True)
     payment = models.CharField(max_length=20)
 
