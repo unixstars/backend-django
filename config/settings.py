@@ -31,7 +31,9 @@ SECRET_KEY = os.getenv("SECRET_KEY")  # .env 파일에서 SECRET_KEY 가져오�
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    ".ap-northeast-2.compute.amazonaws.com",
+]
 
 
 # Application definition

@@ -11,6 +11,7 @@ pyjwt = "*"
 djangorestframework-simplejwt = "*"
 python-dotenv = "*"
 pillow = "*"
+wheel = "*"
 
 [dev-packages]
 black = "*"
