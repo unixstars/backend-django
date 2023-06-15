@@ -6,6 +6,7 @@ from django.contrib.auth.models import (
 )
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.mail import send_mail
+from activity.models import Form
 
 
 class UserManager(BaseUserManager):
@@ -74,6 +75,7 @@ class StudentUser(models.Model):
     user_id = models.OneToOneField(User, on_delete=models.CASCADE)
     activity_id = models.ManyToManyField(
         "activity.Activity",
+        through=Form,
     )
 
     class Meta:
@@ -87,43 +89,56 @@ class StudentUserProfile(models.Model):
             filename,
         )
 
-    user_profile_id = models.AutoField(primary_key=True)
+    student_user_profile_id = models.AutoField(primary_key=True)
     student_user_id = models.OneToOneField(StudentUser, on_delete=models.CASCADE)
-    image = models.ImageField(
-        upload_to=get_upload_path,
-        null=True,
-        blank=True,
-    )
     name = models.CharField(max_length=10)
+    portfolio_image = models.ImageField(upload_to=get_upload_path)
     birth = models.DateField()
     phone_number = models.CharField(max_length=20)
     university = models.CharField(max_length=10)
     major = models.CharField(max_length=20)
-    email = models.EmailField(max_length=254)
+    univ_email = models.EmailField(max_length=254)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class StudentUserPortfolio(models.Model):
-    portfolio_id = models.AutoField(primary_key=True)
+    student_user_portfolio_id = models.AutoField(primary_key=True)
     student_user_id = models.ForeignKey(StudentUser, on_delete=models.CASCADE)
     title = models.CharField(max_length=20)
-    links = models.TextField(null=True, blank=True)
+    contents = models.TextField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
-class PortfolioImage(models.Model):
+class PortfolioFiles(models.Model):
+    portfolio_files_id = models.AutoField(primary_key=True)
+    student_user_portfolio_id = models.OneToOneField(
+        StudentUserPortfolio,
+        on_delete=models.CASCADE,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class PortfolioOneFile(models.Model):
     def get_upload_path(instance, filename):
-        return "student/{}/portfolio/{}/portfolio_images/{}".format(
-            instance.portfolio_id.student_user_id.pk,
-            instance.portfolio_id.pk,
+        return "student/{}/portfolio/{}/portfolio_files/{}".format(
+            instance.portfolio_files_id.student_user_portfolio_id.student_user_id.pk,
+            instance.portfolio_files_id.student_user_portfolio_id.pk,
             filename,
         )
 
-    portfolio_id = models.ForeignKey(StudentUserPortfolio, on_delete=models.CASCADE)
-    image = models.ImageField(
+    portfolio_one_file_id = models.AutoField(primary_key=True)
+    portfolio_files_id = models.ForeignKey(
+        PortfolioFiles,
+        on_delete=models.CASCADE,
+    )
+    file = models.FileField(
         upload_to=get_upload_path,
         null=True,
         blank=True,
     )
-    uploaded_at = models.DateTimeField(auto_now_add=True)
 
 
 class CompanyUser(models.Model):
