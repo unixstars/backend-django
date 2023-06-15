@@ -31,8 +31,10 @@ class Board(models.Model):
     vision = models.TextField()
     pride = models.CharField(max_length=200)
     address = models.CharField(max_length=150)
-    duration = models.DurationField()
+    duration = models.DurationField(default=2592000000)
     is_expired = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class Activity(models.Model):
@@ -57,8 +59,21 @@ class Scrap(models.Model):
 
 
 class Form(models.Model):
+    PENDING, REJECTED, ACCEPTED = "pending", "rejected", "accepted"
+
+    IS_ACCEPTED_CHOICES = [
+        (PENDING, "대기중"),
+        (REJECTED, "불합격"),
+        (ACCEPTED, "합격"),
+    ]
+
     form_id = models.AutoField(primary_key=True)
     activity_id = models.ForeignKey(Activity, on_delete=models.CASCADE)
     student_user_id = models.ForeignKey("user.StudentUser", on_delete=models.CASCADE)
     word = models.TimeField()
-    is_accepted = models.BooleanField(default=False)
+    is_accepted = models.CharField(
+        max_length=10,
+        choices=IS_ACCEPTED_CHOICES,
+        default=PENDING,
+    )
+    submitted_at = models.DateTimeField(auto_now_add=True)

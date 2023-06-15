@@ -29,7 +29,7 @@ AUTH_USER_MODEL = "user.User"
 SECRET_KEY = os.getenv("SECRET_KEY")  # .env 파일에서 SECRET_KEY 가져오기
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     ".ap-northeast-2.compute.amazonaws.com",
@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     "activity.apps.ActivityConfig",
     "user.apps.UserConfig",
     "authentication.apps.AuthenticationConfig",
+    "assignment.apps.AssignmentConfig",
 ]
 
 MIDDLEWARE = [
@@ -120,7 +121,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 """
-#장고 db
+# 장고 db
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -128,6 +129,7 @@ DATABASES = {
     }
 }
 """
+
 
 DATABASES = {
     "default": {
@@ -139,6 +141,7 @@ DATABASES = {
         "PORT": "3306",
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
