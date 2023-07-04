@@ -45,8 +45,9 @@ class Board(models.Model):
     address = models.CharField(max_length=150)
     duration = models.DurationField()
     is_expired = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
     views = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def clean(self):
         if self.duration < timedelta(days=7) or self.duration > timedelta(days=365):
