@@ -96,9 +96,9 @@ class Form(models.Model):
     ]
 
     form_id = models.AutoField(primary_key=True)
-    introduce = models.TextField()
-    reason = models.TextField()
-    merit = models.TextField()
+    introduce = models.TextField(default="")
+    reason = models.TextField(default="")
+    merit = models.TextField(default="")
     is_accepted = models.CharField(
         max_length=10,
         choices=IS_ACCEPTED_CHOICES,
