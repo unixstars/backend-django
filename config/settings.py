@@ -79,7 +79,7 @@ REST_FRAMEWORK = {
         "api.views.BurstRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "burst": "10/sec",
+        "burst": "1000/sec",
     },
 }
 
