@@ -29,7 +29,11 @@ class Board(models.Model):
         null=True,
         blank=True,
     )
-    title = models.CharField(max_length=30)
+    title = models.CharField(
+        max_length=30,
+        null=True,
+        blank=True,
+    )
     company_name = models.CharField(max_length=30)
     introduction = models.TextField()
     vision = models.TextField()
@@ -53,11 +57,7 @@ class Activity(models.Model):
     activity_id = models.AutoField(primary_key=True)
     board_id = models.ForeignKey(Board, on_delete=models.CASCADE)
 
-    title = models.CharField(
-        max_length=20,
-        null=True,
-        blank=True,
-    )
+    title = models.CharField(max_length=20)
     kind = models.CharField(max_length=20)
     people_number = models.IntegerField()
     talent = models.TextField()
