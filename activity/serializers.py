@@ -11,7 +11,7 @@ class ActivitySerializer(serializers.ModelSerializer):
 
 
 class BoardSerializer(serializers.ModelSerializer):
-    activities = ActivitySerializer(source="board_id", many=True, read_only=True)
+    activities = ActivitySerializer(many=True, read_only=True)
     scrap_count = serializers.SerializerMethodField()
     logo = serializers.SerializerMethodField()
     banner = serializers.SerializerMethodField()
