@@ -75,12 +75,6 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
-    "DEFAULT_THROTTLE_CLASSES": [
-        "api.views.BurstRateThrottle",
-    ],
-    "DEFAULT_THROTTLE_RATES": {
-        "burst": "1000/sec",
-    },
 }
 
 # JWT 토큰의 만료기간 설정
