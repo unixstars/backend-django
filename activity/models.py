@@ -18,7 +18,6 @@ class Board(models.Model):
 
     board_id = models.AutoField(primary_key=True)
     company_user_id = models.ForeignKey("user.CompanyUser", on_delete=models.CASCADE)
-    company_name = models.CharField(max_length=30)
     logo = models.ImageField(
         upload_to=get_upload_path_logo,
         null=True,
