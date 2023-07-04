@@ -8,7 +8,7 @@ class BurstRateThrottle(BaseThrottle):
     매 duration초마다 rate수의 요청만 허가.
     """
 
-    RATE = 10  # 요청 수
+    RATE = 1000  # 요청 수
     DURATION = 1  # 1초당
 
     def __init__(self):
