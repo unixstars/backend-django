@@ -16,8 +16,7 @@ class Board(models.Model):
             filename,
         )
 
-    board_id = models.AutoField(primary_key=True)
-    company_user_id = models.ForeignKey("user.CompanyUser", on_delete=models.CASCADE)
+    company_user = models.ForeignKey("user.CompanyUser", on_delete=models.CASCADE)
     logo = models.ImageField(
         upload_to=get_upload_path_logo,
         null=True,
@@ -54,8 +53,7 @@ class Board(models.Model):
 
 
 class Activity(models.Model):
-    activity_id = models.AutoField(primary_key=True)
-    board_id = models.ForeignKey(Board, on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, on_delete=models.CASCADE)
 
     title = models.CharField(max_length=20)
     kind = models.CharField(max_length=20)
@@ -73,8 +71,7 @@ class Activity(models.Model):
 
 
 class Scrap(models.Model):
-    scrap_id = models.AutoField(primary_key=True)
-    student_user_id = models.ForeignKey("user.StudentUser", on_delete=models.CASCADE)
+    student_user = models.ForeignKey("user.StudentUser", on_delete=models.CASCADE)
     board_id = models.ForeignKey(Board, on_delete=models.CASCADE)
 
 
@@ -95,7 +92,6 @@ class Form(models.Model):
         (ACCEPTED, "합격"),
     ]
 
-    form_id = models.AutoField(primary_key=True)
     introduce = models.TextField(default="")
     reason = models.TextField(default="")
     merit = models.TextField(default="")
@@ -105,5 +101,5 @@ class Form(models.Model):
         default=PENDING,
     )
     submitted_at = models.DateTimeField(auto_now_add=True)
-    activity_id = models.ForeignKey(Activity, on_delete=models.CASCADE)
-    student_user_id = models.ForeignKey("user.StudentUser", on_delete=models.CASCADE)
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
+    student_user = models.ForeignKey("user.StudentUser", on_delete=models.CASCADE)
