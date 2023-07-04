@@ -10,7 +10,7 @@ class BoardListPagination(pagination.PageNumberPagination):
 
 
 class BoardListView(generics.ListAPIView):
-    queryset = Board.objects.all()
+    queryset = Board.objects.order_by("company_user_id").all()
     serializer_class = BoardSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = BoardListPagination

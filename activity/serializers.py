@@ -19,6 +19,7 @@ class BoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
         fields = [
+            "company_user_id",
             "title",
             "company_name",
             "introduction",
