@@ -1,4 +1,6 @@
 from django.db import models
+from datetime import timedelta
+from django.core.exceptions import ValidationError
 
 
 class Board(models.Model):
@@ -27,14 +29,24 @@ class Board(models.Model):
         null=True,
         blank=True,
     )
+    title = models.CharField(max_length=30)
+    company_name = models.CharField(max_length=30)
     introduction = models.TextField()
     vision = models.TextField()
-    pride = models.CharField(max_length=200)
+    pride = models.CharField(
+        max_length=200,
+        null=True,
+        blank=True,
+    )
     address = models.CharField(max_length=150)
-    duration = models.DurationField(default=2592000000)
+    duration = models.DurationField()
     is_expired = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    views = models.PositiveIntegerField(default=0)
+
+    def clean(self):
+        if self.duration < timedelta(days=7) or self.duration > timedelta(days=365):
+            raise ValidationError("모집기간은 7과 365사이여야 합니다.")
 
 
 class Activity(models.Model):
@@ -47,9 +59,13 @@ class Activity(models.Model):
     talent = models.TextField()
     frequency = models.TextField()
     way = models.TextField()
-    period = models.IntegerField()
-    recruit = models.BooleanField(default=True)
-    payment = models.CharField(max_length=20)
+    period = models.DurationField()
+    recruit = models.BooleanField(default=False)
+    payment = models.CharField(
+        max_length=20,
+        null=True,
+        blank=True,
+    )
 
 
 class Scrap(models.Model):
@@ -59,21 +75,31 @@ class Scrap(models.Model):
 
 
 class Form(models.Model):
-    PENDING, REJECTED, ACCEPTED = "pending", "rejected", "accepted"
+    PENDING, WAITING, CANCELED, REJECTED, ACCEPTED = (
+        "pending",
+        "waiting",
+        "canceled",
+        "rejected",
+        "accepted",
+    )
 
     IS_ACCEPTED_CHOICES = [
         (PENDING, "대기중"),
+        (WAITING, "확정대기"),
+        (CANCELED, "활동취소"),
         (REJECTED, "불합격"),
         (ACCEPTED, "합격"),
     ]
 
     form_id = models.AutoField(primary_key=True)
-    activity_id = models.ForeignKey(Activity, on_delete=models.CASCADE)
-    student_user_id = models.ForeignKey("user.StudentUser", on_delete=models.CASCADE)
-    word = models.TimeField()
+    introduce = models.TextField()
+    reason = models.TextField()
+    merit = models.TextField()
     is_accepted = models.CharField(
         max_length=10,
         choices=IS_ACCEPTED_CHOICES,
         default=PENDING,
     )
     submitted_at = models.DateTimeField(auto_now_add=True)
+    activity_id = models.ForeignKey(Activity, on_delete=models.CASCADE)
+    student_user_id = models.ForeignKey("user.StudentUser", on_delete=models.CASCADE)
