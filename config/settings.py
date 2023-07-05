@@ -186,13 +186,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-
-# App외부 Static 폴더 위치
-STATIC_DIR = os.path.join(BASE_DIR, "static")
-STATICFILES_DIRS = [
-    STATIC_DIR,
-]
-
 # AWS Access
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
@@ -203,7 +196,10 @@ AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 AWS_LOCATION = "static"
 STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{AWS_LOCATION}/"
-
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
 
 MEDIA_LOCATION = "media"
 DEFAULT_FILE_STORAGE = "unistar-backend.mystorages.MediaStorage"
