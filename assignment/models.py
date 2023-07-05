@@ -3,14 +3,14 @@ from activity.models import Form
 
 
 class Assignment(models.Model):
-    assignment_id = models.AutoField(primary_key=True)
-    form_id = models.OneToOneField(Form, on_delete=models.CASCADE)
+    form = models.OneToOneField(Form, on_delete=models.CASCADE)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Notice(models.Model):
-    notice_id = models.AutoField(primary_key=True)
-    assignment_id = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+
     title = models.CharField(max_length=30)
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
@@ -18,16 +18,16 @@ class Notice(models.Model):
 
 
 class NoticeComment(models.Model):
-    notice_comment_id = models.AutoField(primary_key=True)
-    notice_id = models.ForeignKey(Notice, on_delete=models.CASCADE)
+    notice = models.ForeignKey(Notice, on_delete=models.CASCADE)
+
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
 class WeekAssign(models.Model):
-    week_assign_id = models.AutoField(primary_key=True)
-    assignment_id = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE)
+
     title = models.CharField(max_length=30)
     content = models.TextField()
     week = models.IntegerField()
@@ -35,8 +35,8 @@ class WeekAssign(models.Model):
 
 
 class SubmitFiles(models.Model):
-    submitfiles_id = models.AutoField(primary_key=True)
-    week_assign_id = models.OneToOneField(WeekAssign, on_delete=models.CASCADE)
+    week_assign = models.OneToOneField(WeekAssign, on_delete=models.CASCADE)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -44,13 +44,13 @@ class SubmitFiles(models.Model):
 class SubmitOneFile(models.Model):
     def get_upload_path_files(instance, filename):
         return "student/{}/activity/{}/assginment/{}/week/{}/submit_files/{}".format(
-            instance.submitfiles_id.week_assign_id.assignment_id.form_id.student_user_id.pk,
-            instance.submitfiles_id.week_assign_id.assignment_id.form_id.activity_id.pk,
-            instance.submitfiles_id.week_assign_id.assignment_id.pk,
-            instance.submitfiles_id.week_assign_id.pk,
+            instance.submitfiles.week_assign.assignment.form.student_user.pk,
+            instance.submitfiles.week_assign.assignment.form.activity.pk,
+            instance.submitfiles.week_assign.assignment.pk,
+            instance.submitfiles.week_assign.pk,
             filename,
         )
 
-    file_id = models.AutoField(primary_key=True)
-    submitfiles_id = models.ForeignKey(SubmitFiles, on_delete=models.CASCADE)
+    submitfiles = models.ForeignKey(SubmitFiles, on_delete=models.CASCADE)
+
     file = models.FileField()

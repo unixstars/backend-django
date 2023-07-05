@@ -41,3 +41,6 @@ aws_info/
 
 #적용 가능한 코드들
 legacy.txt
+
+# 로컬 미디어 파일
+media/

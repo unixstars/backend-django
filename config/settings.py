@@ -29,11 +29,12 @@ AUTH_USER_MODEL = "user.User"
 SECRET_KEY = os.getenv("SECRET_KEY")  # .env 파일에서 SECRET_KEY 가져오기
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = [
     ".ap-northeast-2.compute.amazonaws.com",
     "unistar-backend.com",
+    "127.0.0.1",
 ]
 
 
@@ -170,20 +171,27 @@ USE_I18N = True
 
 USE_TZ = True
 
-
+"""
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
+# 장고 기본 static
+STATIC_URL = "static/"
 
-
-STATIC_DIR = os.path.join(BASE_DIR, "static")
-STATICFILES_DIRS = [
-    STATIC_DIR,
-]
+# 로컬환경 media
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+"""
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+# App외부 Static 폴더 위치
+STATIC_DIR = os.path.join(BASE_DIR, "static")
+STATICFILES_DIRS = [
+    STATIC_DIR,
+]
 
 # AWS Access
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
@@ -195,6 +203,7 @@ AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 AWS_LOCATION = "static"
 STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{AWS_LOCATION}/"
+
 
 MEDIA_LOCATION = "media"
 DEFAULT_FILE_STORAGE = "unistar-backend.mystorages.MediaStorage"
