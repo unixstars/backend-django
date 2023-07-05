@@ -192,7 +192,7 @@ AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
 AWS_REGION = os.getenv("AWS_REGION")
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 
-# S3 Storages
+# Static Setting
 AWS_LOCATION = "static"
 STATICFILES_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 STATIC_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{AWS_LOCATION}/"
@@ -201,6 +201,7 @@ STATICFILES_DIRS = [
     STATIC_DIR,
 ]
 
+# Media Setting
 MEDIA_LOCATION = "media"
 DEFAULT_FILE_STORAGE = "unistar-backend.mystorages.MediaStorage"
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{MEDIA_LOCATION}/"
