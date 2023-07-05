@@ -19,7 +19,8 @@ class BoardSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
         fields = [
-            "company_user_id",
+            "logo",
+            "banner",
             "title",
             "company_name",
             "introduction",
@@ -30,14 +31,12 @@ class BoardSerializer(serializers.ModelSerializer):
             "is_expired",
             "views",
             "created_at",
-            "logo",
-            "banner",
             "scrap_count",
             "activities",
         ]
 
     def get_scrap_count(self, obj):
-        return Scrap.objects.filter(board_id=obj).count()
+        return Scrap.objects.filter(board=obj).count()
 
     def get_logo(self, obj):
         if obj.logo:

@@ -1,22 +1,41 @@
 from django.db import models
 from datetime import timedelta
 from django.core.exceptions import ValidationError
+from PIL import Image, ImageOps
 
 
 class Board(models.Model):
     def get_upload_path_logo(instance, filename):
         return "company/{}/logo/{}".format(
-            instance.company_user_id.pk,
+            instance.company_user.pk,
             filename,
         )
 
     def get_upload_path_banner(instance, filename):
         return "company/{}/banner/{}".format(
-            instance.company_user_id.pk,
+            instance.company_user.pk,
             filename,
         )
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+
+        # 로고 캐싱
+        if self.logo:
+            logo_img = Image.open(self.logo.path)
+            output_size = (150, 150)
+            logo_img.thumbnail(output_size)
+            logo_img.save(self.logo.path)
+
+        # 배너 캐싱
+        if self.banner:
+            banner_img = Image.open(self.banner.path)
+            output_size = (358, 176)
+            banner_img = ImageOps.fit(banner_img, output_size, Image.ANTIALIAS)
+            banner_img.save(self.banner.path)
+
     company_user = models.ForeignKey("user.CompanyUser", on_delete=models.CASCADE)
+
     logo = models.ImageField(
         upload_to=get_upload_path_logo,
         null=True,
@@ -64,7 +83,7 @@ class Activity(models.Model):
     period = models.DurationField()
     recruit = models.BooleanField(default=False)
     payment = models.CharField(
-        max_length=20,
+        max_length=50,
         null=True,
         blank=True,
     )
@@ -72,10 +91,13 @@ class Activity(models.Model):
 
 class Scrap(models.Model):
     student_user = models.ForeignKey("user.StudentUser", on_delete=models.CASCADE)
-    board_id = models.ForeignKey(Board, on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, on_delete=models.CASCADE)
 
 
 class Form(models.Model):
+    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
+    student_user = models.ForeignKey("user.StudentUser", on_delete=models.CASCADE)
+
     PENDING, WAITING, CANCELED, REJECTED, ACCEPTED = (
         "pending",
         "waiting",
@@ -92,14 +114,12 @@ class Form(models.Model):
         (ACCEPTED, "합격"),
     ]
 
-    introduce = models.TextField(default="")
-    reason = models.TextField(default="")
-    merit = models.TextField(default="")
+    introduce = models.TextField()
+    reason = models.TextField()
+    merit = models.TextField()
     is_accepted = models.CharField(
         max_length=10,
         choices=IS_ACCEPTED_CHOICES,
         default=PENDING,
     )
     submitted_at = models.DateTimeField(auto_now_add=True)
-    activity = models.ForeignKey(Activity, on_delete=models.CASCADE)
-    student_user = models.ForeignKey("user.StudentUser", on_delete=models.CASCADE)

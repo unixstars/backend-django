@@ -38,7 +38,6 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    user_id = models.AutoField(primary_key=True)
     email = models.EmailField(unique=True)
     username = models.CharField(
         max_length=15, unique=False, validators=[UnicodeUsernameValidator()]
@@ -52,7 +51,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = "email"
     EMAIL_FIELD = "email"
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["username"]
 
     objects = UserManager()
 
@@ -67,30 +66,29 @@ class User(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     class Meta:
-        verbose_name = "기본유저모델"
+        verbose_name = "BaseUserModel"
 
 
 class StudentUser(models.Model):
-    student_user_id = models.AutoField(primary_key=True)
-    user_id = models.OneToOneField(User, on_delete=models.CASCADE)
-    activity_id = models.ManyToManyField(
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    activity = models.ManyToManyField(
         "activity.Activity",
         through=Form,
     )
 
     class Meta:
-        verbose_name = "학생유저"
+        verbose_name = "StudentUser"
 
 
 class StudentUserProfile(models.Model):
     def get_upload_path(instance, filename):
         return "student/{}/profile_image/{}".format(
-            instance.student_user_id.pk,
+            instance.student_user.pk,
             filename,
         )
 
-    student_user_profile_id = models.AutoField(primary_key=True)
-    student_user_id = models.OneToOneField(StudentUser, on_delete=models.CASCADE)
+    student_user = models.OneToOneField(StudentUser, on_delete=models.CASCADE)
+
     name = models.CharField(max_length=10)
     portfolio_image = models.ImageField(upload_to=get_upload_path)
     birth = models.DateField()
@@ -103,8 +101,8 @@ class StudentUserProfile(models.Model):
 
 
 class StudentUserPortfolio(models.Model):
-    student_user_portfolio_id = models.AutoField(primary_key=True)
-    student_user_id = models.ForeignKey(StudentUser, on_delete=models.CASCADE)
+    student_user = models.ForeignKey(StudentUser, on_delete=models.CASCADE)
+
     title = models.CharField(max_length=20)
     contents = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -112,11 +110,11 @@ class StudentUserPortfolio(models.Model):
 
 
 class PortfolioFiles(models.Model):
-    portfolio_files_id = models.AutoField(primary_key=True)
-    student_user_portfolio_id = models.OneToOneField(
+    student_user_portfolio = models.OneToOneField(
         StudentUserPortfolio,
         on_delete=models.CASCADE,
     )
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -124,16 +122,16 @@ class PortfolioFiles(models.Model):
 class PortfolioOneFile(models.Model):
     def get_upload_path(instance, filename):
         return "student/{}/portfolio/{}/portfolio_files/{}".format(
-            instance.portfolio_files_id.student_user_portfolio_id.student_user_id.pk,
-            instance.portfolio_files_id.student_user_portfolio_id.pk,
+            instance.portfolio_files.student_user_portfolio.student_user.pk,
+            instance.portfolio_files.student_user_portfolio.pk,
             filename,
         )
 
-    portfolio_one_file_id = models.AutoField(primary_key=True)
-    portfolio_files_id = models.ForeignKey(
+    portfolio_files = models.ForeignKey(
         PortfolioFiles,
         on_delete=models.CASCADE,
     )
+
     file = models.FileField(
         upload_to=get_upload_path,
         null=True,
@@ -142,8 +140,7 @@ class PortfolioOneFile(models.Model):
 
 
 class CompanyUser(models.Model):
-    company_user_id = models.AutoField(primary_key=True)
-    user_id = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     business_number = models.CharField(max_length=10)
     ceo_name = models.CharField(max_length=10)
@@ -152,4 +149,4 @@ class CompanyUser(models.Model):
     manager_email = models.EmailField()
 
     class Meta:
-        verbose_name = "기업유저"
+        verbose_name = "CompanyUser"
