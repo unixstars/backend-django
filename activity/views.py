@@ -10,7 +10,11 @@ class BoardListPagination(pagination.PageNumberPagination):
 
 
 class BoardListView(generics.ListAPIView):
-    queryset = Board.objects.order_by("-views", "-created_at").all()
+    queryset = (
+        Board.objects.order_by("-views", "-created_at")
+        .prefetch_related("activities")
+        .all()
+    )
     serializer_class = BoardSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = BoardListPagination
