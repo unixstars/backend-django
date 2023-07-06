@@ -174,10 +174,8 @@ USE_TZ = True
 """
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
-# 장고 기본 static
-STATIC_URL = "static/"
-
-# 로컬환경 media
+# 로컬환경
+STATIC_URL = "/static/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 """
 
