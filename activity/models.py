@@ -5,6 +5,7 @@ from PIL import Image
 import io
 import boto3
 from django.conf import settings
+import urllib.request
 
 
 class Board(models.Model):
@@ -26,7 +27,7 @@ class Board(models.Model):
         s3 = boto3.client("s3")
 
         if self.logo:  # 로고 이미지가 있다면
-            logo_image = Image.open(self.logo.path)
+            logo_image = Image.open(urllib.request.urlopen(self.logo.url))
             logo_image.thumbnail((150, 150))  # 비율을 유지하면서 이미지 크기 조절
 
             logo_buffer = io.BytesIO()
@@ -42,7 +43,7 @@ class Board(models.Model):
             )
 
         if self.banner:  # 배너 이미지가 있다면
-            banner_image = Image.open(self.banner.path)
+            banner_image = Image.open(urllib.request.urlopen(self.banner.url))
             banner_image.thumbnail((358, 176))  # 비율을 유지하면서 이미지 크기 조절
 
             banner_buffer = io.BytesIO()
