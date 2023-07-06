@@ -2,7 +2,7 @@ from django.db import models
 from datetime import timedelta
 from django.core.exceptions import ValidationError
 from PIL import Image
-import io
+import io, os
 import sys
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
@@ -21,17 +21,18 @@ class Board(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        # Check if logo exists in the current instance in database
+        # Check if logo or banner exists in the current instance in database
         try:
             this = Board.objects.get(id=self.id)
             if this.logo != self.logo:
                 this.logo.delete(save=False)
             if this.banner != self.banner:
-                this.logo.delete(save=False)
+                this.banner.delete(save=False)
         except:
             pass
 
-        for image_field in [self.logo, self.banner]:
+        for attr in ["logo", "banner"]:
+            image_field = getattr(self, attr)
             # Check if image exists
             if image_field:
                 # Read the file
@@ -43,9 +44,12 @@ class Board(models.Model):
                     return
                 else:
                     image = Image.open(image_read)
+                    image_format = (
+                        os.path.splitext(image_field.name)[1].lstrip(".").upper()
+                    )
 
                 # Set the size. For logo, it's 150x150. For banner, it's 358x176.
-                size = (150, 150) if image_field == self.logo else (358, 176)
+                size = (150, 150) if attr == "logo" else (358, 176)
 
                 # Create a buffer to hold the bytes
                 imageBuffer = io.BytesIO()
@@ -54,17 +58,22 @@ class Board(models.Model):
                 image = image.resize(size, Image.ANTIALIAS)
 
                 # Save the image as jpeg to the buffer
-                image.save(imageBuffer, image.format)
+                image.save(imageBuffer, image_format)
                 imageBuffer.seek(0)
 
                 # Replace the ImageField file with the new resized file
-                image_field = InMemoryUploadedFile(
-                    imageBuffer,
-                    "ImageField",
-                    "%s.%s" % (image_field.name.split(".")[0], image.format.lower()),
-                    "image/%s" % image.format.lower(),
-                    sys.getsizeof(imageBuffer),
-                    None,
+                setattr(
+                    self,
+                    attr,
+                    InMemoryUploadedFile(
+                        imageBuffer,
+                        "ImageField",
+                        "%s.%s"
+                        % (image_field.name.split(".")[0], image_format.lower()),
+                        "image/%s" % image_format.lower(),
+                        sys.getsizeof(imageBuffer),
+                        None,
+                    ),
                 )
         super().save(*args, **kwargs)
 
