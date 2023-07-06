@@ -21,32 +21,40 @@ class Board(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        # Read the file
-        logo_read = self.logo.file
-        logo = Image.open(logo_read)
+        # Check if logo exists
+        if self.logo:
+            # Read the file
+            try:
+                logo_read = self.logo.file
+            except ValueError:
+                # No file, don't process image, just save
+                super().save(*args, **kwargs)
+                return
+            else:
+                logo = Image.open(logo_read)
 
-        if logo.height > 150 or logo.width > 150:
-            size = 150, 150
+            if logo.height > 150 or logo.width > 150:
+                size = 150, 150
 
-            # Create a buffer to hold the bytes
-            imageBuffer = io.BytesIO()
+                # Create a buffer to hold the bytes
+                imageBuffer = io.BytesIO()
 
-            # Resize
-            logo.thumbnail(size, Image.ANTIALIAS)
+                # Resize
+                logo.thumbnail(size, Image.ANTIALIAS)
 
-            # Save the image as jpeg to the buffer
-            logo.save(imageBuffer, logo.format)
-            imageBuffer.seek(0)
+                # Save the image as jpeg to the buffer
+                logo.save(imageBuffer, logo.format)
+                imageBuffer.seek(0)
 
-            # Replace the ImageField file with the new resized file
-            self.logo = InMemoryUploadedFile(
-                imageBuffer,
-                "ImageField",
-                "%s.%s" % (self.logo.name.split(".")[0], logo.format.lower()),
-                "image/%s" % logo.format.lower(),
-                sys.getsizeof(imageBuffer),
-                None,
-            )
+                # Replace the ImageField file with the new resized file
+                self.logo = InMemoryUploadedFile(
+                    imageBuffer,
+                    "ImageField",
+                    "%s.%s" % (self.logo.name.split(".")[0], logo.format.lower()),
+                    "image/%s" % logo.format.lower(),
+                    sys.getsizeof(imageBuffer),
+                    None,
+                )
         super().save(*args, **kwargs)
 
     company_user = models.ForeignKey("user.CompanyUser", on_delete=models.CASCADE)
