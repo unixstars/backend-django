@@ -23,7 +23,7 @@ class Board(models.Model):
     def save(self, *args, **kargs):
         super().save(*args, **kargs)
         # After save, read the file
-        logo_read = storage.open(self.logo.name, "r")
+        logo_read = storage.open(self.logo.name, "rb")
         logo = Image.open(logo_read)
         if logo.height > 150 or logo.width > 150:
             size = 150, 150
@@ -34,7 +34,6 @@ class Board(models.Model):
             # Resize
             logo.thumbnail(size, Image.ANTIALIAS)
 
-            # Save the image as jpeg to the buffer
             logo.save(imageBuffer, logo.format)
 
             # Check whether it is resized
