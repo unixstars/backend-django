@@ -21,6 +21,14 @@ class Board(models.Model):
         )
 
     def save(self, *args, **kwargs):
+        # Check if logo exists in the current instance in database
+        try:
+            this = Board.objects.get(id=self.id)
+            if this.logo != self.logo:
+                this.logo.delete(save=False)
+        except:
+            pass
+
         # Check if logo exists
         if self.logo:
             # Read the file
@@ -56,15 +64,6 @@ class Board(models.Model):
                     None,
                 )
         super().save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        # You have to prepare for the case where logo does not exist
-        if self.logo:
-            storage, name = self.logo.storage, self.logo.name
-            super().delete(*args, **kwargs)  # This will delete the model
-            storage.delete(name)  # This will delete the logo file
-        else:
-            super().delete(*args, **kwargs)  # This will delete the model
 
     company_user = models.ForeignKey("user.CompanyUser", on_delete=models.CASCADE)
 
