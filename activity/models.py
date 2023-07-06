@@ -3,8 +3,8 @@ from datetime import timedelta
 from django.core.exceptions import ValidationError
 from PIL import Image
 import io
-from django.core.files.base import ContentFile
-from django.core.files.storage import default_storage as storage
+import sys
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 
 class Board(models.Model):
@@ -20,11 +20,11 @@ class Board(models.Model):
             filename,
         )
 
-    def save(self, *args, **kargs):
-        super().save(*args, **kargs)
-        # After save, read the file
-        logo_read = storage.open(self.logo.name, "rb")
+    def save(self, *args, **kwargs):
+        # Read the file
+        logo_read = self.logo.file
         logo = Image.open(logo_read)
+
         if logo.height > 150 or logo.width > 150:
             size = 150, 150
 
@@ -34,20 +34,20 @@ class Board(models.Model):
             # Resize
             logo.thumbnail(size, Image.ANTIALIAS)
 
+            # Save the image as jpeg to the buffer
             logo.save(imageBuffer, logo.format)
+            imageBuffer.seek(0)
 
-            # Check whether it is resized
-            logo.show()
-
-            # Save the modified image
-            board = Board.objects.get(pk=self.pk)
-            board.logo.save(self.logo.name, ContentFile(imageBuffer.getvalue()))
-
-            logo_read = storage.open(board.logo.name, "rb")
-            logo = Image.open(logo_read)
-            logo.show()
-
-        logo_read.close()
+            # Replace the ImageField file with the new resized file
+            self.logo = InMemoryUploadedFile(
+                imageBuffer,
+                "ImageField",
+                "%s.%s" % (self.logo.name.split(".")[0], logo.format.lower()),
+                "image/%s" % logo.format.lower(),
+                sys.getsizeof(imageBuffer),
+                None,
+            )
+        super().save(*args, **kwargs)
 
     company_user = models.ForeignKey("user.CompanyUser", on_delete=models.CASCADE)
 
