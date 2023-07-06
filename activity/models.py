@@ -115,7 +115,9 @@ class Board(models.Model):
 
 
 class Activity(models.Model):
-    board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    board = models.ForeignKey(
+        Board, on_delete=models.CASCADE, related_name="activities"
+    )
 
     title = models.CharField(max_length=20)
     kind = models.CharField(max_length=20)
