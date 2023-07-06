@@ -131,6 +131,7 @@ class Activity(models.Model):
     recruit = models.BooleanField(default=False)
     payment = models.CharField(
         max_length=50,
+        default="없음",
     )
 
 
