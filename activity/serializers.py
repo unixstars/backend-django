@@ -2,12 +2,25 @@ from django.conf import settings
 from rest_framework import serializers
 from .models import Board, Activity, Scrap
 from api.views import generate_presigned_url
+from api.serializers import DurationFieldInISOFormat
 
 
 class ActivitySerializer(serializers.ModelSerializer):
+    period = DurationFieldInISOFormat()
+
     class Meta:
         model = Activity
-        fields = "__all__"
+        fields = [
+            "title",
+            "kind",
+            "people_number",
+            "talent",
+            "frequency",
+            "way",
+            "period",
+            "recruit",
+            "payment",
+        ]
 
 
 class BoardSerializer(serializers.ModelSerializer):
@@ -15,6 +28,7 @@ class BoardSerializer(serializers.ModelSerializer):
     scrap_count = serializers.SerializerMethodField()
     logo = serializers.SerializerMethodField()
     banner = serializers.SerializerMethodField()
+    duration = DurationFieldInISOFormat()
 
     class Meta:
         model = Board
