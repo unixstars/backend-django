@@ -26,40 +26,43 @@ class Board(models.Model):
             this = Board.objects.get(id=self.id)
             if this.logo != self.logo:
                 this.logo.delete(save=False)
+            if this.banner != self.banner:
+                this.logo.delete(save=False)
         except:
             pass
 
-        # Check if logo exists
-        if self.logo:
-            # Read the file
-            try:
-                logo_read = self.logo.file
-            except ValueError:
-                # No file, don't process image, just save
-                super().save(*args, **kwargs)
-                return
-            else:
-                logo = Image.open(logo_read)
+        for image_field in [self.logo, self.banner]:
+            # Check if image exists
+            if image_field:
+                # Read the file
+                try:
+                    image_read = image_field.file
+                except ValueError:
+                    # No file, don't process image, just save
+                    super().save(*args, **kwargs)
+                    return
+                else:
+                    image = Image.open(image_read)
 
-            if logo.height > 150 or logo.width > 150:
-                size = 150, 150
+                # Set the size. For logo, it's 150x150. For banner, it's 358x176.
+                size = (150, 150) if image_field == self.logo else (358, 176)
 
                 # Create a buffer to hold the bytes
                 imageBuffer = io.BytesIO()
 
-                # Resize
-                logo.thumbnail(size, Image.ANTIALIAS)
+                # Resize the image
+                image = image.resize(size, Image.ANTIALIAS)
 
                 # Save the image as jpeg to the buffer
-                logo.save(imageBuffer, logo.format)
+                image.save(imageBuffer, image.format)
                 imageBuffer.seek(0)
 
                 # Replace the ImageField file with the new resized file
-                self.logo = InMemoryUploadedFile(
+                image_field = InMemoryUploadedFile(
                     imageBuffer,
                     "ImageField",
-                    "%s.%s" % (self.logo.name.split(".")[0], logo.format.lower()),
-                    "image/%s" % logo.format.lower(),
+                    "%s.%s" % (image_field.name.split(".")[0], image.format.lower()),
+                    "image/%s" % image.format.lower(),
                     sys.getsizeof(imageBuffer),
                     None,
                 )
