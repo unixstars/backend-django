@@ -29,7 +29,7 @@ AUTH_USER_MODEL = "user.User"
 SECRET_KEY = os.getenv("SECRET_KEY")  # .env 파일에서 SECRET_KEY 가져오기
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = [
     ".ap-northeast-2.compute.amazonaws.com",
@@ -189,7 +189,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # AWS Access
 AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
 AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_DEFAULT_ACL = "public-read"
 AWS_REGION = os.getenv("AWS_REGION")
 AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
 AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
@@ -202,11 +201,6 @@ STATIC_DIR = os.path.join(BASE_DIR, "static")
 STATICFILES_DIRS = [
     STATIC_DIR,
 ]
-ADMIN_MEDIA_PREFIX = STATIC_URL + "admin/"
-STATICFILES_FINDERS = (
-    "django.contrib.staticfiles.finders.FileSystemFinder",
-    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
-)
 
 
 # Media Setting
