@@ -43,7 +43,7 @@ class Board(models.Model):
             board = Board.objects.get(pk=self.pk)
             board.logo.save(self.logo.name, ContentFile(imageBuffer.getvalue()))
 
-            logo_read = storage.open(board.logo.name, "r")
+            logo_read = storage.open(board.logo.name, "rb")
             logo = Image.open(logo_read)
             logo.show()
 
