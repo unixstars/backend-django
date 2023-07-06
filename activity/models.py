@@ -47,6 +47,8 @@ class Board(models.Model):
                     image_format = (
                         os.path.splitext(image_field.name)[1].lstrip(".").upper()
                     )
+                    if image_format == "JPG":
+                        image_format = "JPEG"
 
                 # Set the size. For logo, it's 150x150. For banner, it's 358x176.
                 size = (150, 150) if attr == "logo" else (358, 176)
