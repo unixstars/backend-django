@@ -57,6 +57,15 @@ class Board(models.Model):
                 )
         super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        # You have to prepare for the case where logo does not exist
+        if self.logo:
+            storage, name = self.logo.storage, self.logo.name
+            super().delete(*args, **kwargs)  # This will delete the model
+            storage.delete(name)  # This will delete the logo file
+        else:
+            super().delete(*args, **kwargs)  # This will delete the model
+
     company_user = models.ForeignKey("user.CompanyUser", on_delete=models.CASCADE)
 
     logo = models.ImageField(
