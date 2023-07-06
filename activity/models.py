@@ -1,7 +1,10 @@
 from django.db import models
 from datetime import timedelta
 from django.core.exceptions import ValidationError
-from PIL import Image, ImageOps
+from PIL import Image
+import io
+import boto3
+from django.conf import settings
 
 
 class Board(models.Model):
@@ -18,21 +21,45 @@ class Board(models.Model):
         )
 
     def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
+        super().save(*args, **kwargs)  # 기존의 save 호출
 
-        # 로고 캐싱
-        if self.logo:
-            logo_img = Image.open(self.logo.path)
-            output_size = (150, 150)
-            logo_img.thumbnail(output_size)
-            logo_img.save(self.logo.path)
+        s3 = boto3.client("s3")
 
-        # 배너 캐싱
-        if self.banner:
-            banner_img = Image.open(self.banner.path)
-            output_size = (358, 176)
-            banner_img = ImageOps.fit(banner_img, output_size, Image.ANTIALIAS)
-            banner_img.save(self.banner.path)
+        if self.logo:  # 로고 이미지가 있다면
+            logo_image = Image.open(self.logo.path)
+            logo_image.thumbnail((150, 150))  # 비율을 유지하면서 이미지 크기 조절
+
+            logo_buffer = io.BytesIO()
+            logo_image.save(logo_buffer, format=logo_image.format)  # 이미지 데이터를 메모리에 저장
+            logo_buffer.seek(0)
+
+            # S3에 이미지를 다시 업로드
+            s3.upload_fileobj(
+                logo_buffer,
+                settings.AWS_STORAGE_BUCKET_NAME,
+                self.logo.name,
+                ExtraArgs={"ContentType": "image/{}".format(logo_image.format.lower())},
+            )
+
+        if self.banner:  # 배너 이미지가 있다면
+            banner_image = Image.open(self.banner.path)
+            banner_image.thumbnail((358, 176))  # 비율을 유지하면서 이미지 크기 조절
+
+            banner_buffer = io.BytesIO()
+            banner_image.save(
+                banner_buffer, format=banner_image.format
+            )  # 이미지 데이터를 메모리에 저장
+            banner_buffer.seek(0)
+
+            # S3에 이미지를 다시 업로드
+            s3.upload_fileobj(
+                banner_buffer,
+                settings.AWS_STORAGE_BUCKET_NAME,
+                self.banner.name,
+                ExtraArgs={
+                    "ContentType": "image/{}".format(banner_image.format.lower())
+                },
+            )
 
     company_user = models.ForeignKey("user.CompanyUser", on_delete=models.CASCADE)
 
