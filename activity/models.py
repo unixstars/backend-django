@@ -3,9 +3,8 @@ from datetime import timedelta
 from django.core.exceptions import ValidationError
 from PIL import Image
 import io
-import boto3
-from django.conf import settings
-import urllib.request
+from django.core.files.base import ContentFile
+from django.core.files.storage import default_storage as storage
 
 
 class Board(models.Model):
@@ -21,46 +20,35 @@ class Board(models.Model):
             filename,
         )
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)  # 기존의 save 호출
+    def save(self, *args, **kargs):
+        super().save(*args, **kargs)
+        # After save, read the file
+        logo_read = storage.open(self.logo.name, "r")
+        logo = Image.open(logo_read)
+        if logo.height > 150 or logo.width > 150:
+            size = 150, 150
 
-        s3 = boto3.client("s3")
+            # Create a buffer to hold the bytes
+            imageBuffer = io.BytesIO()
 
-        if self.logo:  # 로고 이미지가 있다면
-            logo_image = Image.open(urllib.request.urlopen(self.logo.url))
-            logo_image.thumbnail((150, 150))  # 비율을 유지하면서 이미지 크기 조절
+            # Resize
+            logo.thumbnail(size, Image.ANTIALIAS)
 
-            logo_buffer = io.BytesIO()
-            logo_image.save(logo_buffer, format=logo_image.format)  # 이미지 데이터를 메모리에 저장
-            logo_buffer.seek(0)
+            # Save the image as jpeg to the buffer
+            logo.save(imageBuffer, logo.format)
 
-            # S3에 이미지를 다시 업로드
-            s3.upload_fileobj(
-                logo_buffer,
-                settings.AWS_STORAGE_BUCKET_NAME,
-                self.logo.name,
-                ExtraArgs={"ContentType": "image/{}".format(logo_image.format.lower())},
-            )
+            # Check whether it is resized
+            logo.show()
 
-        if self.banner:  # 배너 이미지가 있다면
-            banner_image = Image.open(urllib.request.urlopen(self.banner.url))
-            banner_image.thumbnail((358, 176))  # 비율을 유지하면서 이미지 크기 조절
+            # Save the modified image
+            board = Board.objects.get(pk=self.pk)
+            board.logo.save(self.logo.name, ContentFile(imageBuffer.getvalue()))
 
-            banner_buffer = io.BytesIO()
-            banner_image.save(
-                banner_buffer, format=banner_image.format
-            )  # 이미지 데이터를 메모리에 저장
-            banner_buffer.seek(0)
+            logo_read = storage.open(board.logo.name, "r")
+            logo = Image.open(logo_read)
+            logo.show()
 
-            # S3에 이미지를 다시 업로드
-            s3.upload_fileobj(
-                banner_buffer,
-                settings.AWS_STORAGE_BUCKET_NAME,
-                self.banner.name,
-                ExtraArgs={
-                    "ContentType": "image/{}".format(banner_image.format.lower())
-                },
-            )
+        logo_read.close()
 
     company_user = models.ForeignKey("user.CompanyUser", on_delete=models.CASCADE)
 
