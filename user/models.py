@@ -6,7 +6,6 @@ from django.contrib.auth.models import (
 )
 from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.core.mail import send_mail
-from activity.models import Form
 
 
 class UserManager(BaseUserManager):
@@ -69,54 +68,79 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = "BaseUserModel"
 
 
+class CompanyUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+
+    business_number = models.CharField(max_length=10)
+    ceo_name = models.CharField(max_length=10)
+    start_date = models.DateField()
+    corporate_number = models.CharField(max_length=13)
+    manager_phone = models.CharField(max_length=20)
+    manager_email = models.EmailField()
+
+    def __str__(self):
+        return self.business_number
+
+    class Meta:
+        verbose_name = "CompanyUser"
+
+
 class StudentUser(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    activity = models.ManyToManyField(
-        "activity.Activity",
-        through=Form,
-    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
 
     class Meta:
         verbose_name = "StudentUser"
 
 
 class StudentUserProfile(models.Model):
-    def get_upload_path(instance, filename):
+    def get_upload_path_portfolio(instance, filename):
         return "student/{}/profile_image/{}".format(
             instance.student_user.pk,
             filename,
         )
 
-    student_user = models.OneToOneField(StudentUser, on_delete=models.CASCADE)
+    def get_upload_path_certificate(instance, filename):
+        return "student/{}/univ_certificate/{}".format(
+            instance.student_user.pk,
+            filename,
+        )
+
+    student_user = models.OneToOneField(
+        StudentUser, on_delete=models.CASCADE, related_name="student_user_profile"
+    )
 
     name = models.CharField(max_length=10)
-    portfolio_image = models.ImageField(upload_to=get_upload_path)
+    portfolio_image = models.ImageField(upload_to=get_upload_path_portfolio)
     birth = models.DateField()
     phone_number = models.CharField(max_length=20)
     university = models.CharField(max_length=10)
     major = models.CharField(max_length=20)
-    univ_email = models.EmailField(max_length=254)
+    univ_certificate = models.ImageField(upload_to=get_upload_path_certificate)
+    bank = models.CharField(max_length=20)
+    account_number = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
 class StudentUserPortfolio(models.Model):
-    student_user = models.ForeignKey(StudentUser, on_delete=models.CASCADE)
+    student_user = models.ForeignKey(
+        StudentUser,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="student_user_portfolio",
+    )
 
     title = models.CharField(max_length=20)
-    contents = models.TextField(null=True, blank=True)
+    content = models.TextField(null=True, blank=True)
+    description = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
 
 class PortfolioFiles(models.Model):
     student_user_portfolio = models.OneToOneField(
-        StudentUserPortfolio,
-        on_delete=models.CASCADE,
+        StudentUserPortfolio, on_delete=models.CASCADE, related_name="portfolio_files"
     )
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
 
 class PortfolioOneFile(models.Model):
@@ -128,25 +152,7 @@ class PortfolioOneFile(models.Model):
         )
 
     portfolio_files = models.ForeignKey(
-        PortfolioFiles,
-        on_delete=models.CASCADE,
+        PortfolioFiles, on_delete=models.CASCADE, related_name="portfolio_one_file"
     )
 
-    file = models.FileField(
-        upload_to=get_upload_path,
-        null=True,
-        blank=True,
-    )
-
-
-class CompanyUser(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-
-    business_number = models.CharField(max_length=10)
-    ceo_name = models.CharField(max_length=10)
-    start_date = models.DateField()
-    manager_phone = models.CharField(max_length=20)
-    manager_email = models.EmailField()
-
-    class Meta:
-        verbose_name = "CompanyUser"
+    file = models.FileField(upload_to=get_upload_path)
