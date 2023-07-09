@@ -16,3 +16,7 @@
 ## 7.5-7.6
 
 - 테스트 데이터 삽입 관련 코드 수정(admin, model, serializer, config.settings)
+
+## 7.9
+
+- ERD DB 전체 반영 완료
