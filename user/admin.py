@@ -30,7 +30,7 @@ class StudentUserProfileAdmin(admin.ModelAdmin):
 
 @admin.register(StudentUserPortfolio)
 class StudentUserPortfolioAdmin(admin.ModelAdmin):
-    list_display = ["title", "contents"]
+    list_display = ["title", "content"]
     search_fields = ["title"]
 
 

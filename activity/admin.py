@@ -21,5 +21,5 @@ class ScrapAdmin(admin.ModelAdmin):
 
 @admin.register(Form)
 class FormAdmin(admin.ModelAdmin):
-    list_display = ["activity", "student_user", "is_accepted"]
-    search_fields = ["activity", "student_user", "is_accepted"]
+    list_display = ["activity", "student_user", "accept_status"]
+    search_fields = ["activity", "student_user", "accept_status"]

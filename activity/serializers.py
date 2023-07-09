@@ -24,11 +24,12 @@ class ActivitySerializer(serializers.ModelSerializer):
 
 
 class BoardSerializer(serializers.ModelSerializer):
-    activities = ActivitySerializer(many=True, read_only=True)
-    scrap_count = serializers.SerializerMethodField()
     logo = serializers.SerializerMethodField()
     banner = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
     duration = DurationFieldInISOFormat()
+    scrap_count = serializers.SerializerMethodField()
+    activity = ActivitySerializer(many=True, read_only=True)
 
     class Meta:
         model = Board
@@ -44,13 +45,10 @@ class BoardSerializer(serializers.ModelSerializer):
             "duration",
             "is_expired",
             "views",
-            "created_at",
             "scrap_count",
-            "activities",
+            "created_at",
+            "activity",
         ]
-
-    def get_scrap_count(self, obj):
-        return Scrap.objects.filter(board=obj).count()
 
     def get_logo(self, obj):
         if obj.logo:
@@ -63,3 +61,14 @@ class BoardSerializer(serializers.ModelSerializer):
             return generate_presigned_url(
                 settings.AWS_STORAGE_BUCKET_NAME, str(obj.banner)
             )
+
+    def get_title(self, obj):
+        # title이 None인 경우에 대한 처리
+        if obj.title is None and obj.activity:
+            # activity의 title을 최대 3개까지 가져와서 '/'로 이어줍니다.
+            activity_titles = [activity.title for activity in obj.activity.all()[:3]]
+            return "/".join(activity_titles)
+        return obj.title
+
+    def get_scrap_count(self, obj):
+        return Scrap.objects.filter(board=obj).count()

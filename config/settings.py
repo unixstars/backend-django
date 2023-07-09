@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     "activity.apps.ActivityConfig",
     "user.apps.UserConfig",
     "authentication.apps.AuthenticationConfig",
-    "assignment.apps.AssignmentConfig",
+    "program.apps.ProgramConfig",
 ]
 
 MIDDLEWARE = [
