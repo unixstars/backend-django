@@ -20,4 +20,3 @@
 ## 7.9
 
 - ERD DB 전체 반영 완료
-- develop branch 분리
