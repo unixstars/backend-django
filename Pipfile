@@ -4,20 +4,20 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "==4.2"
+django = "*"
 djangorestframework = "*"
 django-cors-headers = "*"
 pyjwt = "*"
 djangorestframework-simplejwt = "*"
 python-dotenv = "*"
 pillow = "*"
-wheel = "*"
 boto3 = "*"
+wheel = "*"
+uwsgi = "*"
 django-storages = "*"
-mysqlclient = "*"
+mysqlclient = "==2.1.0"
 dj-rest-auth = "*"
 django-allauth = "*"
-uwsgi = "*"
 
 [dev-packages]
 black = "*"
