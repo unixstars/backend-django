@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
     # CORS
     "corsheaders",
     # AWS S3
@@ -69,6 +70,7 @@ INSTALLED_APPS = [
 # Custom User Model
 AUTH_USER_MODEL = "user.User"
 
+SITE_ID = 1
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
