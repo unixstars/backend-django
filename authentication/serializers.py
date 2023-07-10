@@ -1,3 +1,4 @@
+"""
 from user.models import User
 from rest_framework import serializers
 
@@ -47,3 +48,4 @@ class CompanyUserAuthSerializer(serializers.ModelSerializer):
 
 class RefreshTokenSerializer(serializers.Serializer):
     refresh_token = serializers.CharField(required=True)
+"""

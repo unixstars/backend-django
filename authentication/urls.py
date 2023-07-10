@@ -1,3 +1,4 @@
+"""
 from django.urls import path
 from .views import GeneralRegisterView, CompanyRegisterView, LoginView, TokenRefreshView
 
@@ -7,3 +8,4 @@ urlpatterns = [
     path("login/", LoginView.as_view(), name="login"),
     path("refresh_token/", TokenRefreshView.as_view(), name="refresh_token"),
 ]
+"""
