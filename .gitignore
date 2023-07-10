@@ -7,8 +7,7 @@ __pycache__/
 settings/*.pyc
 settings/__pycache__/
 
-# pipenv 가상환경 관련 파일
-Pipfile.lock
+# 가상환경관련 파일
 /.venv
 
 # Python 바이트코드 파일
