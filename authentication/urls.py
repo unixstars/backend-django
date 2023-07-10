@@ -9,3 +9,4 @@ urlpatterns = [
     path("refresh_token/", TokenRefreshView.as_view(), name="refresh_token"),
 ]
 """
+urlpatterns = []
