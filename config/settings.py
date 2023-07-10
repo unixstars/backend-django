@@ -20,8 +20,6 @@ load_dotenv()  # .env 파일 로드
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# 유저 모델 커스텀
-AUTH_USER_MODEL = "user.User"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -47,15 +45,30 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "rest_framework",
+    # CORS
     "corsheaders",
+    # AWS S3
     "storages",
+    # django-rest-auth
+    "rest_framework",
+    "rest_framework_simplejwt.token_blacklist",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
+    # django-allauth
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    # apps
     "api.apps.ApiConfig",
     "activity.apps.ActivityConfig",
     "user.apps.UserConfig",
-    "authentication.apps.AuthenticationConfig",
     "program.apps.ProgramConfig",
+    "authentication.apps.AuthenticationConfig",
 ]
+
+# Custom User Model
+AUTH_USER_MODEL = "user.User"
+
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -65,30 +78,39 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware",  # CORS 추가
+    # CORS Middleware
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 # CORS 설정
 CORS_ORIGIN_ORIGINS = []
 
-# REST_FRAMEWORK 설정(rest_framework_simplejwt를 인증 백엔드로 추가)
+# REST_FRAMEWORK 설정
 REST_FRAMEWORK = {
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+        "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
     ),
 }
 
-# JWT 토큰의 만료기간 설정
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-}
+# 인증 시 Email만 사용
+ACCOUNT_USER_MODEL_USERNAME_FIELD = None
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_USERNAME_REQUIRED = False
+ACCOUNT_AUTHENTICATION_METHOD = "email"
+ACCOUNT_EMAIL_VERIFICATION = "none"
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+REST_USE_JWT = True
 
-# 커스텀 백엔드 서버 설정
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",  # 장고 기본 백엔드
-    "authentication.authentication.EmailBackend",
-]
+# JWT Token 설정
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=2),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ROTATE_REFRESH_TOKENS": False,
+    "BLACKLIST_AFTER_ROTATION": True,
+}
 
 
 ROOT_URLCONF = "config.urls"
