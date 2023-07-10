@@ -101,7 +101,9 @@ ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_VERIFICATION = "none"
+
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
 REST_USE_JWT = True
 
 # JWT Token 설정
