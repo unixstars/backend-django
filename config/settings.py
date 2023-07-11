@@ -154,6 +154,7 @@ DATABASES = {
 
 
 DATABASES = {
+    """
     "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": os.getenv("DB_NAME"),
@@ -165,7 +166,8 @@ DATABASES = {
             "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
         },
     },
-    "dev": {
+    """
+    "default": {
         "ENGINE": "django.db.backends.mysql",
         "NAME": os.getenv("DB_NAME_DEV"),
         "USER": os.getenv("DB_USER_DEV"),
