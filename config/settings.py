@@ -38,7 +38,6 @@ ALLOWED_HOSTS = [
 
 
 # Application 정의
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -72,6 +71,8 @@ INSTALLED_APPS = [
 # 커스텀 유저 모델
 AUTH_USER_MODEL = "user.User"
 
+# SITE_ID : auth 시 기본 id 필요
+# 여러 App/웹사이트에서 하나의 백엔드 사용 시 SITE 분리
 SITE_ID = 1
 
 MIDDLEWARE = [

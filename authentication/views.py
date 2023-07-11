@@ -80,3 +80,12 @@ class TokenRefreshView(generics.GenericAPIView):
                 {"error": "잘못된 Refresh token입니다."}, status=status.HTTP_401_UNAUTHORIZED
             )
 """
+from user.models import CompanyUser
+from .serializers import CompanyUserSerializer
+from rest_framework import generics
+
+
+# Test
+class CompanyUserView(generics.GenericAPIView):
+    queryset = CompanyUser.objects.all()
+    serializer_class = CompanyUserSerializer

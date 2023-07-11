@@ -9,4 +9,6 @@ urlpatterns = [
     path("refresh_token/", TokenRefreshView.as_view(), name="refresh_token"),
 ]
 """
-urlpatterns = []
+from django.urls import path
+
+urlpatterns = [path("register/company/")]
