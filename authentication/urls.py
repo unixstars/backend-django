@@ -10,5 +10,8 @@ urlpatterns = [
 ]
 """
 from django.urls import path
+from .views import CompanyUserView
 
-urlpatterns = [path("register/company/")]
+urlpatterns = [
+    path("register/company/", CompanyUserView.as_view(), name="register_company"),
+]
