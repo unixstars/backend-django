@@ -64,7 +64,9 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class CompanyUser(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, primary_key=True, related_name="company_user"
+    )
 
     business_number = models.CharField(max_length=10)
     ceo_name = models.CharField(max_length=10)
@@ -81,7 +83,9 @@ class CompanyUser(models.Model):
 
 
 class StudentUser(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, primary_key=True, related_name="student_user"
+    )
 
     class Meta:
         verbose_name = "StudentUser"
