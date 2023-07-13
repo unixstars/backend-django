@@ -103,6 +103,12 @@ REST_FRAMEWORK = {
         "rest_framework.authentication.SessionAuthentication",
         "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
     ),
+    # "DEFAULT_THROTTLE_CLASSES": [
+    #    "api.views.BurstRateThrottle",
+    # ],
+    # "DEFAULT_THROTTLE_RATES": {
+    #    "burst": "1000/sec",
+    # },
 }
 
 # Email 로그인 관련(dj-rest-auth 설정)
