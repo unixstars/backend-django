@@ -65,7 +65,8 @@ class CompanyVerificationView(views.APIView):
                 return Response({"detail": "알 수 없는 오류가 발생했습니다."}, status=500)
 
         data = response.json()
-        if not data.get("status_code") == "OK":
+        item = data["data"][0]
+        if not item["valid"] == "01":
             return Response({"detail": "기업 정보가 유효하지 않습니다."}, status=400)
 
         business_number = serializer.validated_data.get("business_number")
