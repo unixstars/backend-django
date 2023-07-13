@@ -23,7 +23,7 @@ class CompanyVerificationView(views.APIView):
         try:
             service_key = os.getenv("BUSINESS_SERVICE_KEY")
             response = requests.post(
-                f"https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey={service_key}",
+                f"https://api.odcloud.kr/api/nts-businessman/v1/validate?serviceKey={service_key}",
                 json={
                     "businesses": [
                         {
