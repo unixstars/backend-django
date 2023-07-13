@@ -2,7 +2,6 @@ from rest_framework import views
 from rest_framework.response import Response
 from django.core.cache import cache
 import requests, os, random
-from datetime import datetime
 from .serializers import (
     CompanyVerificationSerializer,
     CompanyManagerEmailVerificationSerializer,
@@ -23,22 +22,24 @@ class CompanyVerificationView(views.APIView):
         # 국세청 사업자등록 진위여부 API 호출
         try:
             service_key = os.getenv("BUSINESS_SERVICE_KEY")
-            start_date_raw = serializer.validated_data.get("start_date")
-            # Date를 YYYYMMDD 형태로 변경
-            start_date = datetime.strptime(start_date_raw, "%Y-%m-%d").strftime(
-                "%Y%m%d"
-            )
             response = requests.post(
                 f"https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey={service_key}",
                 json={
                     "businesses": [
                         {
                             "b_no": serializer.validated_data.get("business_number"),
-                            "start_dt": start_date,
+                            "start_dt": serializer.validated_data.get(
+                                "start_date"
+                            ).strftime("%Y%m%d"),
                             "p_nm": serializer.validated_data.get("ceo_name"),
+                            "p_nm_2": "",
+                            "b_nm": "",
                             "corp_no": serializer.validated_data.get(
                                 "corporate_number"
                             ),
+                            "b_sector": "",
+                            "b_type": "",
+                            "b_adr": "",
                         }
                     ]
                 },
@@ -65,6 +66,8 @@ class CompanyVerificationView(views.APIView):
         data = response.json()
         if not data.get("status_code") == "OK":
             return Response({"detail": "기업 정보가 유효하지 않습니다."}, status=400)
+        # 인증여부 캐시에 추가(최종 회원가입에 활용)
+        cache.set(data.get("b_no") + "_authenticated", True, 60 * 60)
         return Response(data)
 
 
