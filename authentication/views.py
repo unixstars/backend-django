@@ -22,27 +22,27 @@ class CompanyVerificationView(views.APIView):
         # 국세청 사업자등록 진위여부 API 호출
         try:
             service_key = os.getenv("BUSINESS_SERVICE_KEY")
+            data = {
+                "businesses": [
+                    {
+                        "b_no": serializer.validated_data.get("business_number"),
+                        "start_dt": serializer.validated_data.get(
+                            "start_date"
+                        ).strftime("%Y%m%d"),
+                        "p_nm": serializer.validated_data.get("ceo_name"),
+                        "p_nm_2": "",
+                        "b_nm": "",
+                        "corp_no": serializer.validated_data.get("corporate_number"),
+                        "b_sector": "",
+                        "b_type": "",
+                        "b_adr": "",
+                    }
+                ]
+            }
+
             response = requests.post(
                 f"https://api.odcloud.kr/api/nts-businessman/v1/validate?serviceKey={service_key}",
-                json={
-                    "businesses": [
-                        {
-                            "b_no": serializer.validated_data.get("business_number"),
-                            "start_dt": serializer.validated_data.get(
-                                "start_date"
-                            ).strftime("%Y%m%d"),
-                            "p_nm": serializer.validated_data.get("ceo_name"),
-                            "p_nm_2": "",
-                            "b_nm": "",
-                            "corp_no": serializer.validated_data.get(
-                                "corporate_number"
-                            ),
-                            "b_sector": "",
-                            "b_type": "",
-                            "b_adr": "",
-                        }
-                    ]
-                },
+                json=data,
             )
             response.raise_for_status()
             # 응답코드가 4xx,5xx 인 경우 HTTPError 발생시키기
