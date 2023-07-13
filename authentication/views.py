@@ -20,13 +20,28 @@ class CompanyVerificationView(views.APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        # 국세청 사업자등록 진위여부 API 호출
         try:
+            url = "https://api.odcloud.kr/api/nts-businessman/v1"
             service_key = os.getenv("BUSINESS_SERVICE_KEY")
+            business_number = serializer.validated_data.get("business_number")
+
+            # 사업자등록 상태조회 API
+            response_b_status = requests.post(
+                f"{url}/status?serviceKey={service_key}",
+                json={"b_no": [business_number]},
+            )
+            response_b_status.raise_for_status()
+
+            data_b_status = response_b_status.json()
+            item_b_status = data_b_status["data"][0]
+            if not item_b_status["b_stt"] == "계속사업자":
+                return Response({"detail": "기업 정보가 유효하지 않습니다. 계속사업자가 아님."}, status=400)
+
+            # 사업자등록 진위여부 API
             data = {
                 "businesses": [
                     {
-                        "b_no": serializer.validated_data.get("business_number"),
+                        "b_no": business_number,
                         "start_dt": serializer.validated_data.get(
                             "start_date"
                         ).strftime("%Y%m%d"),
@@ -42,34 +57,19 @@ class CompanyVerificationView(views.APIView):
             }
 
             response = requests.post(
-                f"https://api.odcloud.kr/api/nts-businessman/v1/validate?serviceKey={service_key}",
+                f"{url}/validate?serviceKey={service_key}",
                 json=data,
             )
             response.raise_for_status()
-            # 응답코드가 4xx,5xx 인 경우 HTTPError 발생시키기
-        except requests.exceptions.HTTPError:
-            if response.status_code == 400:
-                return Response({"detail": "JSON 포맷에 맞지 않는 데이터입니다."}, status=400)
-            elif response.status_code == 404:
-                return Response({"detail": "서비스를 찾을 수 없습니다."}, status=404)
-            elif response.status_code == 411:
-                return Response({"detail": "필수 요청 파라미터를 누락하였습니다."}, status=400)
-            elif response.status_code == 413:
-                return Response(
-                    {"detail": "요청 기업의 수가 100개 이상입니다."},
-                    status=400,
-                )
-            elif response.status_code == 500:
-                return Response({"detail": "내부 서버 오류입니다."}, status=500)
-            else:
-                return Response({"detail": "알 수 없는 오류가 발생했습니다."}, status=500)
+
+        except requests.exceptions.HTTPError as err:
+            return Response({"detail": str(err)}, status=400)
 
         data = response.json()
         item = data["data"][0]
         if not item["valid"] == "01":
             return Response({"detail": "기업 정보가 유효하지 않습니다."}, status=400)
 
-        business_number = serializer.validated_data.get("business_number")
         cache.set(hash_function(business_number) + "_authenticated", True, 60 * 60)
         return Response(data)
 
