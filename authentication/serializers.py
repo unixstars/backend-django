@@ -1,87 +1,59 @@
-"""
-from user.models import User
 from rest_framework import serializers
+from dj_rest_auth.registration.serializers import RegisterSerializer
+from user.models import CompanyUser
+from django.core.cache import cache
 
 
-class UserAuthSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("email", "password")
-        extra_kwargs = {"password": {"write_only": True}}
-
-    def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
-        return user
+class CompanyVerificationSerializer(serializers.Serializer):
+    business_number = serializers.CharField(max_length=10)
+    ceo_name = serializers.CharField(max_length=10)
+    start_date = serializers.DateField()
+    corporate_number = serializers.CharField(max_length=13)
 
 
-class GeneralUserAuthSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ("email", "password", "username")
-        extra_kwargs = {"password": {"write_only": True}}
-
-    def create(self, validated_data):
-        validated_data["user_type"] = "general"
-        user = User.objects.create_user(**validated_data)
-        return user
+class CompanyManagerEmailVerificationSerializer(serializers.Serializer):
+    manager_email = serializers.EmailField()
+    auth_code = serializers.IntegerField()
 
 
-class CompanyUserAuthSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = (
-            "email",
-            "password",
-            "username",
-            "company_name",
-            "business_number",
-            "manager_email",
-            "manager_phone",
+class CompanyManagerPhoneVerificationSerializer(serializers.Serializer):
+    manager_phone = serializers.CharField(max_length=20)
+    auth_number = serializers.IntegerField()
+
+
+class CompanyUserRegistrationSerializer(RegisterSerializer):
+    manager_phone = serializers.CharField(max_length=20)
+    manager_email = serializers.EmailField()
+    business_number = serializers.CharField(max_length=10)
+    ceo_name = serializers.CharField(max_length=10)
+    start_date = serializers.DateField()
+    corporate_number = serializers.CharField(max_length=13)
+
+    def validate(self, attrs):
+        super().validate(attrs)
+
+        manager_phone = attrs.get("manager_phone", "")
+        manager_email = attrs.get("manager_email", "")
+
+        if not cache.get(manager_phone + "_authenticated") or not cache.get(
+            manager_email + "_authenticated"
+        ):
+            raise serializers.ValidationError("회원가입 전 이메일과 휴대폰 인증이 되어 있어야 합니다.")
+
+        return attrs
+
+    def custom_signup(self, request, user):
+        manager_email = self.validated_data.get("manager_email", "")
+        manager_phone = self.validated_data.get("manager_phone", "")
+
+        user.email = manager_email
+        user.save()
+
+        CompanyUser.objects.create(
+            user=user,
+            business_number=self.validated_data.get("business_number", ""),
+            ceo_name=self.validated_data.get("ceo_name", ""),
+            start_date=self.validated_data.get("start_date", ""),
+            corporate_number=self.validated_data.get("corporate_number", ""),
+            manager_phone=manager_phone,
         )
-        extra_kwargs = {"password": {"write_only": True}}
-
-    def create(self, validated_data):
-        validated_data["user_type"] = "company"
-        user = User.objects.create_user(**validated_data)
-        return user
-
-
-class RefreshTokenSerializer(serializers.Serializer):
-    refresh_token = serializers.CharField(required=True)
-"""
-from user.models import User, StudentUser
-from rest_framework import serializers
-
-
-# Test
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["email", "password"]
-
-
-# Test
-class CompanyUserSerializer(serializers.ModelSerializer):
-    email = serializers.SerializerMethodField()
-    password = serializers.SerializerMethodField()
-
-    class Meta:
-        model = StudentUser
-        fields = [
-            "email",
-            "password",
-            "business_number",
-            "ceo_name",
-            "start_date",
-            "corporate_number",
-            "manager_phone",
-            "manager_email",
-        ]
-
-    def get_email(self, obj):
-        email = obj.user.email
-        return email
-
-    def get_password(self, obj):
-        password = obj.user.password
-        return password

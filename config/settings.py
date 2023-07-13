@@ -71,6 +71,12 @@ INSTALLED_APPS = [
 # 커스텀 유저 모델
 AUTH_USER_MODEL = "user.User"
 
+# 로그인 시 인증 방법(장고는 리스트의 모든 인증을 시도)
+AUTHENTICATION_BACKENDS = {
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+}
+
 # SITE_ID : auth 시 기본 id 필요
 # 여러 App/웹사이트에서 하나의 백엔드 사용 시 SITE 분리
 SITE_ID = 1
@@ -99,7 +105,7 @@ REST_FRAMEWORK = {
     ),
 }
 
-# 인증 시 Email만 사용
+# Email 로그인 관련(dj-rest-auth 설정)
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
@@ -107,11 +113,11 @@ ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
-# 백엔드 설정
+# 콘솔 출력(전송)용 이메일 백엔드(개발 및 테스트용)
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-# 토큰 사용
-REST_USE_JWT = True
+# JWT 토큰 사용
+USE_JWT = True
 
 # JWT Token 설정
 SIMPLE_JWT = {

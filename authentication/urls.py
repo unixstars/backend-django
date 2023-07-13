@@ -1,17 +1,42 @@
-"""
 from django.urls import path
-from .views import GeneralRegisterView, CompanyRegisterView, LoginView, TokenRefreshView
+from .views import (
+    CompanyVerificationView,
+    CompanyManagerEmailSendView,
+    CompanyManagerEmailVerificationView,
+    CompanyManagerPhoneSendView,
+    CompanyManagerPhoneVerificationView,
+    CompanyUserRegisterView,
+)
 
 urlpatterns = [
-    path("register/general/", GeneralRegisterView.as_view(), name="general_register"),
-    path("register/company/", CompanyRegisterView.as_view(), name="company_register"),
-    path("login/", LoginView.as_view(), name="login"),
-    path("refresh_token/", TokenRefreshView.as_view(), name="refresh_token"),
-]
-"""
-from django.urls import path
-from .views import CompanyUserView
-
-urlpatterns = [
-    path("register/company/", CompanyUserView.as_view(), name="register_company"),
+    path(
+        "company/info/verify/",
+        CompanyVerificationView.as_view(),
+        name="company-info-verify",
+    ),
+    path(
+        "company/manager_email/send/",
+        CompanyManagerEmailSendView.as_view(),
+        name="company-manager_email-send",
+    ),
+    path(
+        "company/manager_email/verify/",
+        CompanyManagerEmailVerificationView.as_view(),
+        name="company-manager_email-verify",
+    ),
+    path(
+        "company/manager_phone/send/",
+        CompanyManagerPhoneSendView.as_view(),
+        name="company-manager_phone-send",
+    ),
+    path(
+        "company/manager_phone/verify/",
+        CompanyManagerPhoneVerificationView.as_view(),
+        name="company-manager_phone-verify",
+    ),
+    path(
+        "company/register/",
+        CompanyUserRegisterView.as_view(),
+        name="company-register",
+    ),
 ]
