@@ -67,7 +67,8 @@ class CompanyVerificationView(views.APIView):
         if not data.get("status_code") == "OK":
             return Response({"detail": "기업 정보가 유효하지 않습니다."}, status=400)
         # 인증여부 캐시에 추가(최종 회원가입에 활용)
-        cache.set(data["b_no"] + "_authenticated", True, 60 * 60)
+        b_no = data["businesses"][0]["b_no"]
+        cache.set(b_no + "_authenticated", True, 60 * 60)
         return Response(data)
 
 
