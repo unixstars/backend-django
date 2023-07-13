@@ -32,19 +32,23 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
     def validate(self, attrs):
         super().validate(attrs)
 
-        manager_phone = attrs.get("manager_phone", "")
+        business_number = attrs.get("business_number", "")
         manager_email = attrs.get("manager_email", "")
+        manager_phone = attrs.get("manager_phone", "")
 
-        if not cache.get(manager_phone + "_authenticated") or not cache.get(
-            manager_email + "_authenticated"
+        if (
+            not cache.get(business_number + "_authenticated")
+            or not cache.get(manager_email + "_authenticated")
+            or not cache.get(manager_phone + "_authenticated")
         ):
-            raise serializers.ValidationError("회원가입 전 이메일과 휴대폰 인증이 되어 있어야 합니다.")
+            raise serializers.ValidationError(
+                "회원가입 전 회사정보, 이메일, 휴대폰 인증이 모두 되어 있어야 합니다."
+            )
 
         return attrs
 
     def custom_signup(self, request, user):
         manager_email = self.validated_data.get("manager_email", "")
-        manager_phone = self.validated_data.get("manager_phone", "")
 
         user.email = manager_email
         user.save()
@@ -55,5 +59,6 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
             ceo_name=self.validated_data.get("ceo_name", ""),
             start_date=self.validated_data.get("start_date", ""),
             corporate_number=self.validated_data.get("corporate_number", ""),
-            manager_phone=manager_phone,
+            manager_email=manager_email,
+            manager_phone=self.validated_data.get("manager_phone", ""),
         )
