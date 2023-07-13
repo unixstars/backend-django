@@ -1,7 +1,7 @@
 from django.conf import settings
 from rest_framework import serializers
 from .models import Board, Activity, Scrap
-from api.views import generate_presigned_url
+from api.common import generate_presigned_url
 from api.serializers import DurationFieldInISOFormat
 
 
