@@ -2,6 +2,7 @@ from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from user.models import CompanyUser
 from django.core.cache import cache
+from api.common import hash_function
 
 
 class CompanyVerificationSerializer(serializers.Serializer):
@@ -37,9 +38,9 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
         manager_phone = attrs.get("manager_phone", "")
 
         if (
-            not cache.get(business_number + "_authenticated")
-            or not cache.get(manager_email + "_authenticated")
-            or not cache.get(manager_phone + "_authenticated")
+            not cache.get(hash_function(business_number) + "_authenticated")
+            or not cache.get(hash_function(manager_email) + "_authenticated")
+            or not cache.get(hash_function(manager_phone) + "_authenticated")
         ):
             raise serializers.ValidationError(
                 "회원가입 전 회사정보, 이메일, 휴대폰 인증이 모두 되어 있어야 합니다."

@@ -2,6 +2,7 @@ from rest_framework import views
 from rest_framework.response import Response
 from django.core.cache import cache
 import requests, os, random
+from api.common import hash_function
 from .serializers import (
     CompanyVerificationSerializer,
     CompanyManagerEmailVerificationSerializer,
@@ -66,11 +67,10 @@ class CompanyVerificationView(views.APIView):
         data = response.json()
         if not data.get("status_code") == "OK":
             return Response({"detail": "기업 정보가 유효하지 않습니다."}, status=400)
-        else:
-            # 인증여부 캐시에 추가(최종 회원가입에 활용)
-            b_no = data["businesses"][0]["b_no"]
-            cache.set(b_no + "_authenticated", True, 60 * 60)
-            return Response(data)
+
+        business_number = serializer.validated_data.get("business_number")
+        cache.set(hash_function(business_number) + "_authenticated", True, 60 * 60)
+        return Response(data)
 
 
 class CompanyManagerPhoneSendView(views.APIView):
@@ -79,7 +79,7 @@ class CompanyManagerPhoneSendView(views.APIView):
         # 랜덤난수 생성
         manager_phone_auth_number = random.randint(100000, 999999)
         # 캐시 5분 저장
-        cache.set(manager_phone, manager_phone_auth_number, 60 * 5)
+        cache.set(hash_function(manager_phone), manager_phone_auth_number, 60 * 5)
 
         # 네이버 클라우드 SMS API
         try:
@@ -129,7 +129,7 @@ class CompanyManagerPhoneVerificationView(views.APIView):
         manager_phone = serializer.validated_data.get("manager_phone")
         auth_number = serializer.validated_data.get("auth_number")
 
-        correct_auth_number = cache.get(manager_phone)
+        correct_auth_number = cache.get(hash_function(manager_phone))
 
         if correct_auth_number is None:
             return Response({"detail": "인증번호가 만료되었습니다."}, status=400)
@@ -137,7 +137,7 @@ class CompanyManagerPhoneVerificationView(views.APIView):
             return Response({"detail": "잘못된 인증번호 입니다."}, status=400)
         else:
             # 인증여부 캐시에 추가(최종 회원가입에 활용)
-            cache.set(manager_phone + "_authenticated", True, 60 * 60)
+            cache.set(hash_function(manager_phone) + "_authenticated", True, 60 * 60)
             return Response({"detail": "인증에 성공하였습니다."})
 
 
@@ -145,7 +145,7 @@ class CompanyManagerEmailSendView(views.APIView):
     def post(self, request):
         manager_email = request.data.get("manager_email")
         manager_email_auth_code = random.randint(100000, 999999)
-        cache.set(manager_email, manager_email_auth_code, 60 * 5)
+        cache.set(hash_function(manager_email), manager_email_auth_code, 60 * 5)
 
         try:
             uri = "/api/v1/mails"
@@ -197,7 +197,7 @@ class CompanyManagerEmailVerificationView(views.APIView):
         manager_email = serializer.validated_data.get("manager_email")
         auth_code = serializer.validated_data.get("auth_code")
 
-        correct_auth_code = cache.get(manager_email)
+        correct_auth_code = cache.get(hash_function(manager_email))
 
         if correct_auth_code is None:
             return Response({"detail": "인증코드가 만료되었습니다."}, status=400)
@@ -205,7 +205,7 @@ class CompanyManagerEmailVerificationView(views.APIView):
             return Response({"detail": "잘못된 인증코드 입니다."}, status=400)
         else:
             # 인증여부 캐시에 추가(최종 회원가입에 활용)
-            cache.set(manager_email + "_authenticated", True, 60 * 60)
+            cache.set(hash_function(manager_email) + "_authenticated", True, 60 * 60)
             return Response({"detail": "인증에 성공하였습니다."})
 
 

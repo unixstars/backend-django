@@ -57,3 +57,11 @@ def generate_presigned_url(bucket_name, object_name, expiration=300):
         return None
 
     return response
+
+
+# hash 함수, one way
+import hashlib
+
+
+def hash_function(data):
+    return hashlib.sha256(data.encode()).hexdigest()
