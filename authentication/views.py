@@ -2,6 +2,7 @@ from rest_framework import views
 from rest_framework.response import Response
 from django.core.cache import cache
 import requests, os, random
+from datetime import datetime
 from .serializers import (
     CompanyVerificationSerializer,
     CompanyManagerEmailVerificationSerializer,
@@ -22,17 +23,18 @@ class CompanyVerificationView(views.APIView):
         # 국세청 사업자등록 진위여부 API 호출
         try:
             service_key = os.getenv("BUSINESS_SERVICE_KEY")
+            start_date_raw = serializer.validated_data.get("start_date")
+            # Date를 YYYYMMDD 형태로 변경
+            start_date = datetime.strptime(start_date_raw, "%Y-%m-%d").strftime(
+                "%Y%m%d"
+            )
             response = requests.post(
                 f"https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey={service_key}",
                 json={
                     "businesses": [
                         {
                             "b_no": serializer.validated_data.get("business_number"),
-                            "start_dt": serializer.validated_data.get(
-                                "start_date"
-                            ).strftime(
-                                "%Y%m%d"
-                            ),  # Date를 string으로 변환
+                            "start_dt": start_date,
                             "p_nm": serializer.validated_data.get("ceo_name"),
                             "corp_no": serializer.validated_data.get(
                                 "corporate_number"
