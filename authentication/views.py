@@ -12,6 +12,7 @@ from .serializers import (
 from .ncloud import get_api_keys
 from dj_rest_auth.registration.views import RegisterView
 from rest_framework.permissions import AllowAny
+from django_ratelimit.decorators import ratelimit
 
 
 class CompanyVerificationView(views.APIView):
@@ -76,9 +77,9 @@ class CompanyVerificationView(views.APIView):
         return Response(data)
 
 
+@ratelimit(key="post:manager_email", rate="10/h")
 class CompanyManagerEmailSendView(views.APIView):
     permission_classes = [AllowAny]
-    throttle_scope = "send"
 
     def post(self, request):
         manager_email = request.data.get("manager_email")
@@ -146,9 +147,9 @@ class CompanyManagerEmailVerificationView(views.APIView):
             return Response({"detail": "인증에 성공하였습니다."})
 
 
+@ratelimit(key="post:manager_phone", rate="10/h")
 class CompanyManagerPhoneSendView(views.APIView):
     permission_classes = [AllowAny]
-    throttle_scope = "send"
 
     def post(self, request):
         manager_phone = request.data.get("manager_phone")
