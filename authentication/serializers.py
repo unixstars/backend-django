@@ -4,7 +4,6 @@ from user.models import CompanyUser
 from django.core.cache import cache
 from api.common import hash_function
 from allauth.utils import email_address_exists
-from dj_rest_auth.utils import jwt_encode
 
 
 class CompanyVerificationSerializer(serializers.Serializer):
@@ -69,8 +68,3 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
             manager_phone=self.validated_data.get("manager_phone", ""),
         )
         return user
-
-    def get_response_data(self, user):
-        data = super().get_response_data(user)
-        data["access_token"], data["refresh_token"] = jwt_encode(user)
-        return data
