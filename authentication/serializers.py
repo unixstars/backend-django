@@ -72,5 +72,5 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
 
     def get_response_data(self, user):
         data = super().get_response_data(user)
-        data["token"] = jwt_encode(user)
+        data["access_token"], data["refresh_token"] = jwt_encode(user)
         return data
