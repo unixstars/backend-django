@@ -12,6 +12,7 @@ from .serializers import (
 from .ncloud import get_api_keys
 from dj_rest_auth.registration.views import RegisterView
 from rest_framework.permissions import AllowAny
+from django_ratelimit.decorators import ratelimit
 
 
 class CompanyVerificationView(views.APIView):
@@ -79,7 +80,12 @@ class CompanyVerificationView(views.APIView):
 class CompanyManagerEmailSendView(views.APIView):
     permission_classes = [AllowAny]
 
+    @ratelimit(key="ip", rate="5/m")
     def post(self, request):
+        was_limited = getattr(request, "limited", False)
+        if was_limited:
+            return Response({"detail": "너무 많은 요청입니다. 요청은 분당 5회로 제한됩니다."}, status=429)
+
         manager_email = request.data.get("manager_email")
         manager_email_auth_code = random.randint(100000, 999999)
         cache.set(hash_function(manager_email), manager_email_auth_code, 60 * 5)
@@ -148,11 +154,14 @@ class CompanyManagerEmailVerificationView(views.APIView):
 class CompanyManagerPhoneSendView(views.APIView):
     permission_classes = [AllowAny]
 
+    @ratelimit(key="ip", rate="5/m")
     def post(self, request):
+        was_limited = getattr(request, "limited", False)
+        if was_limited:
+            return Response({"detail": "너무 많은 요청입니다. 요청은 분당 5회로 제한됩니다."}, status=429)
+
         manager_phone = request.data.get("manager_phone")
-        # 랜덤난수 생성
         manager_phone_auth_number = random.randint(100000, 999999)
-        # 캐시 5분 저장
         cache.set(hash_function(manager_phone), manager_phone_auth_number, 60 * 5)
 
         # 네이버 클라우드 SMS API
