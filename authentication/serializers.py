@@ -24,6 +24,7 @@ class CompanyManagerPhoneVerificationSerializer(serializers.Serializer):
 
 
 class CompanyUserRegistrationSerializer(RegisterSerializer):
+    email = serializers.EmailField(required=False)
     manager_phone = serializers.CharField(max_length=20)
     manager_email = serializers.EmailField()
     business_number = serializers.CharField(max_length=10)
