@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     "storages",
     # django-rest-auth
     "rest_framework",
-    "rest_framework.authtoken",
     "rest_framework_simplejwt.token_blacklist",
     "dj_rest_auth",
     "dj_rest_auth.registration",
@@ -98,7 +97,7 @@ CORS_ORIGIN_ORIGINS = []
 
 # REST_FRAMEWORK 설정
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.AllowAny",),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
     ),
@@ -123,7 +122,7 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # JWT 토큰 사용
-USE_JWT = True
+REST_USE_JWT = True
 
 # JWT Token 설정
 SIMPLE_JWT = {
