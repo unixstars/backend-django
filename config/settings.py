@@ -123,7 +123,7 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # JWT 토큰 사용
-REST_USE_JWT = True
+USE_JWT = True
 
 # JWT Token 설정
 SIMPLE_JWT = {
