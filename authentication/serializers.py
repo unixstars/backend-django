@@ -3,6 +3,7 @@ from dj_rest_auth.registration.serializers import RegisterSerializer
 from user.models import CompanyUser
 from django.core.cache import cache
 from api.common import hash_function
+from allauth.utils import email_address_exists
 
 
 class CompanyVerificationSerializer(serializers.Serializer):
@@ -35,6 +36,10 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
 
         business_number = attrs.get("business_number", "")
         manager_email = attrs.get("manager_email", "")
+        if email_address_exists(manager_email):
+            raise serializers.ValidationError(
+                ("해당 이메일로 가입된 유저가 이미 존재합니다."),
+            )
         manager_phone = attrs.get("manager_phone", "")
 
         if (
@@ -48,11 +53,9 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
 
         return attrs
 
-    def custom_signup(self, request, user):
-        manager_email = self.validated_data.get("manager_email", "")
-
-        user.email = manager_email
-        user.save()
+    def save(self, request):
+        self.validated_data["email"] = self.validated_data.get("manager_email", "")
+        user = super().save(request)
 
         CompanyUser.objects.create(
             user=user,
@@ -60,6 +63,8 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
             ceo_name=self.validated_data.get("ceo_name", ""),
             start_date=self.validated_data.get("start_date", ""),
             corporate_number=self.validated_data.get("corporate_number", ""),
-            manager_email=manager_email,
+            manager_email=self.validated_data.get("manager_email", ""),
             manager_phone=self.validated_data.get("manager_phone", ""),
         )
+
+        return user
