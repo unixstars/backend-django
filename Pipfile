@@ -18,7 +18,6 @@ django-storages = "*"
 mysqlclient = "==2.1.0"
 dj-rest-auth = "*"
 django-allauth = "*"
-django-ratelimit = "*"
 
 [dev-packages]
 black = "*"
