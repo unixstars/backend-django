@@ -122,8 +122,11 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 # 콘솔 출력(전송)용 이메일 백엔드(개발 및 테스트용)
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
-# JWT 토큰 사용
-USE_JWT = True
+# JWT 토큰 사용(dj-rest-auth)
+REST_AUTH = {
+    "USE_JWT": True,
+    "JWT_AUTH_COOKIE": "jwt-auth",
+}
 
 # JWT Token 설정
 SIMPLE_JWT = {
