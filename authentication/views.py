@@ -105,7 +105,7 @@ class CompanyManagerPhoneSendView(views.APIView):
             }
 
             response = requests.post(
-                f"https://sens.apigw.ntruss.com/{uri}",
+                f"https://sens.apigw.ntruss.com{uri}",
                 headers=headers,
                 json=data,
             )
@@ -172,7 +172,7 @@ class CompanyManagerEmailSendView(views.APIView):
             }
 
             response = requests.post(
-                f"https://mail.apigw.ntruss.com/{uri}",
+                f"https://mail.apigw.ntruss.com{uri}",
                 headers=headers,
                 json=data,
             )
