@@ -110,6 +110,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "200/day",
         "user": "1000/day",
+        "dj_rest_auth": "20/day",
         "custom": "100/day",
     },
 }
