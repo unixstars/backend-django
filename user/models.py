@@ -67,12 +67,12 @@ class CompanyUser(models.Model):
         User, on_delete=models.CASCADE, primary_key=True, related_name="company_user"
     )
 
-    business_number = models.CharField(max_length=10)
+    business_number = models.CharField(max_length=10, unique=True)
     ceo_name = models.CharField(max_length=10)
     start_date = models.DateField()
-    corporate_number = models.CharField(max_length=13)
-    manager_phone = models.CharField(max_length=20)
-    manager_email = models.EmailField()
+    corporate_number = models.CharField(max_length=13, unique=True)
+    manager_phone = models.CharField(max_length=20, unique=True)
+    manager_email = models.EmailField(unique=True)
 
     def __str__(self):
         return self.business_number
