@@ -63,7 +63,7 @@ class CompanyVerificationView(views.APIView):
             response.raise_for_status()
 
         except requests.exceptions.HTTPError as err:
-            return Response({"detail": str(err)}, status=400)
+            return Response({"detail": str(err)}, status=response.status_code)
 
         data = response.json()
         item = data["data"][0]
@@ -111,11 +111,9 @@ class CompanyManagerPhoneSendView(views.APIView):
             )
             response.raise_for_status()
 
-        except requests.exceptions.HTTPError:
+        except requests.exceptions.HTTPError as err:
             if response.status_code != 202:
-                return Response(
-                    {"detail": "메시지 전송에 실패했습니다."}, status=response.status_code
-                )
+                return Response({"detail": str(err)}, status=response.status_code)
 
         return Response(response.json())
 
@@ -179,11 +177,9 @@ class CompanyManagerEmailSendView(views.APIView):
                 json=data,
             )
             response.raise_for_status()
-        except requests.exceptions.HTTPError:
+        except requests.exceptions.HTTPError as err:
             if response.status_code != 201:
-                return Response(
-                    {"detail": "이메일 전송에 실패했습니다."}, status=response.status_code
-                )
+                return Response({"detail": str(err)}, status=response.status_code)
 
         return Response(response.json())
 
