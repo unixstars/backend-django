@@ -102,13 +102,16 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
     ),
-    # 요청 횟수 제한 : 실제 프론트랑 연결했을 때 테스트 (Wifi 네트워크에서는 테스트 불가)
-    # "DEFAULT_THROTTLE_CLASSES": [
-    #    "api.views.BurstRateThrottle",
-    # ],
-    # "DEFAULT_THROTTLE_RATES": {
-    #    "burst": "1000/sec",
-    # },
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "200/day",
+        "user": "1000/day",
+        "send": "10/day",
+    },
 }
 
 # Email 로그인 관련(dj-rest-auth 설정)
