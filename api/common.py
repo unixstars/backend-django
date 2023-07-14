@@ -64,4 +64,7 @@ import hashlib
 
 
 def hash_function(data):
-    return hashlib.sha256(data.encode()).hexdigest()
+    m = hashlib.sha256()
+    m.update(data.encode("utf-8"))
+    result = m.hexdigest()
+    return result
