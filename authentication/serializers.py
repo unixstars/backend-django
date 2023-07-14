@@ -2,7 +2,7 @@ from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from user.models import CompanyUser
 from django.core.cache import cache
-from api.common import hash_function
+from api.utils import hash_function
 from allauth.utils import email_address_exists
 
 
