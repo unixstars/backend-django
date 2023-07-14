@@ -11,10 +11,12 @@ from .serializers import (
 )
 from .ncloud import get_api_keys
 from dj_rest_auth.registration.views import RegisterView
+from rest_framework.permissions import AllowAny
 
 
 class CompanyVerificationView(views.APIView):
     serializer_class = CompanyVerificationSerializer
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -74,73 +76,9 @@ class CompanyVerificationView(views.APIView):
         return Response(data)
 
 
-class CompanyManagerPhoneSendView(views.APIView):
-    def post(self, request):
-        manager_phone = request.data.get("manager_phone")
-        # 랜덤난수 생성
-        manager_phone_auth_number = random.randint(100000, 999999)
-        # 캐시 5분 저장
-        cache.set(hash_function(manager_phone), manager_phone_auth_number, 60 * 5)
-
-        # 네이버 클라우드 SMS API
-        try:
-            service_id = os.getenv("SMS_SERVICE_ID")
-            uri = f"/sms/v2/services/{service_id}/messages"
-            timestamp, access_key, signing_key = get_api_keys(uri, "POST")
-
-            headers = {
-                "Content-Type": "application/json; charset=utf-8",
-                "x-ncp-apigw-timestamp": timestamp,
-                "x-ncp-iam-access-key": access_key,
-                "x-ncp-apigw-signature-v2": signing_key,
-            }
-
-            data = {
-                "type": "SMS",
-                "contentType": "COMM",
-                "from": os.getenv("SMS_CALLING_NUM"),
-                "subject": "[유니스타 기업회원가입 담당자 인증]",
-                "content": f"유니스타 기업회원가입 인증번호는 [{manager_phone_auth_number}]입니다. 인증번호를 정확히 입력해주세요.",
-                "messages": [{"to": f"{manager_phone}"}],
-            }
-
-            response = requests.post(
-                f"https://sens.apigw.ntruss.com{uri}",
-                headers=headers,
-                json=data,
-            )
-            response.raise_for_status()
-
-        except requests.exceptions.HTTPError as err:
-            if response.status_code != 202:
-                return Response({"detail": str(err)}, status=response.status_code)
-
-        return Response(response.json())
-
-
-class CompanyManagerPhoneVerificationView(views.APIView):
-    serializer_class = CompanyManagerPhoneVerificationSerializer
-
-    def post(self, request):
-        serializer = self.serializer_class(data=request.data)
-        serializer.is_valid(raise_exception=True)
-
-        manager_phone = serializer.validated_data.get("manager_phone")
-        auth_number = serializer.validated_data.get("auth_number")
-
-        correct_auth_number = cache.get(hash_function(manager_phone))
-
-        if correct_auth_number is None:
-            return Response({"detail": "인증번호가 만료되었습니다."}, status=400)
-        elif correct_auth_number != auth_number:
-            return Response({"detail": "잘못된 인증번호 입니다."}, status=400)
-        else:
-            # 인증여부 캐시에 추가(최종 회원가입에 활용)
-            cache.set(hash_function(manager_phone) + "_authenticated", True, 60 * 60)
-            return Response({"detail": "인증에 성공하였습니다."})
-
-
 class CompanyManagerEmailSendView(views.APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         manager_email = request.data.get("manager_email")
         manager_email_auth_code = random.randint(100000, 999999)
@@ -186,6 +124,7 @@ class CompanyManagerEmailSendView(views.APIView):
 
 class CompanyManagerEmailVerificationView(views.APIView):
     serializer_class = CompanyManagerEmailVerificationSerializer
+    permission_classes = [AllowAny]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -206,5 +145,75 @@ class CompanyManagerEmailVerificationView(views.APIView):
             return Response({"detail": "인증에 성공하였습니다."})
 
 
+class CompanyManagerPhoneSendView(views.APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        manager_phone = request.data.get("manager_phone")
+        # 랜덤난수 생성
+        manager_phone_auth_number = random.randint(100000, 999999)
+        # 캐시 5분 저장
+        cache.set(hash_function(manager_phone), manager_phone_auth_number, 60 * 5)
+
+        # 네이버 클라우드 SMS API
+        try:
+            service_id = os.getenv("SMS_SERVICE_ID")
+            uri = f"/sms/v2/services/{service_id}/messages"
+            timestamp, access_key, signing_key = get_api_keys(uri, "POST")
+
+            headers = {
+                "Content-Type": "application/json; charset=utf-8",
+                "x-ncp-apigw-timestamp": timestamp,
+                "x-ncp-iam-access-key": access_key,
+                "x-ncp-apigw-signature-v2": signing_key,
+            }
+
+            data = {
+                "type": "SMS",
+                "contentType": "COMM",
+                "from": os.getenv("SMS_CALLING_NUM"),
+                "subject": "[유니스타 기업회원가입 담당자 인증]",
+                "content": f"유니스타 기업회원가입 인증번호는 [{manager_phone_auth_number}]입니다. 인증번호를 정확히 입력해주세요.",
+                "messages": [{"to": f"{manager_phone}"}],
+            }
+
+            response = requests.post(
+                f"https://sens.apigw.ntruss.com{uri}",
+                headers=headers,
+                json=data,
+            )
+            response.raise_for_status()
+
+        except requests.exceptions.HTTPError as err:
+            if response.status_code != 202:
+                return Response({"detail": str(err)}, status=response.status_code)
+
+        return Response(response.json())
+
+
+class CompanyManagerPhoneVerificationView(views.APIView):
+    serializer_class = CompanyManagerPhoneVerificationSerializer
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        manager_phone = serializer.validated_data.get("manager_phone")
+        auth_number = serializer.validated_data.get("auth_number")
+
+        correct_auth_number = cache.get(hash_function(manager_phone))
+
+        if correct_auth_number is None:
+            return Response({"detail": "인증번호가 만료되었습니다."}, status=400)
+        elif correct_auth_number != auth_number:
+            return Response({"detail": "잘못된 인증번호 입니다."}, status=400)
+        else:
+            # 인증여부 캐시에 추가(최종 회원가입에 활용)
+            cache.set(hash_function(manager_phone) + "_authenticated", True, 60 * 60)
+            return Response({"detail": "인증에 성공하였습니다."})
+
+
 class CompanyUserRegisterView(RegisterView):
     serializer_class = CompanyUserRegistrationSerializer
+    permission_classes = [AllowAny]
