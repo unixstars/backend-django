@@ -66,6 +66,8 @@ INSTALLED_APPS = [
     "user.apps.UserConfig",
     "program.apps.ProgramConfig",
     "authentication.apps.AuthenticationConfig",
+    # crontab(작업 자동화)
+    "django_crontab",
 ]
 
 # 커스텀 유저 모델
@@ -102,6 +104,7 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
     ),
+    # Throttling(API 횟수 제한)
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
         "rest_framework.throttling.UserRateThrottle",
@@ -110,10 +113,14 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "200/day",
         "user": "1000/day",
-        "dj_rest_auth": "20/day",
+        "dj_rest_auth": "34/day",
         "custom": "100/day",
     },
 }
+
+# 만료 토큰 삭제 반복작업
+CRONJOBS = [("0 0 * * *", "authentication.cron.delete_expired_tokens")]
+
 
 # Email 로그인 관련(dj-rest-auth 설정)
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
@@ -135,11 +142,11 @@ REST_AUTH = {
     "SESSION_LOGIN": False,
 }
 
-# JWT Token 설정
+# JWT Token 설정(simple JWT)
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=2),
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "ROTATE_REFRESH_TOKENS": True,
+    "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": True,
 }
 

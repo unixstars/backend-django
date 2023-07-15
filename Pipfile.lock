@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b1d8ccb9dd6ab6a879986eacccb21a4b99fdeb5c401b36fe2eb01012041c86bd"
+            "sha256": "cf32c83de481e43aacab361774dff63329e4b1fb7ad905adec03dcac94eb2ff7"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -263,6 +263,13 @@
             ],
             "index": "pypi",
             "version": "==4.2.0"
+        },
+        "django-crontab": {
+            "hashes": [
+                "sha256:1201810a212460aaaa48eb6a766738740daf42c1a4f6aafecfb1525036929236"
+            ],
+            "index": "pypi",
+            "version": "==0.7.1"
         },
         "django-storages": {
             "hashes": [
