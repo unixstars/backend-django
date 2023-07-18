@@ -6,6 +6,7 @@ from .views import (
     CompanyManagerPhoneSendView,
     CompanyManagerPhoneVerificationView,
     CompanyUserRegisterView,
+    UserLoginView,
     GoogleLoginView,
     AppleLoginView,
     KakaoLoginView,
@@ -42,6 +43,11 @@ urlpatterns = [
         "company/register/",
         CompanyUserRegisterView.as_view(),
         name="company-register",
+    ),
+    path(
+        "user/login/",
+        UserLoginView.as_view(),
+        name="user-login",
     ),
     path(
         "student/google/signin/",
