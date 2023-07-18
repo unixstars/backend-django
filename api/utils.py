@@ -34,7 +34,7 @@ def hash_function(data):
 
 # request의 특정항목에 대한 제한
 class FieldRateThrottle(SimpleRateThrottle):
-    rate = "10/hour"
+    rate = None
     field = None
 
     def get_cache_key(self, request, view):

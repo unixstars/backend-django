@@ -2,7 +2,8 @@ from rest_framework import views, status
 from rest_framework.response import Response
 from django.core.cache import cache
 import requests, os, random, jwt, json
-from api.utils import hash_function, FieldRateThrottle
+from api.utils import hash_function
+from .utils import SendRateThrottle, LoginRateThrottle
 from .serializers import (
     CompanyVerificationSerializer,
     CompanyManagerEmailVerificationSerializer,
@@ -17,6 +18,7 @@ from dj_rest_auth.app_settings import api_settings
 from allauth.account import app_settings as allauth_account_settings
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from dj_rest_auth.views import LoginView
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from user.models import User, StudentUser
@@ -87,7 +89,7 @@ class CompanyVerificationView(views.APIView):
 
 class CompanyManagerEmailSendView(views.APIView):
     permission_classes = [AllowAny]
-    throttle_classes = [FieldRateThrottle]
+    throttle_classes = [SendRateThrottle]
     throttle_field = "manager_email"
 
     def post(self, request):
@@ -158,7 +160,7 @@ class CompanyManagerEmailVerificationView(views.APIView):
 
 class CompanyManagerPhoneSendView(views.APIView):
     permission_classes = [AllowAny]
-    throttle_classes = [FieldRateThrottle]
+    throttle_classes = [SendRateThrottle]
     throttle_field = "manager_phone"
 
     def post(self, request):
@@ -283,6 +285,11 @@ class CompanyUserRegisterView(RegisterView):
             )
         else:
             return Response(status=status.HTTP_204_NO_CONTENT, headers=headers)
+
+
+class UserLoginView(LoginView):
+    throttle_classes = [LoginRateThrottle]
+    throttle_field = "email"
 
 
 class GoogleLoginView(views.APIView):
