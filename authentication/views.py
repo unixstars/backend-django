@@ -240,7 +240,7 @@ class CompanyUserRegisterView(RegisterView):
             data = {
                 "user": user,
                 "access": self.access_token,
-                # 'refresh': self.refresh_token,
+                "refresh": "",
             }
 
             # Create an instance of the response to set the cookie
