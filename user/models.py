@@ -59,7 +59,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         send_mail(subject, message, from_email, [self.email], **kwargs)
 
     class Meta:
-        verbose_name = "BaseUserModel"
+        verbose_name = "User"
 
 
 class CompanyUser(models.Model):
