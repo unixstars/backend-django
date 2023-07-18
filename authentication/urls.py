@@ -45,7 +45,7 @@ urlpatterns = [
         name="company-register",
     ),
     path(
-        "user/login/",
+        "login/",
         UserLoginView.as_view(),
         name="user-login",
     ),
