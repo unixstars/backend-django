@@ -112,7 +112,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "200/day",
         "user": "1000/day",
-        "dj_rest_auth": "34/day",
+        "dj_rest_auth": "200/day",
         "custom": "100/day",
     },
 }
@@ -149,6 +149,7 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
 }
 
+CSRF_COOKIE_SECURE = True
 
 ROOT_URLCONF = "config.urls"
 
