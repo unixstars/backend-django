@@ -6,6 +6,10 @@ from .views import (
     CompanyManagerPhoneSendView,
     CompanyManagerPhoneVerificationView,
     CompanyUserRegisterView,
+    GoogleLoginView,
+    AppleLoginView,
+    KakaoLoginView,
+    NaverLoginView,
 )
 
 urlpatterns = [
@@ -38,5 +42,25 @@ urlpatterns = [
         "company/register/",
         CompanyUserRegisterView.as_view(),
         name="company-register",
+    ),
+    path(
+        "student/google/signin/",
+        GoogleLoginView.as_view(),
+        name="google-signin",
+    ),
+    path(
+        "student/apple/signin/",
+        AppleLoginView.as_view(),
+        name="apple-signin",
+    ),
+    path(
+        "student/kakao/signin/",
+        KakaoLoginView.as_view(),
+        name="kakao-signin",
+    ),
+    path(
+        "student/naver/signin/",
+        NaverLoginView.as_view(),
+        name="naver-signin",
     ),
 ]

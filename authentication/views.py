@@ -1,7 +1,7 @@
-from rest_framework import views
+from rest_framework import views, status
 from rest_framework.response import Response
 from django.core.cache import cache
-import requests, os, random
+import requests, os, random, jwt, json
 from api.utils import hash_function, FieldRateThrottle
 from .serializers import (
     CompanyVerificationSerializer,
@@ -12,6 +12,9 @@ from .serializers import (
 from .ncloud import get_api_keys
 from dj_rest_auth.registration.views import RegisterView
 from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.tokens import RefreshToken
+from user.models import User, StudentUser
+from jwt.algorithms import RSAAlgorithm
 
 
 class CompanyVerificationView(views.APIView):
@@ -219,3 +222,198 @@ class CompanyManagerPhoneVerificationView(views.APIView):
 class CompanyUserRegisterView(RegisterView):
     serializer_class = CompanyUserRegistrationSerializer
     permission_classes = [AllowAny]
+
+
+class GoogleLoginView(views.APIView):
+    def post(self, request):
+        access_token = request.data.get("access_token", None)
+        if access_token is None:
+            return Response(
+                {"error": "Access token is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        url = f"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={access_token}"
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            return Response({"error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = response.json()
+        email = data.get("email", None)
+        client_id = data.get(
+            "user_id", None
+        )  # Note: Google uses 'user_id' instead of 'id'
+
+        if not email or not client_id:
+            return Response(
+                {"error": "Email or client_id missing from provider"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user = User.objects.get(email=email, username=client_id)
+        except User.DoesNotExist:
+            user = User.objects.create(email=email, username=client_id)
+            student_user = StudentUser.objects.create(user=user)
+            student_user.save()
+
+        refresh = RefreshToken.for_user(user)
+
+        response = Response(
+            {
+                "access": str(refresh.access_token),
+            }
+        )
+        response.set_cookie(key="refresh", value=str(refresh), httponly=True)
+        return response
+
+
+class AppleLoginView(views.APIView):
+    def post(self, request):
+        access_token = request.data.get("access_token", None)
+        if access_token is None:
+            return Response(
+                {"error": "Access token is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        url = f"https://appleid.apple.com/auth/keys"
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            return Response({"error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = response.json()
+        public_key_data = data["keys"][0]
+        public_key = RSAAlgorithm.from_jwk(json.dumps(public_key_data))
+
+        try:
+            payload = jwt.decode(
+                access_token, public_key, algorithms=["RS256"], audience="YOUR_AUDIENCE"
+            )
+        except jwt.exceptions.InvalidTokenError as err:
+            return Response({"error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
+
+        email = payload.get("email", None)
+        client_id = payload.get("sub", None)
+
+        if not email or not client_id:
+            return Response(
+                {"error": "Email or client_id missing from provider"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user = User.objects.get(email=email, username=client_id)
+        except User.DoesNotExist:
+            user = User.objects.create(email=email, username=client_id)
+            student_user = StudentUser.objects.create(user=user)
+            student_user.save()
+
+        refresh = RefreshToken.for_user(user)
+
+        response = Response(
+            {
+                "access": str(refresh.access_token),
+            }
+        )
+        response.set_cookie(key="refresh", value=str(refresh), httponly=True)
+        return response
+
+
+class KakaoLoginView(views.APIView):
+    def post(self, request):
+        access_token = request.data.get("access_token", None)
+        if access_token is None:
+            return Response(
+                {"error": "Access token is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        headers = {
+            "Authorization": f"Bearer {access_token}",
+            "Content-type": "application/x-www-form-urlencoded;charset=utf-8",
+        }
+        url = "https://kapi.kakao.com/v2/user/me"
+
+        try:
+            response = requests.post(url, headers=headers)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            return Response({"error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = response.json()
+        email = data.get("kakao_account", {}).get("email", None)
+        client_id = data.get("id", None)
+
+        if not email or not client_id:
+            return Response(
+                {"error": "Email or client_id missing from provider"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user = User.objects.get(email=email, username=str(client_id))
+        except User.DoesNotExist:
+            user = User.objects.create(email=email, username=str(client_id))
+            student_user = StudentUser.objects.create(user=user)
+            student_user.save()
+
+        refresh = RefreshToken.for_user(user)
+
+        response = Response(
+            {
+                "access": str(refresh.access_token),
+            }
+        )
+        response.set_cookie(key="refresh", value=str(refresh), httponly=True)
+        return response
+
+
+class NaverLoginView(views.APIView):
+    def post(self, request):
+        access_token = request.data.get("access_token", None)
+        if access_token is None:
+            return Response(
+                {"error": "Access token is required"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        headers = {"Authorization": f"Bearer {access_token}"}
+        url = "https://openapi.naver.com/v1/nid/me"
+
+        try:
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as err:
+            return Response({"error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
+
+        data = response.json()
+        email = data.get("response", {}).get("email", None)
+        client_id = data.get("response", {}).get("id", None)
+
+        if not email or not client_id:
+            return Response(
+                {"error": "Email or client_id missing from provider"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            user = User.objects.get(email=email, username=str(client_id))
+        except User.DoesNotExist:
+            user = User.objects.create(email=email, username=str(client_id))
+            student_user = StudentUser.objects.create(user=user)
+            student_user.save()
+
+        refresh = RefreshToken.for_user(user)
+
+        response = Response(
+            {
+                "access": str(refresh.access_token),
+            }
+        )
+        response.set_cookie(key="refresh", value=str(refresh), httponly=True)
+        return response
