@@ -45,6 +45,11 @@ urlpatterns = [
         name="company-register",
     ),
     path(
+        "login/",
+        UserLoginView.as_view(),
+        name="user-login",
+    ),
+    path(
         "student/google/signin/",
         GoogleLoginView.as_view(),
         name="google-signin",
