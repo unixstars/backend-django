@@ -230,7 +230,7 @@ class CompanyManagerPhoneVerificationView(views.APIView):
 class CompanyUserRegisterView(RegisterView):
     serializer_class = CompanyUserRegistrationSerializer
     permission_classes = [AllowAny]
-
+    """
     def get_response_data(self, user):
         if (
             allauth_account_settings.EMAIL_VERIFICATION
@@ -285,6 +285,7 @@ class CompanyUserRegisterView(RegisterView):
             )
         else:
             return Response(status=status.HTTP_204_NO_CONTENT, headers=headers)
+        """
 
 
 class UserLoginView(LoginView):

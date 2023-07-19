@@ -99,7 +99,10 @@ CORS_ORIGIN_ORIGINS = []
 
 # REST_FRAMEWORK 설정
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+        "rest_framework.authentication.SessionAuthentication",
+    ),
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "dj_rest_auth.jwt_auth.JWTCookieAuthentication",
     ),
@@ -135,8 +138,9 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # JWT 토큰 사용(dj-rest-auth)
 REST_AUTH = {
     "USE_JWT": True,
-    "JWT_AUTH_HTTPONLY": True,
     "JWT_AUTH_REFRESH_COOKIE": "refresh",
+    "JWT_AUTH_SECURE": True,
+    "JWT_AUTH_HTTPONLY": True,
     "JWT_AUTH_COOKIE_USE_CSRF": True,
     "SESSION_LOGIN": False,
 }
