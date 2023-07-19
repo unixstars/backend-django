@@ -138,10 +138,8 @@ EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 # JWT 토큰 사용(dj-rest-auth)
 REST_AUTH = {
     "USE_JWT": True,
-    "JWT_AUTH_REFRESH_COOKIE": "refresh",
     "JWT_AUTH_SECURE": True,
-    "JWT_AUTH_HTTPONLY": True,
-    "JWT_AUTH_COOKIE_USE_CSRF": True,
+    "JWT_AUTH_HTTPONLY": False,
     "SESSION_LOGIN": False,
 }
 
