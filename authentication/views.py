@@ -14,9 +14,6 @@ from .ncloud import get_api_keys
 from dj_rest_auth.registration.views import RegisterView
 from rest_framework.permissions import AllowAny
 
-from dj_rest_auth.app_settings import api_settings
-from allauth.account import app_settings as allauth_account_settings
-from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from dj_rest_auth.views import LoginView
 
@@ -230,62 +227,6 @@ class CompanyManagerPhoneVerificationView(views.APIView):
 class CompanyUserRegisterView(RegisterView):
     serializer_class = CompanyUserRegistrationSerializer
     permission_classes = [AllowAny]
-    """
-    def get_response_data(self, user):
-        if (
-            allauth_account_settings.EMAIL_VERIFICATION
-            == allauth_account_settings.EmailVerificationMethod.MANDATORY
-        ):
-            return {"detail": _("Verification e-mail sent.")}
-
-        if api_settings.USE_JWT:
-            data = {
-                "user": user,
-                "access": self.access_token,
-                "refresh": "",
-            }
-
-            # Create an instance of the response to set the cookie
-            response = Response(
-                api_settings.JWT_SERIALIZER(
-                    data, context=self.get_serializer_context()
-                ).data
-            )
-
-            # Set the refresh token in an HTTP only cookie
-            response.set_cookie(
-                key="refresh",
-                value=self.refresh_token,
-                httponly=True,
-                secure=settings.CSRF_COOKIE_SECURE,
-            )
-
-            return response
-        elif api_settings.SESSION_LOGIN:
-            return None
-        else:
-            return api_settings.TOKEN_SERIALIZER(
-                user.auth_token, context=self.get_serializer_context()
-            ).data
-
-    def create(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        response = self.get_response_data(user)
-
-        if isinstance(response, Response):
-            return response
-        elif response:
-            return Response(
-                response,
-                status=status.HTTP_201_CREATED,
-                headers=headers,
-            )
-        else:
-            return Response(status=status.HTTP_204_NO_CONTENT, headers=headers)
-        """
 
 
 class UserLoginView(LoginView):

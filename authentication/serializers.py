@@ -57,6 +57,7 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
     def save(self, request):
         self.validated_data["email"] = self.validated_data.get("manager_email", "")
         user = super().save(request)
+        user.is_company_user = True
 
         CompanyUser.objects.create(
             user=user,
