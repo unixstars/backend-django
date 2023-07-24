@@ -3,6 +3,7 @@ from django.conf import settings
 from botocore.exceptions import NoCredentialsError
 import hashlib
 from rest_framework.throttling import SimpleRateThrottle
+from mystorages import MediaStorage
 
 
 # media 파일의 주소에 대해 사인된 url을 생성하는 함수
@@ -16,7 +17,10 @@ def generate_presigned_url(bucket_name, object_name, expiration=300):
     try:
         response = s3_client.generate_presigned_url(
             "get_object",
-            Params={"Bucket": bucket_name, "Key": object_name},
+            Params={
+                "Bucket": bucket_name,
+                "Key": f"{MediaStorage.location}/{object_name}",
+            },
             ExpiresIn=expiration,
         )
     except NoCredentialsError:
