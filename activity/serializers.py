@@ -99,6 +99,7 @@ class BoardDetailSerializer(BoardListSerializer):
 
 class BoardCreateSerializer(serializers.ModelSerializer):
     activity = ActivitySerializer(many=True)
+    duration = DurationFieldInISOFormat()
 
     class Meta:
         model = Board
