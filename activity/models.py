@@ -2,10 +2,10 @@ from django.db import models
 from datetime import timedelta
 from django.core.exceptions import ValidationError
 from PIL import Image
-import io, os
-import sys
+import io, os, sys
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from user.models import CompanyUser, StudentUser
+from django.utils import timezone
 
 
 class Board(models.Model):
@@ -113,6 +113,12 @@ class Board(models.Model):
     views = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def update_expired_status(self):
+        deadline = self.created_at + self.duration
+        if timezone.now() > deadline and not self.is_expired:
+            self.is_expired = True
+            self.save()
 
     def __str__(self):
         return self.company_name
