@@ -58,7 +58,7 @@ class Board(models.Model):
                 imageBuffer = io.BytesIO()
 
                 # Resize the image
-                image = image.resize(size, Image.ANTIALIAS)
+                image = image.resize(size, Image.Resampling.LANCZOS)
 
                 # Save the image as jpeg to the buffer
                 image.save(imageBuffer, image_format)
