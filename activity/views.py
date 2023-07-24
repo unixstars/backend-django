@@ -58,12 +58,19 @@ class BoardDurationExtendView(generics.UpdateAPIView):
         board = self.get_object()
         original_deadline = board.created_at + board.duration
 
+        if board.duration_extended >= 4:
+            return Response(
+                {"detail": "기한연장은 최대 4번까지만 가능합니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         if original_deadline > timezone.now():
             board.duration += timedelta(days=7)
         else:
             board.duration = timezone.now() - board.created_at + timedelta(days=7)
 
         board.is_expired = False
+        board.duration_extended += 1
         board.save()
 
         return Response(status=status.HTTP_200_OK)
