@@ -113,6 +113,7 @@ class Board(models.Model):
     views = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    duration_extended = models.IntegerField(default=0)
 
     def update_expired_status(self):
         deadline = self.created_at + self.duration
