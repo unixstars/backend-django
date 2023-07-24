@@ -28,7 +28,6 @@ class ActivitySerializer(serializers.ModelSerializer):
 class BoardListSerializer(serializers.ModelSerializer):
     logo = serializers.SerializerMethodField()
     title = serializers.SerializerMethodField()
-    duration = DurationFieldInISOFormat()
     scrap_count = serializers.SerializerMethodField()
     d_day = serializers.SerializerMethodField()
 
@@ -84,11 +83,10 @@ class BoardDetailSerializer(BoardListSerializer):
             "vision",
             "pride",
             "address",
-            "duration",
             "is_expired",
             "views",
             "scrap_count",
-            "created_at",
+            "d_day",
             "activity",
         ]
 
