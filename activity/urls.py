@@ -47,7 +47,7 @@ urlpatterns = [
         name="scrap-create",
     ),
     path(
-        "scrap/<int:id>/",
+        "scrap/<int:board_pk>/",
         ScrapDeleteView.as_view(),
         name="scrap-delete",
     ),

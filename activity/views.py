@@ -119,12 +119,13 @@ class ScrapCreateView(generics.CreateAPIView):
 
 class ScrapDeleteView(generics.DestroyAPIView):
     queryset = Scrap.objects.all()
-    serializer_class = ScrapSerializer
-    lookup_field = "id"
     permission_classes = [IsAuthenticated, IsStudentUser]
 
     def get_object(self):
+        queryset = self.get_queryset()
+        board = get_object_or_404(Board, pk=self.kwargs["board_pk"])
         obj = get_object_or_404(
-            Scrap, id=self.kwargs["id"], student_user=self.request.user.student_user
+            queryset, board=board, student_user=self.request.user.student_user
         )
+        self.check_object_permissions(self.request, obj)
         return obj
