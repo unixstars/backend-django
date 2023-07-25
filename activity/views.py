@@ -10,6 +10,7 @@ from .serializers import (
     BoardDetailSerializer,
     ScrapSerializer,
     FormSerializer,
+    FormBoardListSerializer,
 )
 from api.permissions import (
     IsCompanyUser,
@@ -157,26 +158,19 @@ class ScrapDeleteView(generics.DestroyAPIView):
         return obj
 
 
-class FormListView(generics.ListAPIView):
-    serializer_class = FormSerializer
-    permission_classes = [IsAuthenticated, IsStudentUser]
-
-    def get_queryset(self):
-        return Form.objects.filter(student_user=self.request.user.student_user)
-
-
-class FormDetailView(generics.RetrieveAPIView):
-    serializer_class = FormSerializer
-    permission_classes = [IsAuthenticated, IsStudentUser]
-    lookup_field = "id"
-
-    def get_queryset(self):
-        return Form.objects.filter(student_user=self.request.user.student_user)
-
-
 class FormCreateView(generics.CreateAPIView):
     serializer_class = FormSerializer
     permission_classes = [IsAuthenticated, IsStudentUser]
 
     def perform_create(self, serializer):
         serializer.save(student_user=self.request.user.student_user)
+
+
+class FormBoardListView(generics.ListAPIView):
+    serializer_class = FormBoardListSerializer
+    permission_classes = [IsAuthenticated, IsStudentUser]
+
+    def get_queryset(self):
+        return Form.objects.filter(
+            student_user=self.request.user.student_user, accept_status__ne="accepted"
+        ).select_related("board")

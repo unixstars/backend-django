@@ -10,9 +10,8 @@ from .views import (
     ScrapDetailView,
     ScrapCreateView,
     ScrapDeleteView,
-    FormListView,
-    FormDetailView,
     FormCreateView,
+    FormBoardListView,
 )
 
 urlpatterns = [
@@ -70,5 +69,10 @@ urlpatterns = [
         "form/create/",
         FormCreateView.as_view(),
         name="form-create",
+    ),
+    path(
+        "form/boards/",
+        FormBoardListView.as_view(),
+        name="form-board-list",
     ),
 ]
