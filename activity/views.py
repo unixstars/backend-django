@@ -171,6 +171,8 @@ class FormBoardListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, IsStudentUser]
 
     def get_queryset(self):
-        return Form.objects.filter(
-            student_user=self.request.user.student_user, accept_status__ne="accepted"
-        ).select_related("board")
+        return (
+            Form.objects.filter(student_user=self.request.user.student_user)
+            .exclude(accept_status__ne="accepted")
+            .select_related("board")
+        )
