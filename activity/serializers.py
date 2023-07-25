@@ -136,7 +136,7 @@ class BoardCreateSerializer(serializers.ModelSerializer):
 class ScrapSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scrap
-        fields = ["id", "board", "student_user"]
+        fields = ["id", "board"]
 
         def create(self, validated_data):
             board = validated_data.get("board")
