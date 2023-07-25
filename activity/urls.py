@@ -52,7 +52,7 @@ urlpatterns = [
         name="scrap-list-board",
     ),
     path(
-        "scrap/<int:pk>",
+        "scrap/<int:pk>/",
         ScrapDetailView.as_view(),
         name="scrap-detail-board",
     ),
