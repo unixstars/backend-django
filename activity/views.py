@@ -173,6 +173,6 @@ class FormBoardListView(generics.ListAPIView):
     def get_queryset(self):
         return (
             Form.objects.filter(student_user=self.request.user.student_user)
-            .exclude(accept_status__ne="accepted")
+            .exclude(accept_status="accepted")
             .select_related("board")
         )
