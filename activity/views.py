@@ -110,12 +110,11 @@ class CompanyUserBoardDetailView(generics.RetrieveAPIView):
 
 
 class ScrapCreateView(generics.CreateAPIView):
-    queryset = Scrap.objects.all()
     serializer_class = ScrapSerializer
     permission_classes = [IsAuthenticated, IsStudentUser]
 
-    def perform_create(self, serializer):
-        serializer.save(student_user=self.request.user.student_user)
+    def get_serializer_context(self):
+        return {"request": self.request}
 
 
 class ScrapDeleteView(generics.DestroyAPIView):
