@@ -137,3 +137,8 @@ class ScrapSerializer(serializers.ModelSerializer):
     class Meta:
         model = Scrap
         fields = ["id", "board", "student_user"]
+
+        def create(self, validated_data):
+            board = validated_data.get("board")
+            student_user = self.context["request"].user.student_user
+            return Scrap.objects.create(board=board, student_user=student_user)
