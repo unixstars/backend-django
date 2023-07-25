@@ -1,6 +1,6 @@
 from django.conf import settings
 from rest_framework import serializers
-from .models import Board, Activity, Scrap
+from .models import Board, Activity, Scrap, Form
 from api.utils import generate_presigned_url
 from api.serializers import DurationFieldInISOFormat
 from django.utils import timezone
@@ -140,3 +140,16 @@ class ScrapSerializer(serializers.ModelSerializer):
 
         def create(self, validated_data):
             return super().create(validated_data)
+
+
+class FormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Form
+        fields = [
+            "id",
+            "activity",
+            "introduce",
+            "reason",
+            "merit",
+            "accept_status",
+        ]

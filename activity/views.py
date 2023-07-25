@@ -1,6 +1,7 @@
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import Board, Scrap
+from rest_framework.exceptions import PermissionDenied
+from .models import Board, Scrap, Form
 from .paginations import BoardListPagination
 from user.models import CompanyUser
 from .serializers import (
@@ -8,6 +9,7 @@ from .serializers import (
     BoardCreateSerializer,
     BoardDetailSerializer,
     ScrapSerializer,
+    FormSerializer,
 )
 from api.permissions import (
     IsCompanyUser,
@@ -109,6 +111,30 @@ class CompanyUserBoardDetailView(generics.RetrieveAPIView):
         return Board.objects.filter(company_user__user=user)
 
 
+class ScrapListView(generics.ListAPIView):
+    serializer_class = BoardListSerializer
+    permission_classes = [IsAuthenticated, IsStudentUser]
+
+    def get_queryset(self):
+        scraps = Scrap.objects.filter(student_user=self.request.user.student_user)
+        return [scrap.board for scrap in scraps]
+
+
+class ScrapDetailView(generics.RetrieveAPIView):
+    serializer_class = BoardDetailSerializer
+    permission_classes = [IsAuthenticated, IsStudentUser]
+
+    def get_queryset(self):
+        return Scrap.objects.filter(student_user=self.request.user.student_user)
+
+    def get_object(self):
+        obj = super().get_object()
+        if self.request.user.student_user != obj.student_user:
+            raise PermissionDenied("스크랩한 대상자가 아니므로 권한이 없습니다.")
+
+        return obj.board
+
+
 class ScrapCreateView(generics.CreateAPIView):
     serializer_class = ScrapSerializer
     permission_classes = [IsAuthenticated, IsStudentUser]
@@ -129,3 +155,28 @@ class ScrapDeleteView(generics.DestroyAPIView):
         )
         self.check_object_permissions(self.request, obj)
         return obj
+
+
+class FormListView(generics.ListAPIView):
+    serializer_class = FormSerializer
+    permission_classes = [IsAuthenticated, IsStudentUser]
+
+    def get_queryset(self):
+        return Form.objects.filter(student_user=self.request.user.student_user)
+
+
+class FormDetailView(generics.RetrieveAPIView):
+    serializer_class = FormSerializer
+    permission_classes = [IsAuthenticated, IsStudentUser]
+    lookup_field = "id"
+
+    def get_queryset(self):
+        return Form.objects.filter(student_user=self.request.user.student_user)
+
+
+class FormCreateView(generics.CreateAPIView):
+    serializer_class = FormSerializer
+    permission_classes = [IsAuthenticated, IsStudentUser]
+
+    def perform_create(self, serializer):
+        serializer.save(student_user=self.request.user.student_user)
