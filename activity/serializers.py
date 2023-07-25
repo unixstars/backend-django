@@ -131,3 +131,9 @@ class BoardCreateSerializer(serializers.ModelSerializer):
         for activity_data in activities_data:
             Activity.objects.create(board=board, **activity_data)
         return board
+
+
+class ScrapSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Scrap
+        fields = ["id", "board", "student_user"]

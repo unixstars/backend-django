@@ -6,12 +6,26 @@ from .views import (
     BoardDurationExtendView,
     CompanyUserBoardListView,
     CompanyUserBoardDetailView,
+    ScrapCreateView,
+    ScrapDeleteView,
 )
 
 urlpatterns = [
-    path("board/", BoardListView.as_view(), name="board-list"),
-    path("board/<int:pk>/", BoardDetailView.as_view(), name="board-detail"),
-    path("board/create/", BoardCreateView.as_view(), name="board-create"),
+    path(
+        "board/",
+        BoardListView.as_view(),
+        name="board-list",
+    ),
+    path(
+        "board/<int:pk>/",
+        BoardDetailView.as_view(),
+        name="board-detail",
+    ),
+    path(
+        "board/create/",
+        BoardCreateView.as_view(),
+        name="board-create",
+    ),
     path(
         "board/<int:pk>/extend/",
         BoardDurationExtendView.as_view(),
@@ -26,5 +40,15 @@ urlpatterns = [
         "board/company/<int:pk>/",
         CompanyUserBoardDetailView.as_view(),
         name="board-detail-company",
+    ),
+    path(
+        "scrap/",
+        ScrapCreateView.as_view(),
+        name="scrap-create",
+    ),
+    path(
+        "scrap/<int:id>/",
+        ScrapDeleteView.as_view(),
+        name="scrap-delete",
     ),
 ]

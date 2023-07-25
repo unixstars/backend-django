@@ -1,18 +1,24 @@
 from rest_framework import generics, status
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from .models import Board
+from .models import Board, Scrap
 from .paginations import BoardListPagination
 from user.models import CompanyUser
 from .serializers import (
     BoardListSerializer,
     BoardCreateSerializer,
     BoardDetailSerializer,
+    ScrapSerializer,
 )
-from api.permissions import IsCompanyUser, IsBoardOwner
+from api.permissions import (
+    IsCompanyUser,
+    IsStudentUser,
+    IsBoardOwner,
+)
 from django.db.models import F
 from rest_framework.response import Response
 from django.utils import timezone
 from datetime import timedelta
+from django.shortcuts import get_object_or_404
 
 
 class BoardListView(generics.ListAPIView):
@@ -101,3 +107,25 @@ class CompanyUserBoardDetailView(generics.RetrieveAPIView):
     def get_queryset(self):
         user = self.request.user
         return Board.objects.filter(company_user__user=user)
+
+
+class ScrapCreateView(generics.CreateAPIView):
+    queryset = Scrap.objects.all()
+    serializer_class = ScrapSerializer
+    permission_classes = [IsAuthenticated, IsStudentUser]
+
+    def perform_create(self, serializer):
+        serializer.save(student_user=self.request.user.student_user)
+
+
+class ScrapDeleteView(generics.DestroyAPIView):
+    queryset = Scrap.objects.all()
+    serializer_class = ScrapSerializer
+    lookup_field = "id"
+    permission_classes = [IsAuthenticated, IsStudentUser]
+
+    def get_object(self):
+        obj = get_object_or_404(
+            Scrap, id=self.kwargs["id"], student_user=self.request.user.student_user
+        )
+        return obj
