@@ -67,16 +67,6 @@ urlpatterns = [
         name="scrap-delete",
     ),
     path(
-        "forms/",
-        FormListView.as_view(),
-        name="form-list",
-    ),
-    path(
-        "form/<int:id>/",
-        FormDetailView.as_view(),
-        name="form-detail",
-    ),
-    path(
         "form/create/",
         FormCreateView.as_view(),
         name="form-create",

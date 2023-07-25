@@ -155,10 +155,10 @@ class Scrap(models.Model):
 
 class Form(models.Model):
     student_user = models.ForeignKey(
-        StudentUser, on_delete=models.SET_NULL, null=True, related_name="form"
+        StudentUser, on_delete=models.CASCADE, related_name="form"
     )
     activity = models.ForeignKey(
-        Activity, on_delete=models.SET_NULL, null=True, related_name="form"
+        Activity, on_delete=models.CASCADE, related_name="form"
     )
 
     PENDING, WAITING, CANCELED, REJECTED, ACCEPTED = (
