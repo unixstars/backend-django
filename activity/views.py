@@ -113,8 +113,8 @@ class ScrapCreateView(generics.CreateAPIView):
     serializer_class = ScrapSerializer
     permission_classes = [IsAuthenticated, IsStudentUser]
 
-    def get_serializer_context(self):
-        return {"request": self.request}
+    def perform_create(self, serializer):
+        serializer.save(student_user=self.request.user.student_user)
 
 
 class ScrapDeleteView(generics.DestroyAPIView):
