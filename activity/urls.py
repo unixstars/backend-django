@@ -4,6 +4,8 @@ from .views import (
     BoardDetailView,
     BoardCreateView,
     BoardDurationExtendView,
+    CompanyUserBoardListView,
+    CompanyUserBoardDetailView,
 )
 
 urlpatterns = [
@@ -14,5 +16,15 @@ urlpatterns = [
         "board/<int:pk>/extend/",
         BoardDurationExtendView.as_view(),
         name="board_duration-extend",
+    ),
+    path(
+        "board/company/",
+        CompanyUserBoardListView.as_view(),
+        name="board-list-company",
+    ),
+    path(
+        "board/company/<int:pk>/",
+        CompanyUserBoardDetailView.as_view(),
+        name="board-detail-company",
     ),
 ]

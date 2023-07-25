@@ -9,4 +9,4 @@ class IsCompanyUser(permissions.BasePermission):
 
 class IsBoardOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
-        return obj.company_user == request.user.company_user
+        return obj.company_user.user == request.user

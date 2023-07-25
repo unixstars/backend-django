@@ -74,3 +74,30 @@ class BoardDurationExtendView(generics.UpdateAPIView):
         board.save()
 
         return Response(status=status.HTTP_200_OK)
+
+
+class CompanyUserBoardListView(generics.ListAPIView):
+    serializer_class = BoardListSerializer
+    permission_classes = [
+        IsAuthenticated,
+        IsCompanyUser,
+        IsBoardOwner,
+    ]
+    pagination_class = BoardListPagination
+
+    def get_queryset(self):
+        user = self.request.user
+        return Board.objects.filter(company_user__user=user)
+
+
+class CompanyUserBoardDetailView(generics.RetrieveAPIView):
+    serializer_class = BoardDetailSerializer
+    permission_classes = [
+        IsAuthenticated,
+        IsCompanyUser,
+        IsBoardOwner,
+    ]
+
+    def get_queryset(self):
+        user = self.request.user
+        return Board.objects.filter(company_user__user=user)

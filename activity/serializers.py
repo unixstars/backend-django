@@ -13,6 +13,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Activity
         fields = [
+            "id",
             "title",
             "kind",
             "people_number",
@@ -34,6 +35,7 @@ class BoardListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Board
         fields = [
+            "id",
             "logo",
             "title",
             "company_name",
@@ -75,6 +77,7 @@ class BoardDetailSerializer(BoardListSerializer):
     class Meta:
         model = Board
         fields = [
+            "id",
             "logo",
             "banner",
             "title",
