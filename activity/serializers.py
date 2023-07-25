@@ -28,7 +28,6 @@ class ActivitySerializer(serializers.ModelSerializer):
 
 class BoardListSerializer(serializers.ModelSerializer):
     logo = serializers.SerializerMethodField()
-    title = serializers.SerializerMethodField()
     scrap_count = serializers.SerializerMethodField()
     d_day = serializers.SerializerMethodField()
 
@@ -50,14 +49,6 @@ class BoardListSerializer(serializers.ModelSerializer):
             return generate_presigned_url(
                 settings.AWS_STORAGE_BUCKET_NAME, str(obj.logo)
             )
-
-    def get_title(self, obj):
-        # title이 None인 경우에 대한 처리
-        if obj.title is None and obj.activity:
-            # activity의 title을 최대 3개까지 가져와서 '/'로 이어줍니다.
-            activity_titles = [activity.title for activity in obj.activity.all()[:3]]
-            return "/".join(activity_titles)
-        return obj.title
 
     def get_scrap_count(self, obj):
         return Scrap.objects.filter(board=obj).count()
@@ -124,6 +115,12 @@ class BoardCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("대외활동은 최대 3개만 가능합니다.")
         return activities_data
 
+    def validate(self, data):
+        if not data.get("title"):
+            titles = [activity["title"] for activity in data.get("activity", [])]
+            data["title"] = "/".join(titles[:3])
+        return data
+
     @transaction.atomic
     def create(self, validated_data):
         activities_data = validated_data.pop("activity")
@@ -153,3 +150,21 @@ class FormSerializer(serializers.ModelSerializer):
             "merit",
             "accept_status",
         ]
+
+
+class FormBoardListSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source="board.id")
+    logo = serializers.SerializerMethodField()
+    title = serializers.CharField(source="board.title")
+    company_name = serializers.CharField(source="board.company_name")
+
+    class Meta:
+        model = Form
+        fields = ["id", "logo", "title", "company_name", "accept_status"]
+
+    def get_logo(self, obj):
+        logo = obj.board.logo
+        if logo:
+            return generate_presigned_url(
+                settings.AWS_STORAGE_BUCKET_NAME, str(obj.logo)
+            )
