@@ -124,15 +124,15 @@ class ScrapDetailView(generics.RetrieveAPIView):
     serializer_class = BoardDetailSerializer
     permission_classes = [IsAuthenticated, IsStudentUser]
 
-    def get_queryset(self):
-        return Scrap.objects.filter(student_user=self.request.user.student_user)
-
     def get_object(self):
-        obj = super().get_object()
-        if self.request.user.student_user != obj.student_user:
+        board = Board.objects.get(pk=self.kwargs["pk"])
+
+        if not Scrap.objects.filter(
+            board=board, student_user=self.request.user.student_user
+        ).exists():
             raise PermissionDenied("스크랩한 대상자가 아니므로 권한이 없습니다.")
 
-        return obj.board
+        return board
 
 
 class ScrapCreateView(generics.CreateAPIView):
