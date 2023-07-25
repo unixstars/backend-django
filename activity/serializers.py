@@ -139,6 +139,4 @@ class ScrapSerializer(serializers.ModelSerializer):
         fields = ["id", "board"]
 
         def create(self, validated_data):
-            board = validated_data.get("board")
-            student_user = self.context["request"].user.student_user
-            return Scrap.objects.create(board=board, student_user=student_user)
+            return super().create(validated_data)
