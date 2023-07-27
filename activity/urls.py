@@ -6,8 +6,8 @@ from .views import (
     BoardDurationExtendView,
     CompanyUserBoardListView,
     CompanyUserBoardDetailView,
-    ScrapListView,
-    ScrapDetailView,
+    ScrapBoardListView,
+    ScrapBoardDetailView,
     ScrapCreateView,
     ScrapDeleteView,
     FormCreateView,
@@ -47,12 +47,12 @@ urlpatterns = [
     ),
     path(
         "scraps/",
-        ScrapListView.as_view(),
+        ScrapBoardListView.as_view(),
         name="scrap-list-board",
     ),
     path(
         "scrap/<int:pk>/",
-        ScrapDetailView.as_view(),
+        ScrapBoardDetailView.as_view(),
         name="scrap-detail-board",
     ),
     path(
