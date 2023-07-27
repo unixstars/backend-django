@@ -112,7 +112,7 @@ class CompanyUserBoardDetailView(generics.RetrieveAPIView):
         return Board.objects.filter(company_user__user=user)
 
 
-class ScrapListView(generics.ListAPIView):
+class ScrapBoardListView(generics.ListAPIView):
     serializer_class = BoardListSerializer
     permission_classes = [IsAuthenticated, IsStudentUser]
 
@@ -121,7 +121,7 @@ class ScrapListView(generics.ListAPIView):
         return [scrap.board for scrap in scraps]
 
 
-class ScrapDetailView(generics.RetrieveAPIView):
+class ScrapBoardDetailView(generics.RetrieveAPIView):
     serializer_class = BoardDetailSerializer
     permission_classes = [IsAuthenticated, IsStudentUser]
 
@@ -171,8 +171,7 @@ class FormBoardListView(generics.ListAPIView):
     permission_classes = [IsAuthenticated, IsStudentUser]
 
     def get_queryset(self):
-        return (
-            Form.objects.filter(student_user=self.request.user.student_user)
-            .exclude(accept_status="accepted")
-            .select_related("board")
-        )
+        forms = Form.objects.filter(
+            student_user=self.request.user.student_user
+        ).exclude(accept_status="accepted")
+        return forms

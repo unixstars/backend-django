@@ -5,6 +5,52 @@ from api.utils import generate_presigned_url
 from api.serializers import DurationFieldInISOFormat
 from django.utils import timezone
 from django.db import transaction
+from datetime import timedelta
+
+
+class BoardSerializer(serializers.ModelSerializer):
+    logo = serializers.SerializerMethodField()
+    banner = serializers.SerializerMethodField()
+    scrap_count = serializers.SerializerMethodField()
+    d_day = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Board
+        fields = [
+            "id",
+            "logo",
+            "banner",
+            "title",
+            "company_name",
+            "introduction",
+            "vision",
+            "pride",
+            "address",
+            "views",
+            "scrap_count",
+            "d_day",
+        ]
+
+    def get_logo(self, obj):
+        if obj.logo:
+            return generate_presigned_url(
+                settings.AWS_STORAGE_BUCKET_NAME, str(obj.logo)
+            )
+
+    def get_banner(self, obj):
+        if obj.banner:
+            return generate_presigned_url(
+                settings.AWS_STORAGE_BUCKET_NAME, str(obj.banner)
+            )
+
+    def get_scrap_count(self, obj):
+        return Scrap.objects.filter(board=obj).count()
+
+    def get_d_day(self, obj):
+        deadline = obj.created_at + obj.duration
+        difference = deadline - timezone.now()
+        # d-day 또는 기한이 지난 경우 0 반환
+        return max(difference.days, 0)
 
 
 class ActivitySerializer(serializers.ModelSerializer):
@@ -26,11 +72,31 @@ class ActivitySerializer(serializers.ModelSerializer):
         ]
 
 
-class BoardListSerializer(serializers.ModelSerializer):
-    logo = serializers.SerializerMethodField()
-    scrap_count = serializers.SerializerMethodField()
-    d_day = serializers.SerializerMethodField()
+class ScrapSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Scrap
+        fields = ["id", "board"]
 
+
+class FormSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Form
+        fields = [
+            "id",
+            "activity",
+            "introduce",
+            "reason",
+            "merit",
+            "accept_status",
+        ]
+
+
+"""
+View에 맞게  overriding
+"""
+
+
+class BoardListSerializer(BoardSerializer):
     class Meta:
         model = Board
         fields = [
@@ -38,32 +104,14 @@ class BoardListSerializer(serializers.ModelSerializer):
             "logo",
             "title",
             "company_name",
-            "is_expired",
             "views",
             "scrap_count",
             "d_day",
         ]
 
-    def get_logo(self, obj):
-        if obj.logo:
-            return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(obj.logo)
-            )
 
-    def get_scrap_count(self, obj):
-        return Scrap.objects.filter(board=obj).count()
-
-    def get_d_day(self, obj):
-        obj.update_expired_status()
-        deadline = obj.created_at + obj.duration
-        difference = deadline - timezone.now()
-        # d-day 또는 기한이 지난 경우 0 반환
-        return max(difference.days, 0)
-
-
-class BoardDetailSerializer(BoardListSerializer):
+class BoardDetailSerializer(BoardSerializer):
     activity = ActivitySerializer(many=True, read_only=True)
-    banner = serializers.SerializerMethodField()
 
     class Meta:
         model = Board
@@ -77,23 +125,15 @@ class BoardDetailSerializer(BoardListSerializer):
             "vision",
             "pride",
             "address",
-            "is_expired",
             "views",
             "scrap_count",
             "d_day",
             "activity",
         ]
 
-    def get_banner(self, obj):
-        if obj.banner:
-            return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(obj.banner)
-            )
 
-
-class BoardCreateSerializer(serializers.ModelSerializer):
+class BoardCreateSerializer(BoardSerializer):
     activity = ActivitySerializer(many=True)
-    duration = DurationFieldInISOFormat()
 
     class Meta:
         model = Board
@@ -109,6 +149,11 @@ class BoardCreateSerializer(serializers.ModelSerializer):
             "duration",
             "activity",
         ]
+
+    def validate_duration(self, value):
+        if value < timedelta(days=7) or value > timedelta(days=60):
+            raise serializers.ValidationError("모집기간은 7일에서 60일 사이여야 합니다.")
+        return value
 
     def validate_activity(self, activities_data):
         if len(activities_data) > 3:
@@ -130,41 +175,35 @@ class BoardCreateSerializer(serializers.ModelSerializer):
         return board
 
 
-class ScrapSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Scrap
-        fields = ["id", "board"]
-
-        def create(self, validated_data):
-            return super().create(validated_data)
-
-
-class FormSerializer(serializers.ModelSerializer):
+class FormBoardListSerializer(FormSerializer):
     class Meta:
         model = Form
         fields = [
             "id",
-            "activity",
-            "introduce",
-            "reason",
-            "merit",
             "accept_status",
+            "logo",
+            "title",
+            "company_name",
         ]
 
-
-class FormBoardListSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source="board.id")
-    logo = serializers.SerializerMethodField()
-    title = serializers.CharField(source="board.title")
-    company_name = serializers.CharField(source="board.company_name")
-
-    class Meta:
-        model = Form
-        fields = ["id", "logo", "title", "company_name", "accept_status"]
+    """
+    ListAPIView(GET)의 경우 Serializer보다 APIView가 먼저 작동하므로, 필터링 된 form이 obj로 들어옴.
+    View에서는 forms가 반환되었더라도, serialzer에서는 단일 form에 대해 작동. obj = 단일 form 객체
+    """
 
     def get_logo(self, obj):
-        logo = obj.board.logo
-        if logo:
+        board = obj.activity.board
+        if board.logo:
             return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(obj.logo)
+                settings.AWS_STORAGE_BUCKET_NAME, str(board.logo)
             )
+
+    def get_title(self, obj):
+        board = obj.activity.board
+        title = board.title
+        return title
+
+    def get_company_name(self, obj):
+        board = obj.activity.board
+        company_name = board.company_name
+        return company_name

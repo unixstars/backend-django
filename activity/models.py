@@ -1,11 +1,8 @@
 from django.db import models
-from datetime import timedelta
-from django.core.exceptions import ValidationError
 from PIL import Image
 import io, os, sys
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from user.models import CompanyUser, StudentUser
-from django.utils import timezone
 
 
 class Board(models.Model):
@@ -109,24 +106,13 @@ class Board(models.Model):
     )
     address = models.CharField(max_length=150)
     duration = models.DurationField()
-    is_expired = models.BooleanField(default=False)
     views = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     duration_extended = models.IntegerField(default=0)
 
-    def update_expired_status(self):
-        deadline = self.created_at + self.duration
-        if timezone.now() > deadline and not self.is_expired:
-            self.is_expired = True
-            self.save()
-
     def __str__(self):
         return self.company_name
-
-    def clean(self):
-        if self.duration < timedelta(days=7) or self.duration > timedelta(days=365):
-            raise ValidationError("모집기간은 7과 365사이여야 합니다.")
 
 
 class Activity(models.Model):
