@@ -176,6 +176,10 @@ class BoardCreateSerializer(BoardSerializer):
 
 
 class FormBoardListSerializer(FormSerializer):
+    logo = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+    company_name = serializers.SerializerMethodField()
+
     class Meta:
         model = Form
         fields = [
