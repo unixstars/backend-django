@@ -1,4 +1,3 @@
-from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from activity.models import Form
 
@@ -14,16 +13,20 @@ class AcceptedApplicant(models.Model):
     form = models.OneToOneField(
         Form, on_delete=models.CASCADE, related_name="accepted_applicant"
     )
-    warning = models.IntegerField(
-        default=0, validators=[MinValueValidator(0), MaxValueValidator(5)]
-    )
-    start_date = models.DateField()
-    week = models.PositiveIntegerField(default=1)
+    start_date = models.DateField(auto_now_add=True)
+    week = models.IntegerField(default=0)
     activity_status = models.CharField(
         max_length=10,
         choices=ACTIVITY_STATUS_CHOICES,
         default=ONGOING,
     )
+
+
+class ApplicantWarning(models.Model):
+    accepted_applicant = models.ForeignKey(
+        AcceptedApplicant, on_delete=models.CASCADE, related_name="applicant_warning"
+    )
+    content = models.CharField(max_length=50)
 
 
 class Notice(models.Model):
@@ -42,8 +45,16 @@ class NoticeComment(models.Model):
         Notice, on_delete=models.CASCADE, related_name="notice_comment"
     )
 
+    STUDENT, COMPANY = "student", "company"
+    USER_TYPE_CHOICES = (
+        (STUDENT, "학생유저"),
+        (COMPANY, "기업유저"),
+    )
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    user_type = models.CharField(
+        max_length=10, choices=USER_TYPE_CHOICES, default=STUDENT
+    )
 
 
 class Assignment(models.Model):
@@ -72,6 +83,8 @@ class Assignment(models.Model):
         default=IN_PROGRESS,
     )
     duration = models.DurationField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
 
 class AssignmentComment(models.Model):
@@ -79,8 +92,16 @@ class AssignmentComment(models.Model):
         Assignment, on_delete=models.CASCADE, related_name="assignment_comment"
     )
 
+    STUDENT, COMPANY = "student", "company"
+    USER_TYPE_CHOICES = (
+        (STUDENT, "학생유저"),
+        (COMPANY, "기업유저"),
+    )
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
+    user_type = models.CharField(
+        max_length=10, choices=USER_TYPE_CHOICES, default=STUDENT
+    )
 
 
 class Submit(models.Model):
@@ -93,22 +114,17 @@ class Submit(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class SubmitFiles(models.Model):
-    submit = models.OneToOneField(
-        Submit, on_delete=models.CASCADE, related_name="submit_files"
-    )
-
-
-class SubmitOneFile(models.Model):
+class SubmitFile(models.Model):
     def get_upload_path_file(instance, filename):
         return "activity/{}/student/{}/assginment/{}".format(
-            instance.submitfiles.submit.assignment.accepted_applicant.form.activity.pk,
-            instance.submitfiles.submit.assignment.accepted_applicant.form.student.pk,
+            instance.submit.assignment.accepted_applicant.form.activity.pk,
+            instance.submit.assignment.accepted_applicant.form.student.pk,
             filename,
         )
 
-    submitfiles = models.ForeignKey(
-        SubmitFiles, on_delete=models.CASCADE, related_name="submit_one_file"
+    submit = models.ForeignKey(
+        Submit, on_delete=models.CASCADE, related_name="submit_file"
     )
 
     file = models.FileField(upload_to=get_upload_path_file)
+    created_at = models.DateTimeField(auto_now_add=True)

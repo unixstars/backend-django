@@ -1,11 +1,17 @@
 from django.conf import settings
 from rest_framework import serializers
-from .models import Board, Activity, Scrap, Form
+from .models import Board, Activity, Scrap, Form, Suggestion
 from api.utils import generate_presigned_url
 from api.serializers import DurationFieldInISOFormat
 from django.utils import timezone
 from django.db import transaction
 from datetime import timedelta
+from user.serializers import (
+    StudentUserProfileSerializer,
+    StudentUserPortfolioListSerializer,
+)
+from user.models import StudentUserProfile, StudentUserPortfolio
+from user.serializers import PortfolioFileSerializer
 
 
 class BoardSerializer(serializers.ModelSerializer):
@@ -49,8 +55,8 @@ class BoardSerializer(serializers.ModelSerializer):
     def get_d_day(self, obj):
         deadline = obj.created_at + obj.duration
         difference = deadline - timezone.now()
-        # d-day 또는 기한이 지난 경우 0 반환
-        return max(difference.days, 0)
+        # 기한이 지난 경우 -1 반환
+        return max(difference.days, -1)
 
 
 class ActivitySerializer(serializers.ModelSerializer):
@@ -93,6 +99,9 @@ class FormSerializer(serializers.ModelSerializer):
 
 """
 View에 맞게  overriding
+GET APIView의 경우 Serializer보다 APIView가 먼저 작동: 필터링 된 모델이 obj로 들어옴.
+View에서는 objects(eg. forms)가 반환되었더라도, serialzer에서는 단일 object에 대해 작동.
+POST,PUT,DELETE APIView의 경우 APIView가 Serializer보다 먼저 작동.
 """
 
 
@@ -190,24 +199,260 @@ class FormBoardListSerializer(FormSerializer):
             "company_name",
         ]
 
-    """
-    ListAPIView(GET)의 경우 Serializer보다 APIView가 먼저 작동하므로, 필터링 된 form이 obj로 들어옴.
-    View에서는 forms가 반환되었더라도, serialzer에서는 단일 form에 대해 작동. obj = 단일 form 객체
-    """
-
+    # obj.board.logo 형태로 사용해야 하므로 BoardSerializer는 상속 불가
     def get_logo(self, obj):
-        board = obj.activity.board
-        if board.logo:
-            return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(board.logo)
-            )
+        logo = obj.activity.board.logo
+        if logo:
+            return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(logo))
 
     def get_title(self, obj):
-        board = obj.activity.board
-        title = board.title
-        return title
+        return obj.activity.board.title
 
     def get_company_name(self, obj):
+        return obj.activity.board.company_name
+
+
+class FormBoardDetailSerializer(FormSerializer):
+    logo = serializers.SerializerMethodField()
+    banner = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+    company_name = serializers.SerializerMethodField()
+    introduction = serializers.SerializerMethodField()
+    vision = serializers.SerializerMethodField()
+    pride = serializers.SerializerMethodField()
+    address = serializers.SerializerMethodField()
+    d_day = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Form
+        fields = [
+            "id",
+            "accept_status",
+            "logo",
+            "banner",
+            "title",
+            "company_name",
+            "introduction",
+            "vision",
+            "pride",
+            "address",
+            "d_day",
+        ]
+
+    def get_logo(self, obj):
+        logo = obj.activity.board.logo
+        if logo:
+            return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(logo))
+
+    def get_banner(self, obj):
+        banner = obj.activity.board.banner
+        if banner:
+            return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(banner))
+
+    def get_title(self, obj):
+        return obj.activity.board.title
+
+    def get_company_name(self, obj):
+        return obj.activity.board.company_name
+
+    def get_introduction(self, obj):
+        return obj.activity.board.introduction
+
+    def get_vision(self, obj):
+        return obj.activity.board.vision
+
+    def get_pride(self, obj):
+        return obj.activity.board.pride
+
+    def get_address(self, obj):
+        return obj.activity.board.address
+
+    def get_d_day(self, obj):
         board = obj.activity.board
-        company_name = board.company_name
-        return company_name
+        deadline = board.created_at + board.duration
+        difference = deadline - timezone.now()
+        return max(difference.days, -1)
+
+
+class FormFillSerializer(StudentUserProfileSerializer):
+    portfolio_list = StudentUserPortfolioListSerializer(
+        source="student_user.student_user_portfolio", many=True
+    )
+
+    class Meta:
+        model = StudentUserProfile
+        fields = [
+            "id",
+            "name",
+            "profile_image",
+            "birth",
+            "phone_number",
+            "university",
+            "major",
+            "portfolio_list",
+        ]
+
+
+class FormCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Form
+        fields = [
+            "id",
+            "activity",
+            "introduce",
+            "reason",
+            "merit",
+            "student_user_portfolio",
+        ]
+
+
+class FormDetailSerializer(FormSerializer):
+    profile = StudentUserProfileSerializer(source="student_user.student_user_profile")
+    portfolio_list = StudentUserPortfolioListSerializer(
+        source="student_user.student_user_portfolio", many=True
+    )
+
+    class Meta:
+        model = Form
+        fields = [
+            "id",
+            "activity",
+            "introduce",
+            "reason",
+            "merit",
+            "accept_status",
+            "profile",
+            "portfolio_list",
+        ]
+
+
+class CompanyActivityListSerializer(serializers.ModelSerializer):
+    deadline = serializers.SerializerMethodField()
+    form_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Activity
+        fields = [
+            "id",
+            "title",
+            "deadline",
+            "form_count",
+        ]
+
+    def get_deadline(self, obj):
+        board = obj.board
+        deadline = board.created_at + board.duration
+        if timezone.now() > deadline:
+            return "마감됨"
+        return deadline.date()
+
+    def get_form_count(self, obj):
+        return Form.objects.filter(activity=obj).count()
+
+
+class FormListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Form
+        fields = [
+            "id",
+            "accept_status",
+        ]
+
+
+class CompanyActivityFormListSerializer(serializers.ModelSerializer):
+    # related_name으로 역방향 쿼리를 추적할 수 있으므로, source를 표기하지 않음
+    form = FormListSerializer(many=True, read_only=True)
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Activity
+        fields = [
+            "id",
+            "title",
+            "name",
+            "form",
+        ]
+
+    def get_name(self, obj):
+        return obj.form.student_user.student_user_profile.name
+
+
+class CompanyStudentProfileListSerializer(serializers.ModelSerializer):
+    portfolio_list = StudentUserPortfolioListSerializer(
+        source="student_user.student_user_portfolio", many=True
+    )
+
+    class Meta:
+        model = StudentUserProfile
+        fields = [
+            "id",
+            "name",
+            "university",
+            "major",
+            "portfolio_list",
+        ]
+
+
+class CompanyStudentProfileDetailSerializer(serializers.ModelSerializer):
+    portfolio_list = StudentUserPortfolioListSerializer(
+        source="student_user.student_user_portfolio", many=True
+    )
+    profile_image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = StudentUserProfile
+        fields = [
+            "id",
+            "name",
+            "profile_image",
+            "birth",
+            "phone_number",
+            "university",
+            "major",
+            "portfolio_list",
+        ]
+
+    def get_profile_image(self, obj):
+        if obj.profile_image:
+            return generate_presigned_url(
+                settings.AWS_STORAGE_BUCKET_NAME, str(obj.profile_image)
+            )
+
+
+class CompanyStudentPortfolioDetailSerializer(serializers.ModelSerializer):
+    portfolio_file = PortfolioFileSerializer(many=True, required=False)
+
+    class Meta:
+        model = StudentUserPortfolio
+        fields = [
+            "id",
+            "title",
+            "content",
+            "description",
+            "portfolio_file",
+        ]
+
+
+class SuggestionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Suggestion
+        fields = [
+            "id",
+            "company_user",
+            "student_user",
+        ]
+
+
+class SuggestionListSerializer(serializers.ModelSerializer):
+    company_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Suggestion
+        fields = [
+            "id",
+            "company_name",
+        ]
+
+    def get_company_name(self, obj):
+        board = obj.company_user.board.first()
+        return board.company_name

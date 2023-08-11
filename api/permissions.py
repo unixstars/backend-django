@@ -23,3 +23,49 @@ class IsStudentUser(permissions.BasePermission):
 class IsBoardOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.company_user.user == request.user
+
+
+class IsFormOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.student_user.user == request.user
+
+
+class IsProfileOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.student_user.user == request.user
+
+
+class IsPortFolioOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.student_user.user == request.user
+
+
+class IsNoticeCommentStudent(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.notice.accepted_applicant.form.student_user.user == request.user
+
+
+class IsAssignmentCommentStudent(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.assignment.accepted_applicant.form.student_user.user == request.user
+
+
+class IsNoticeCommentCompany(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return (
+            obj.notice.accepted_applicant.form.activity.board.company_user.user
+            == request.user
+        )
+
+
+class IsAssignmentCommentCompany(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return (
+            obj.assignment.accepted_applicant.form.activity.board.company_user.user
+            == request.user
+        )
+
+
+class IsSubmitOwnerStudent(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return obj.assignment.accepted_applicant.form.student_user.user == request.user

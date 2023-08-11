@@ -22,6 +22,7 @@ from user.models import User, StudentUser
 from jwt.algorithms import RSAAlgorithm
 
 
+# 기업회원 회원가입/법인 기업 인증 : 법인 인증
 class CompanyVerificationView(views.APIView):
     serializer_class = CompanyVerificationSerializer
     permission_classes = [AllowAny]
@@ -84,6 +85,7 @@ class CompanyVerificationView(views.APIView):
         return Response(data)
 
 
+# 기업회원 회원가입/이메일 인증 : 담당자 이메일 전송
 class CompanyManagerEmailSendView(views.APIView):
     permission_classes = [AllowAny]
     throttle_classes = [SendRateThrottle]
@@ -132,6 +134,7 @@ class CompanyManagerEmailSendView(views.APIView):
         return Response(response.json())
 
 
+# 기업회원 회원가입/이메일 인증 : 담당자 이메일 인증
 class CompanyManagerEmailVerificationView(views.APIView):
     serializer_class = CompanyManagerEmailVerificationSerializer
     permission_classes = [AllowAny]
@@ -155,6 +158,7 @@ class CompanyManagerEmailVerificationView(views.APIView):
             return Response({"detail": "인증에 성공하였습니다."})
 
 
+# 기업회원 회원가입/연락처 인증 : 담당자 연락처 전송
 class CompanyManagerPhoneSendView(views.APIView):
     permission_classes = [AllowAny]
     throttle_classes = [SendRateThrottle]
@@ -201,6 +205,7 @@ class CompanyManagerPhoneSendView(views.APIView):
         return Response(response.json())
 
 
+# 기업회원 회원가입/연락처 인증 : 담당자 연락처 인증
 class CompanyManagerPhoneVerificationView(views.APIView):
     serializer_class = CompanyManagerPhoneVerificationSerializer
     permission_classes = [AllowAny]
@@ -224,16 +229,19 @@ class CompanyManagerPhoneVerificationView(views.APIView):
             return Response({"detail": "인증에 성공하였습니다."})
 
 
+# 기업회원 회원가입/회원가입 : 기업회원 회원가입
 class CompanyUserRegisterView(RegisterView):
     serializer_class = CompanyUserRegistrationSerializer
     permission_classes = [AllowAny]
 
 
+# 기업회원 참여하기/로그인 : 기업회원 로그인
 class UserLoginView(LoginView):
     throttle_classes = [LoginRateThrottle]
     throttle_field = "email"
 
 
+# 구글 로그인/회원가입 => 프론트 작업 후 수정 예정
 class GoogleLoginView(views.APIView):
     def post(self, request):
         access_token = request.data.get("access_token", None)
@@ -280,6 +288,7 @@ class GoogleLoginView(views.APIView):
         return response
 
 
+# 애플 로그인/회원가입 => 프론트 작업 후 수정 예정
 class AppleLoginView(views.APIView):
     def post(self, request):
         access_token = request.data.get("access_token", None)
@@ -334,6 +343,7 @@ class AppleLoginView(views.APIView):
         return response
 
 
+# 카카오 로그인/회원가입 => 프론트 작업 후 수정 예정
 class KakaoLoginView(views.APIView):
     def post(self, request):
         access_token = request.data.get("access_token", None)
@@ -383,6 +393,7 @@ class KakaoLoginView(views.APIView):
         return response
 
 
+# 네이버 로그인/회원가입 => 프론트 작업 후 수정 예정
 class NaverLoginView(views.APIView):
     def post(self, request):
         access_token = request.data.get("access_token", None)
