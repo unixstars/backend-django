@@ -2,7 +2,7 @@ from django.db import models
 from PIL import Image
 import io, os, sys
 from django.core.files.uploadedfile import InMemoryUploadedFile
-from user.models import CompanyUser, StudentUser
+from user.models import CompanyUser, StudentUser, StudentUserPortfolio
 
 
 class Board(models.Model):
@@ -146,6 +146,13 @@ class Form(models.Model):
     activity = models.ForeignKey(
         Activity, on_delete=models.CASCADE, related_name="form"
     )
+    student_user_portfolio = models.ForeignKey(
+        StudentUserPortfolio,
+        on_delete=models.SET_NULL,
+        related_name="form",
+        null=True,
+        default=None,
+    )
 
     PENDING, WAITING, CANCELED, REJECTED, ACCEPTED = (
         "pending",
@@ -172,3 +179,13 @@ class Form(models.Model):
         default=PENDING,
     )
     submitted_at = models.DateTimeField(auto_now_add=True)
+
+
+class Suggestion(models.Model):
+    company_user = models.ForeignKey(
+        CompanyUser, on_delete=models.CASCADE, related_name="suggestion"
+    )
+    student_user = models.ForeignKey(
+        StudentUser, on_delete=models.CASCADE, related_name="suggestion"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)

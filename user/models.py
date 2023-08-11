@@ -94,7 +94,7 @@ class StudentUser(models.Model):
 
 
 class StudentUserProfile(models.Model):
-    def get_upload_path_portfolio(instance, filename):
+    def get_upload_path_profile_image(instance, filename):
         return "student/{}/profile_image/{}".format(
             instance.student_user.pk,
             filename,
@@ -111,12 +111,14 @@ class StudentUserProfile(models.Model):
     )
 
     name = models.CharField(max_length=10)
-    portfolio_image = models.ImageField(upload_to=get_upload_path_portfolio)
+    profile_image = models.ImageField(
+        upload_to=get_upload_path_profile_image, null=True, default=None
+    )
     birth = models.DateField()
     phone_number = models.CharField(max_length=20)
     university = models.CharField(max_length=10)
     major = models.CharField(max_length=20)
-    univ_certificate = models.ImageField(upload_to=get_upload_path_certificate)
+    univ_certificate = models.FileField(upload_to=get_upload_path_certificate)
     bank = models.CharField(max_length=20)
     account_number = models.CharField(max_length=100)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -138,22 +140,16 @@ class StudentUserPortfolio(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
 
-class PortfolioFiles(models.Model):
-    student_user_portfolio = models.OneToOneField(
-        StudentUserPortfolio, on_delete=models.CASCADE, related_name="portfolio_files"
-    )
-
-
-class PortfolioOneFile(models.Model):
+class PortfolioFile(models.Model):
     def get_upload_path(instance, filename):
         return "student/{}/portfolio/{}/portfolio_files/{}".format(
-            instance.portfolio_files.student_user_portfolio.student_user.pk,
-            instance.portfolio_files.student_user_portfolio.pk,
+            instance.student_user_portfolio.student_user.pk,
+            instance.student_user_portfolio.pk,
             filename,
         )
 
-    portfolio_files = models.ForeignKey(
-        PortfolioFiles, on_delete=models.CASCADE, related_name="portfolio_one_file"
+    student_user_portfolio = models.ForeignKey(
+        StudentUserPortfolio, on_delete=models.CASCADE, related_name="portfolio_file"
     )
 
     file = models.FileField(upload_to=get_upload_path)
