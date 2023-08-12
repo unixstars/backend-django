@@ -11,6 +11,7 @@ from .models import (
     Submit,
     SubmitFile,
 )
+from activity.models import Activity
 
 
 class ProgramListSerializer(serializers.ModelSerializer):
@@ -125,8 +126,6 @@ class ProgramDetailSerializer(serializers.ModelSerializer):
 
     def get_warning_count(self, obj) -> int:
         warnings = ApplicantWarning.objects.filter(accepted_applicant=obj)
-        if not warnings:
-            return 0
         return warnings.count()
 
 
@@ -307,3 +306,177 @@ class SubmitUpdateSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class CompanyProgramListSerializer(serializers.ModelSerializer):
+    logo = serializers.SerializerMethodField()
+    company_name = serializers.SerializerMethodField()
+    week = serializers.SerializerMethodField()
+    total_week = serializers.SerializerMethodField()
+    activity_status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Activity
+        fields = [
+            "id",
+            "title",
+            "logo",
+            "company_name",
+            "week",
+            "total_week",
+            "activity_status",
+        ]
+
+    def get_logo(self, obj):
+        logo = obj.board.logo
+        if logo:
+            return generate_presigned_url(
+                settings.AWS_STORAGE_BUCKET_NAME,
+                str(logo),
+            )
+
+    def get_company_name(self, obj):
+        company_name = obj.board.company_name
+        return company_name
+
+    def get_week(self, obj):
+        first_form = obj.form.first()
+        return first_form.accepted_applicant.week
+
+    def get_total_week(self, obj):
+        duration = obj.board.duration
+        weeks, remaining_days = divmod(duration.days, 7)
+        if remaining_days > 0:
+            weeks += 1
+        return weeks
+
+    def get_activity_status(self, obj):
+        first_form = obj.form.first()
+        return first_form.accepted_applicant.activity_status
+
+
+class CompanyProgramApplicantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AcceptedApplicant
+        fields = [
+            "id",
+            "student_name",
+            "warning_count",
+        ]
+
+    def get_student_name(self, obj):
+        return obj.form.student_user.name
+
+    def warning_count(self, obj) -> int:
+        warnings = obj.applicant_warning.all()
+        return warnings.count()
+
+
+class CompanyProgramDetailSerializer(serializers.ModelSerializer):
+    company_name = serializers.SerializerMethodField()
+    week = serializers.SerializerMethodField()
+    total_week = serializers.SerializerMethodField()
+    activity_status = serializers.SerializerMethodField()
+    applicant = CompanyProgramApplicantSerializer(
+        many=True, source="form.accepted_applicant"
+    )
+
+    class Meta:
+        model = Activity
+        fields = [
+            "id",
+            "title",
+            "company_name",
+            "week",
+            "total_week",
+            "activity_status",
+            "applicant",
+        ]
+
+    def get_company_name(self, obj):
+        company_name = obj.board.company_name
+        return company_name
+
+    def get_week(self, obj):
+        first_form = obj.form.first()
+        return first_form.accepted_applicant.week
+
+    def get_total_week(self, obj):
+        duration = obj.board.duration
+        weeks, remaining_days = divmod(duration.days, 7)
+        if remaining_days > 0:
+            weeks += 1
+        return weeks
+
+    def get_activity_status(self, obj):
+        first_form = obj.form.first()
+        return first_form.accepted_applicant.activity_status
+
+
+class CompanyProgramApplicantDetailSerializer(serializers.ModelSerializer):
+    student_name = serializers.SerializerMethodField()
+    activity_title = serializers.SerializerMethodField()
+    company_name = serializers.SerializerMethodField()
+    total_week = serializers.SerializerMethodField()
+    warning_count = serializers.SerializerMethodField()
+    notice = NoticeListSerializer(many=True)
+    assignment = AssignmentListSerializer(many=True)
+
+    class Meta:
+        model = AcceptedApplicant
+        fields = [
+            "id",
+            "student_name",
+            "activity_title",
+            "company_name",
+            "week",
+            "total_week",
+            "activity_status",
+            "warning_count",
+            "notice",
+            "assignment",
+        ]
+
+    def get_student_name(self, obj):
+        return obj.form.student_user.student_user_profile.name
+
+    def get_activity_title(self, obj):
+        activity_title = obj.form.activity.title
+        return activity_title
+
+    def get_company_name(self, obj):
+        company_name = obj.form.activity.board.company_name
+        return company_name
+
+    def get_total_week(self, obj):
+        duration = obj.form.activity.board.duration
+        weeks, remaining_days = divmod(duration.days, 7)
+        if remaining_days > 0:
+            weeks += 1
+        return weeks
+
+    def get_warning_count(self, obj) -> int:
+        warnings = ApplicantWarning.objects.filter(accepted_applicant=obj)
+        return warnings.count()
+
+
+class CompanyProgramApplicantWarningSerializer(serializers.ModelSerializer):
+    warning = ProgramWarningSerializer(many=True, source="applicant_warning")
+    student_name = serializers.SerializerMethodField()
+    warning_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AcceptedApplicant
+        fields = [
+            "id",
+            "student_name",
+            "warning_count",
+            "warning",
+        ]
+
+    def get_student_name(self, obj):
+        return obj.form.student_user.student_user_profile.name
+
+    def warning_count(self, obj) -> int:
+        warnings = obj.applicant_warning.all()
+        return warnings.count()

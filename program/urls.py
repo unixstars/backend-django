@@ -12,6 +12,10 @@ from .views import (
     AssignmentCommentCreateView,
     SubmitCreateView,
     SubmitUpdateView,
+    CompanyProgramListView,
+    CompanyProgramDetailView,
+    CompanyProgramApplicantDetailView,
+    CompanyProgramApplicantWarningView,
 )
 
 urlpatterns = [
@@ -90,9 +94,29 @@ urlpatterns = [
     ),
     ##기업
     # 활동관리: 진행중, 완료활동 리스트
+    path(
+        "company/program/",
+        CompanyProgramListView.as_view(),
+        name="company-program-list",
+    ),
     # 활동관리/활동1: 활동1 참여자 리스트
+    path(
+        "company/program/<int:pk>/",
+        CompanyProgramDetailView.as_view(),
+        name="company-program-detail",
+    ),
     # 활동관리/활동1/학생1: 공지,과제 리스트
+    path(
+        "company/program/<int:activity_id>/applicant/<int:pk>/",
+        CompanyProgramApplicantDetailView.as_view(),
+        name="company-program-applicant-detail",
+    ),
     # 활동관리/활동1/학생1/경고: 부여한 경고 리스트
+    path(
+        "company/program/<int:activity_id>/applicant/<int:pk>/warning/",
+        CompanyProgramApplicantWarningView.as_view(),
+        name="company-program-applicant-warning",
+    ),
     # 활동관리/활동1/학생1/경고/경고하기: 경고 부여하기
     # 활동관리/활동1/학생1/공지: 공지
     # 활동관리/활동1/학생1/공지/공지 작성: 공지 작성
