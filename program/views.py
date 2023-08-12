@@ -1,6 +1,7 @@
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.db.models import Exists, OuterRef
 from api.permissions import (
     IsStudentUser,
     IsCompanyUser,
@@ -19,6 +20,7 @@ from .models import (
     AssignmentComment,
     Submit,
 )
+from activity.models import Activity
 from .serializers import (
     ProgramListSerializer,
     ProgramDetailSerializer,
@@ -31,6 +33,10 @@ from .serializers import (
     AssignmentCommentCreateSerializer,
     SubmitCreateSerializer,
     SubmitUpdateSerializer,
+    CompanyProgramListSerializer,
+    CompanyProgramDetailSerializer,
+    CompanyProgramApplicantDetailSerializer,
+    CompanyProgramApplicantWarningSerializer,
 )
 
 
@@ -216,9 +222,66 @@ class SubmitUpdateView(generics.UpdateAPIView):
 
 ##기업
 # 활동관리: 진행중, 완료활동 리스트
+class CompanyProgramListView(generics.ListAPIView):
+    serializer_class = CompanyProgramListSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def get_queryset(self):
+        user = self.request.user.company_user
+
+        # AcceptedApplicant가 존재하는 Form을 찾는 서브쿼리
+        # 서브쿼리: 한 쿼리 내에서 다른 쿼리의 결과를 사용하기 위한 쿼리
+        # OuterRef를 통해 바깥 쿼리인 Activity의 pk 참조, .values로 해당하는 pk목록 가져옴
+        # Exist()(SQL EXIST 생성)를 통해 해당 조건에 맞는 쿼리 생성
+        has_accepted_applicant = AcceptedApplicant.objects.filter(
+            form__activity=OuterRef("pk")
+        ).values("pk")
+
+        return Activity.objects.filter(
+            Exists(has_accepted_applicant), board__company_user=user
+        )
+
+
 # 활동관리/활동1: 활동1 참여자 리스트
+class CompanyProgramDetailView(generics.RetrieveAPIView):
+    serializer_class = CompanyProgramDetailSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def get_queryset(self):
+        user = self.request.user.company_user
+        has_accepted_applicant = AcceptedApplicant.objects.filter(
+            form__activity=OuterRef("pk")
+        ).values("pk")
+
+        return Activity.objects.filter(
+            Exists(has_accepted_applicant), board__company_user=user
+        )
+
+
 # 활동관리/활동1/학생1: 공지,과제 리스트
+class CompanyProgramApplicantDetailView(generics.RetrieveAPIView):
+    serializer_class = CompanyProgramApplicantDetailSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def get_queryset(self):
+        activity_id = self.kwargs.get("activity_id")
+        return AcceptedApplicant.objects.filter(form__activity__pk=activity_id).exclude(
+            activity_status="canceled"
+        )
+
+
 # 활동관리/활동1/학생1/경고: 부여한 경고 리스트
+class CompanyProgramApplicantWarningView(generics.RetrieveAPIView):
+    serializer_class = CompanyProgramApplicantWarningSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def get_queryset(self):
+        activity_id = self.kwargs.get("activity_id")
+        return AcceptedApplicant.objects.filter(form__activity__pk=activity_id).exclude(
+            activity_status="canceled"
+        )
+
+
 # 활동관리/활동1/학생1/경고/경고하기: 경고 부여하기
 # 활동관리/활동1/학생1/공지: 공지
 # 활동관리/활동1/학생1/공지/공지 작성: 공지 작성
