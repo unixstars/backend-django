@@ -5,9 +5,6 @@ from django.conf import settings
 
 
 class StudentUserProfileSerializer(serializers.ModelSerializer):
-    profile_image = serializers.SerializerMethodField()
-    univ_certificate = serializers.SerializerMethodField()
-
     class Meta:
         model = StudentUserProfile
         fields = [
@@ -35,6 +32,18 @@ class StudentUserProfileSerializer(serializers.ModelSerializer):
                 settings.AWS_STORAGE_BUCKET_NAME, str(obj.univ_certificate)
             )
 
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if instance.profile_image:
+            ret["profile_image"] = generate_presigned_url(
+                settings.AWS_STORAGE_BUCKET_NAME, str(instance.profile_image)
+            )
+        if instance.univ_certificate:
+            ret["univ_certificate"] = generate_presigned_url(
+                settings.AWS_STORAGE_BUCKET_NAME, str(instance.univ_certificate)
+            )
+        return ret
+
 
 class PortfolioFileSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,6 +57,14 @@ class PortfolioFileSerializer(serializers.ModelSerializer):
             return generate_presigned_url(
                 settings.AWS_STORAGE_BUCKET_NAME, str(obj.file)
             )
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if instance.file:
+            ret["file"] = generate_presigned_url(
+                settings.AWS_STORAGE_BUCKET_NAME, str(instance.file)
+            )
+        return ret
 
 
 class StudentUserPortfolioSerializer(serializers.ModelSerializer):

@@ -177,8 +177,6 @@ class NoticeCommentCreateSerializer(serializers.ModelSerializer):
 
 
 class SubmitFileSerializer(serializers.ModelSerializer):
-    file = serializers.SerializerMethodField()
-
     class Meta:
         model = SubmitFile
         fields = [
@@ -191,6 +189,15 @@ class SubmitFileSerializer(serializers.ModelSerializer):
             return generate_presigned_url(
                 settings.AWS_STORAGE_BUCKET_NAME, str(obj.file)
             )
+
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if instance.file:
+            ret["file"] = generate_presigned_url(
+                settings.AWS_STORAGE_BUCKET_NAME, str(instance.file)
+            )
+
+        return ret
 
 
 class SubmitSerializer(serializers.ModelSerializer):
