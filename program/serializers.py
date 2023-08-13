@@ -214,6 +214,7 @@ class AssignmentDetailSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
+            "content",
             "progress_status",
             "deadline",
             "created_at",
@@ -480,3 +481,74 @@ class CompanyProgramApplicantWarningSerializer(serializers.ModelSerializer):
     def warning_count(self, obj) -> int:
         warnings = obj.applicant_warning.all()
         return warnings.count()
+
+
+class CompanyProgramWarningCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ApplicantWarning
+        fields = ["content"]
+
+
+class CompanyProgramNoticeDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notice
+        fields = [
+            "id",
+            "title",
+            "content",
+            "is_checked",
+            "created_at",
+        ]
+
+
+class CompanyProgramNoticeCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notice
+        fields = [
+            "title",
+            "content",
+        ]
+
+
+class CompanyProgramNoticeCommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NoticeComment
+        fields = ["content"]
+
+
+class CompanyProgramAssignmentDetailSerializer(serializers.ModelSerializer):
+    deadline = serializers.SerializerMethodField()
+    submit = SubmitSerializer()
+
+    class Meta:
+        model = Assignment
+        fields = [
+            "id",
+            "title",
+            "content",
+            "progress_status",
+            "deadline",
+            "created_at",
+            "submit",
+        ]
+
+    def get_deadline(self, obj):
+        deadline_datetime = obj.created_at + obj.duration
+        deadline_date = deadline_datetime.date()
+        return deadline_date
+
+
+class CompanyProgramAssignmentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Assignment
+        fields = [
+            "title",
+            "content",
+            "duration",
+        ]
+
+
+class CompanyProgramAssignmentCommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssignmentComment
+        fields = ["content"]

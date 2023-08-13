@@ -16,6 +16,16 @@ from .views import (
     CompanyProgramDetailView,
     CompanyProgramApplicantDetailView,
     CompanyProgramApplicantWarningView,
+    CompanyProgramWarningCreateView,
+    CompanyProgramNoticeDetailView,
+    CompanyProgramNoticeCreateView,
+    CompanyProgramNoticeCommentCreateView,
+    CompanyProgramAssignmentDetailView,
+    CompanyProgramAssignmentCreateView,
+    CompanyProgramAssignmentCommentCreateView,
+    CompanyProgramAssignmentDurationExtendView,
+    CompanyProgramAssignmentRevisionView,
+    CompanyProgramAssignmentApprovalView,
 )
 
 urlpatterns = [
@@ -118,13 +128,63 @@ urlpatterns = [
         name="company-program-applicant-warning",
     ),
     # 활동관리/활동1/학생1/경고/경고하기: 경고 부여하기
+    path(
+        "company/program/applicant/<int:applicant_id>/warning/create/",
+        CompanyProgramWarningCreateView.as_view(),
+        name="company-program-applicant-warning-create",
+    ),
     # 활동관리/활동1/학생1/공지: 공지
+    path(
+        "company/program/applicant/<int:applicant_id>/notice/<int:pk>/",
+        CompanyProgramNoticeDetailView.as_view(),
+        name="company-program-applicant-notice-detail",
+    ),
     # 활동관리/활동1/학생1/공지/공지 작성: 공지 작성
+    path(
+        "company/program/applicant/<int:applicant_id>/notice/create/",
+        CompanyProgramNoticeCreateView.as_view(),
+        name="company-program-applicant-notice-create",
+    ),
     # 활동관리/활동1/학생1/공지/댓글 작성: 공지 댓글 작성
+    path(
+        "company/program/notice/<int:notice_id>/comment/create/",
+        CompanyProgramNoticeCommentCreateView.as_view(),
+        name="company-program-notice-comment-create",
+    ),
     # 활동관리/활동1/학생1/과제: 과제
+    path(
+        "company/program/applicant/<int:applicant_id>/assignment/<int:pk>/",
+        CompanyProgramAssignmentDetailView.as_view(),
+        name="company-program-assignment-detail",
+    ),
     # 활동관리/활동1/학생1/과제/과제 작성: 과제 작성
+    path(
+        "company/program/applicant/<int:applicant_id>/assignment/create/",
+        CompanyProgramAssignmentCreateView.as_view(),
+        name="company-program-assignment-create",
+    ),
     # 활동관리/활동1/학생1/과제/댓글 작성: 과제 댓글 작성
+    path(
+        "company/program/assignment/<int:assignment_id>/comment/create/",
+        CompanyProgramAssignmentCommentCreateView.as_view(),
+        name="company-program-assignment-comment-create",
+    ),
     # 활동관리/활동1/학생1/과제: 과제 마감기한 연장
+    path(
+        "company/program/assignment/<int:pk>/extend/",
+        CompanyProgramAssignmentDurationExtendView.as_view(),
+        name="company-program-assignment-duration-extend",
+    ),
     # 활동관리/활동1/학생1/과제/수정요구: 과제 수정요구(1,2차)
+    path(
+        "company/program/assignment/<int:pk>/revise/",
+        CompanyProgramAssignmentRevisionView.as_view(),
+        name="company-program-assignment-revise",
+    ),
     # 활동관리/활동1/학생1/과제/최종 승인: 과제 최종승인
+    path(
+        "company/program/assignment/<int:pk>/approve/",
+        CompanyProgramAssignmentApprovalView.as_view(),
+        name="company-program-assignment-approve",
+    ),
 ]
