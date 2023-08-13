@@ -2,6 +2,8 @@ from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Exists, OuterRef
+from django.utils import timezone
+from datetime import timedelta
 from api.permissions import (
     IsStudentUser,
     IsCompanyUser,
@@ -37,6 +39,13 @@ from .serializers import (
     CompanyProgramDetailSerializer,
     CompanyProgramApplicantDetailSerializer,
     CompanyProgramApplicantWarningSerializer,
+    CompanyProgramWarningCreateSerializer,
+    CompanyProgramNoticeDetailSerializer,
+    CompanyProgramNoticeCreateSerializer,
+    CompanyProgramNoticeCommentCreateSerializer,
+    CompanyProgramAssignmentDetailSerializer,
+    CompanyProgramAssignmentCreateSerializer,
+    CompanyProgramAssignmentCommentCreateSerializer,
 )
 
 
@@ -283,11 +292,138 @@ class CompanyProgramApplicantWarningView(generics.RetrieveAPIView):
 
 
 # 활동관리/활동1/학생1/경고/경고하기: 경고 부여하기
+class CompanyProgramWarningCreateView(generics.CreateAPIView):
+    serializer_class = CompanyProgramWarningCreateSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def perform_create(self, serializer):
+        applicant_id = self.kwargs.get("applicant_id")
+        applicant = AcceptedApplicant.objects.get(pk=applicant_id)
+        serializer.save(accepted_applicant=applicant)
+
+
 # 활동관리/활동1/학생1/공지: 공지
+class CompanyProgramNoticeDetailView(generics.RetrieveAPIView):
+    serializer_class = CompanyProgramNoticeDetailSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def get_queryset(self):
+        applicant_id = self.kwargs.get("applicant_id")
+        return Notice.objects.filter(accepted_applicant__pk=applicant_id)
+
+
 # 활동관리/활동1/학생1/공지/공지 작성: 공지 작성
+class CompanyProgramNoticeCreateView(generics.CreateAPIView):
+    serializer_class = CompanyProgramNoticeCreateSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def perform_create(self, serializer):
+        applicant_id = self.kwargs.get("applicant_id")
+        applicant = AcceptedApplicant.objects.get(pk=applicant_id)
+        serializer.save(accepted_applicant=applicant)
+
+
+# 활동관리/활동1/학생1/공지/댓글 작성: 공지 댓글 작성
+class CompanyProgramNoticeCommentCreateView(generics.CreateAPIView):
+    serializer_class = CompanyProgramNoticeCommentCreateSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser, IsNoticeCommentCompany]
+
+    def perform_create(self, serializer):
+        notice_id = self.kwargs.get("notice_id")
+        notice = Notice.objects.get(pk=notice_id)
+        serializer.save(notice=notice, user_type=NoticeComment.COMPANY)
+
+
 # 활동관리/활동1/학생1/과제: 과제
+class CompanyProgramAssignmentDetailView(generics.RetrieveAPIView):
+    serializer_class = CompanyProgramAssignmentDetailSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def get_queryset(self):
+        applicant_id = self.kwargs.get("applicant_id")
+        applicant = AcceptedApplicant.objects.get(pk=applicant_id)
+        return Assignment.objects.filter(accepted_applicant=applicant)
+
+
 # 활동관리/활동1/학생1/과제/과제 작성: 과제 작성
+class CompanyProgramAssignmentCreateView(generics.CreateAPIView):
+    serializer_class = CompanyProgramAssignmentCreateSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def perform_create(self, serializer):
+        applicant_id = self.kwargs.get("applicant_id")
+        applicant = AcceptedApplicant.objects.get(pk=applicant_id)
+        serializer.save(accepted_applicant=applicant)
+
+
 # 활동관리/활동1/학생1/과제/댓글 작성: 과제 댓글 작성
+class CompanyProgramAssignmentCommentCreateView(generics.CreateAPIView):
+    serializer_class = CompanyProgramAssignmentCommentCreateSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser, IsAssignmentCommentCompany]
+
+    def perform_create(self, serializer):
+        assignment_id = self.kwargs.get("assignment_id")
+        assignment = Assignment.objects.get(pk=assignment_id)
+        serializer.save(assignment=assignment)
+
+
 # 활동관리/활동1/학생1/과제: 과제 마감기한 연장
+class CompanyProgramAssignmentDurationExtendView(generics.UpdateAPIView):
+    queryset = Assignment.objects.all()
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def update(self, request, *args, **kwargs):
+        assignment = self.get_object()
+        original_deadline = assignment.created_at + assignment.duration
+
+        if original_deadline > timezone.now():
+            assignment.duration += timedelta(days=3)
+        else:
+            assignment.duration = (
+                timezone.now() - assignment.created_at + timedelta(days=3)
+            )
+
+        assignment.save()
+        return Response(status=status.HTTP_200_OK)
+
+
 # 활동관리/활동1/학생1/과제/수정요구: 과제 수정요구(1,2차)
+class CompanyProgramAssignmentRevisionView(generics.UpdateAPIView):
+    queryset = Assignment.objects.all()
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def update(self, request, *args, **kwargs):
+        assignment = self.get_object()
+
+        if assignment.prgress_status == Assignment.IN_PROGRESS:
+            assignment.prgress_status = Assignment.FIRST_REVISION
+            assignment.save()
+        if assignment.prgress_status == Assignment.FIRST_REVISION:
+            assignment.prgress_status = Assignment.SECOND_REVISION
+            assignment.save()
+        else:
+            return Response(
+                {"detail": "수정 요청은 과제 상태가 진행중 또는 1차 수정일때만 가능합니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(status=status.HTTP_200_OK)
+
+
 # 활동관리/활동1/학생1/과제/최종 승인: 과제 최종승인
+class CompanyProgramAssignmentApprovalView(generics.UpdateAPIView):
+    queryset = Assignment.objects.all()
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def update(self, request, *args, **kwargs):
+        assignment = self.get_object()
+
+        if assignment.prgress_status == Assignment.FINAL_APPROVAL:
+            return Response(
+                {"detail": "이미 최종 승인된 상태입니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        assignment.prgress_status = Assignment.FINAL_APPROVAL
+        assignment.save()
+
+        return Response(status=status.HTTP_200_OK)
