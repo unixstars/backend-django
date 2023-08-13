@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, parsers
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Exists, OuterRef
@@ -191,6 +191,7 @@ class SubmitCreateView(generics.CreateAPIView):
         IsStudentUser,
         IsSubmitOwnerStudent,
     ]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
 
     def create(self, request, *args, **kwargs):
         assignment_id = self.kwargs.get("assignment_id")
