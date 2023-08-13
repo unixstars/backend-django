@@ -143,6 +143,8 @@ class BoardDetailSerializer(BoardSerializer):
 
 class BoardCreateSerializer(BoardSerializer):
     activity = ActivitySerializer(many=True)
+    logo = serializers.ImageField()
+    banner = serializers.ImageField()
 
     class Meta:
         model = Board
