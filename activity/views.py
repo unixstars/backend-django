@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, parsers
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from .models import Board, Scrap, Form, Activity, Suggestion
@@ -79,6 +79,7 @@ class BoardCreateView(generics.CreateAPIView):
     queryset = Board.objects.all()
     serializer_class = BoardCreateSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
 
     def perform_create(self, serializer):
         company_user = CompanyUser.objects.get(user=self.request.user)

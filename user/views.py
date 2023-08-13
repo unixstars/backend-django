@@ -1,4 +1,4 @@
-from rest_framework import generics
+from rest_framework import generics, parsers
 from rest_framework.permissions import IsAuthenticated
 from api.permissions import IsStudentUser, IsPortFolioOwner, IsProfileOwner
 from .models import StudentUserPortfolio, StudentUserProfile
@@ -14,6 +14,7 @@ class StudentUserPortFolioCreateView(generics.CreateAPIView):
     queryset = StudentUserPortfolio.objects.all()
     serializer_class = StudentUserPortfolioSerializer
     permission_classes = [IsAuthenticated, IsStudentUser]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
 
     def perform_create(self, serializer):
         serializer.save(student_user=self.request.user.student_user)
@@ -28,6 +29,7 @@ class StudentUserPortfolioDetailView(generics.RetrieveUpdateDestroyAPIView):
         IsStudentUser,
         IsPortFolioOwner,
     ]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
 
 
 # 포트폴리오 : 학생 유저 포트폴리오 리스트
@@ -46,6 +48,7 @@ class StudentUserProfileCreateView(generics.CreateAPIView):
     queryset = StudentUserProfile.objects.all()
     serializer_class = StudentUserProfileSerializer
     permission_classes = [IsAuthenticated, IsStudentUser]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
 
     def perform_create(self, serializer):
         serializer.save(student_user=self.request.user.student_user)
@@ -60,3 +63,4 @@ class StudentUserProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
         IsStudentUser,
         IsProfileOwner,
     ]
+    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
