@@ -185,6 +185,19 @@ class BoardCreateSerializer(BoardSerializer):
             Activity.objects.create(board=board, **activity_data)
         return board
 
+    # 이미지 반환값을 presigned_url 사용
+    def to_representation(self, instance):
+        ret = super().to_representation(instance)
+        if instance.logo:
+            ret["logo"] = generate_presigned_url(
+                settings.AWS_STORAGE_BUCKET_NAME, str(instance.logo)
+            )
+        if instance.banner:
+            ret["banner"] = generate_presigned_url(
+                settings.AWS_STORAGE_BUCKET_NAME, str(instance.banner)
+            )
+        return ret
+
 
 class FormBoardListSerializer(FormSerializer):
     logo = serializers.SerializerMethodField()
