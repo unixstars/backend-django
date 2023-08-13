@@ -18,7 +18,6 @@ class Board(models.Model):
             filename,
         )
 
-    """
     def save(self, *args, **kwargs):
         # Check if logo or banner exists in the current instance in database
         try:
@@ -77,7 +76,7 @@ class Board(models.Model):
                     ),
                 )
         super().save(*args, **kwargs)
-    """
+
     company_user = models.ForeignKey(
         CompanyUser, on_delete=models.CASCADE, related_name="board"
     )
