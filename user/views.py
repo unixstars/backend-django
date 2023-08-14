@@ -4,6 +4,7 @@ from api.permissions import IsStudentUser, IsPortFolioOwner, IsProfileOwner
 from .models import StudentUserPortfolio, StudentUserProfile
 from .serializers import (
     StudentUserPortfolioSerializer,
+    StudentUserPortfolioUpdateSerializer,
     StudentUserPortfolioListSerializer,
     StudentUserProfileSerializer,
     StudentUserProfileUpdateSerializer,
@@ -24,7 +25,7 @@ class StudentUserPortFolioCreateView(generics.CreateAPIView):
 # 포트폴리오/포트폴리오1 : 학생 유저 포트폴리오 하나 보기,수정,삭제
 class StudentUserPortfolioDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = StudentUserPortfolio.objects.all()
-    serializer_class = StudentUserPortfolioSerializer
+    serializer_class = StudentUserPortfolioUpdateSerializer
     permission_classes = [
         IsAuthenticated,
         IsStudentUser,
