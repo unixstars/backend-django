@@ -8,27 +8,27 @@ from .views import (
 )
 
 urlpatterns = [
-    # 프로필/수정페이지 : 학생 유저 프로필 생성
+    # v 프로필/수정페이지 : 학생 유저 프로필 생성
     path(
         "student/profile/create/",
         StudentUserProfileCreateView.as_view(),
         name="student-profile-create",
     ),
-    # 프로필 : 학생 유저 프로필 하나 보기
+    # v 프로필 : 학생 유저 프로필 하나 보기
     path(
         # GET
         "student/profile/<int:pk>/",
         StudentUserProfileDetailView.as_view(),
         name="student-profile-detail",
     ),
-    # 프로필 : 학생 유저 프로필 하나 수정
+    # v 프로필 : 학생 유저 프로필 하나 수정
     path(
         # PUT
         "student/profile/<int:pk>/update/",
         StudentUserProfileDetailView.as_view(),
         name="student-profile-update",
     ),
-    # 프로필 : 학생 유저 프로필 하나 삭제
+    # v 프로필 : 학생 유저 프로필 하나 삭제
     path(
         # DELETE
         "student/profile/<int:pk>/delete/",

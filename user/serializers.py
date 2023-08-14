@@ -142,6 +142,23 @@ class StudentUserPortfolioSerializer(serializers.ModelSerializer):
         return student_user_portfolio
 
 
+class StudentUserPortfolioUpdateSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(required=False)
+    content = serializers.CharField(required=False)
+    description = serializers.CharField(required=False)
+    portfolio_file = PortfolioFileSerializer(many=True, required=False)
+
+    class Meta:
+        model = StudentUserPortfolio
+        fields = [
+            "id",
+            "title",
+            "content",
+            "description",
+            "portfolio_file",
+        ]
+
+
 class StudentUserPortfolioListSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentUserPortfolio
