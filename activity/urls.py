@@ -30,44 +30,44 @@ from .views import (
 )
 
 urlpatterns = [
-    # 홈/로그인 전 : 게시글 목록(전부)
+    # v 홈/로그인 전 : 게시글 목록(전부)
     path(
         "board/",
         BoardListView.as_view(),
         name="board-list",
     ),
-    # 대외활동 게시글/로그인 전 : 게시글 하나(전부)
+    # v 대외활동 게시글/로그인 전 : 게시글 하나(전부)
     path(
         "board/<int:pk>/",
         BoardDetailView.as_view(),
         name="board-detail",
     ),
-    # 대외활동 게시글 추가하기 : 게시글 생성
+    # v 대외활동 게시글 추가하기 : 게시글 생성
     path(
         "company/board/create/",
         BoardCreateView.as_view(),
         name="board-create",
     ),
-    # 대외활동 게시글/마감기한 연장(7일) : 게시글 마감기한연장
+    # v 대외활동 게시글/마감기한 연장(7일) : 게시글 마감기한연장
     path(
         # board의 pk
         "company/board/<int:pk>/extend/",
         BoardDurationExtendView.as_view(),
         name="board_duration-extend",
     ),
-    # 활동등록 : 기업유저가 등록한 게시글 리스트
+    # v 활동등록 : 기업유저가 등록한 게시글 리스트
     path(
         "company/board/",
         CompanyUserBoardListView.as_view(),
         name="company-board-list",
     ),
-    # 대외활동 게시글 : 기업유저가 등록한 게시글 하나
+    # v 대외활동 게시글 : 기업유저가 등록한 게시글 하나
     path(
         "company/board/<int:pk>/",
         CompanyUserBoardDetailView.as_view(),
         name="company-board-detail",
     ),
-    # 지원관리 : 기업유저가 등록한 '대외활동' 목록
+    # v 지원관리 : 기업유저가 등록한 '대외활동' 목록
     path(
         "company/activity/",
         CompanyActivityListView.as_view(),
@@ -97,25 +97,25 @@ urlpatterns = [
         CompanyActivityFormRejectView.as_view(),
         name="company-activity-form-reject",
     ),
-    # 지원관리/스크랩 : 스크랩 한 게시글 리스트
+    # v 지원관리/스크랩 : 스크랩 한 게시글 리스트
     path(
         "student/scrap/board/",
         ScrapBoardListView.as_view(),
         name="scrap-board-list",
     ),
-    # 지원관리/스크랩/게시글 : 스크랩 한 게시글 하나
+    # v 지원관리/스크랩/게시글 : 스크랩 한 게시글 하나
     path(
         "student/scrap/board/<int:pk>/",
         ScrapBoardDetailView.as_view(),
         name="scrap-board-detail",
     ),
-    # 대외활동 게시글/로그인 경우/스크랩 : 스크랩하기
+    # v 대외활동 게시글/로그인 경우/스크랩 : 스크랩하기
     path(
         "student/scrap/create/",
         ScrapCreateView.as_view(),
         name="scrap-create",
     ),
-    # 대외활동 게시글/로그인 경우/스크랩 : 스크랩취소
+    # v 대외활동 게시글/로그인 경우/스크랩 : 스크랩취소
     path(
         "student/scrap/delete/<int:board_pk>/",
         ScrapDeleteView.as_view(),
