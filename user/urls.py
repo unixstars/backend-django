@@ -35,20 +35,20 @@ urlpatterns = [
         StudentUserProfileDetailView.as_view(),
         name="student-profile-delete",
     ),
-    # 포트폴리오 추가: 학생 유저 포트폴리오 생성
+    # v 포트폴리오 추가: 학생 유저 포트폴리오 생성
     path(
         "student/portfolio/create/",
         StudentUserPortFolioCreateView.as_view(),
         name="student-portfolio-create",
     ),
-    # 포트폴리오/포트폴리오1 : 학생 유저 포트폴리오 하나 보기
+    # v 포트폴리오/포트폴리오1 : 학생 유저 포트폴리오 하나 보기
     path(
         # GET
         "student/portfolio/<int:pk>/",
         StudentUserPortfolioDetailView.as_view(),
         name="student-portfolio-detail",
     ),
-    # 포트폴리오/포트폴리오1 : 학생 유저 포트폴리오 하나 수정
+    # v 포트폴리오/포트폴리오1 : 학생 유저 포트폴리오 하나 수정
     path(
         # PUT
         "student/portfolio/<int:pk>/update/",
