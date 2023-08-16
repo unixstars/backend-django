@@ -171,7 +171,7 @@ class StudentUserPortfolioUpdateSerializer(serializers.ModelSerializer):
             file_id = file_data.get("id")
 
             portfolio_file = PortfolioFile.objects.get(
-                id=file_id, student_user_portfolio=instance
+                pk=file_id, student_user_portfolio=instance
             )
             if "file" in file_data:
                 portfolio_file.file = file_data["file"]
