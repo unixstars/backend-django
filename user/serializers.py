@@ -1,7 +1,8 @@
-from rest_framework import serializers
+from rest_framework import serializers, status
 from .models import StudentUserProfile, StudentUserPortfolio, PortfolioFile
 from api.utils import generate_presigned_url
 from django.conf import settings
+from rest_framework.response import Response
 
 
 class StudentUserProfileSerializer(serializers.ModelSerializer):
@@ -169,6 +170,11 @@ class StudentUserPortfolioUpdateSerializer(serializers.ModelSerializer):
 
         for file_data in portfolio_files_data:
             file_id = file_data.get("id")
+            if not file_id:
+                return Response(
+                    {"detail": "id 존재 안함."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
 
             portfolio_file = PortfolioFile.objects.get(
                 pk=file_id, student_user_portfolio=instance
