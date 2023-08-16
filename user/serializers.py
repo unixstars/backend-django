@@ -100,6 +100,7 @@ class PortfolioFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = PortfolioFile
         fields = [
+            "id",
             "file",
         ]
 
@@ -157,6 +158,33 @@ class StudentUserPortfolioUpdateSerializer(serializers.ModelSerializer):
             "description",
             "portfolio_file",
         ]
+
+    def update(self, instance, validated_data):
+        portfolio_files_data = validated_data.pop("portfolio_file", [])
+        # portfolio_file을 제외한 StudentUserPortfolio 업데이트
+        instance.title = validated_data.get("title", instance.title)
+        instance.content = validated_data.get("content", instance.content)
+        instance.description = validated_data.get("description", instance.description)
+        instance.save()
+
+        for file_data in portfolio_files_data:
+            file_id = file_data.get("id", None)
+
+            # 만약 ID가 제공되면, 해당 객체를 업데이트
+            if file_id:
+                portfolio_file = PortfolioFile.objects.get(
+                    id=file_id, student_user_portfolio=instance
+                )
+                if "file" in file_data:
+                    portfolio_file.file = file_data["file"]
+                    portfolio_file.save()
+            # ID가 없다면, 새로운 객체를 생성
+            else:
+                PortfolioFile.objects.create(
+                    student_user_portfolio=instance, **file_data
+                )
+
+        return instance
 
 
 class StudentUserPortfolioListSerializer(serializers.ModelSerializer):
