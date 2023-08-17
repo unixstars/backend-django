@@ -343,6 +343,7 @@ class FormDetailSerializer(FormSerializer):
     activity = ActivityListSerializer()
     student_user_portfolio = StudentUserPortfolioListSerializer()
     activity_list = serializers.SerializerMethodField()
+    portfolio_list = serializers.SerializerMethodField()
 
     class Meta:
         model = Form
