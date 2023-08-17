@@ -121,7 +121,7 @@ urlpatterns = [
         ScrapDeleteView.as_view(),
         name="scrap-delete",
     ),
-    # 지원 페이지/포트폴리오 있음 : 지원서 작성 화면
+    # v 지원 페이지/포트폴리오 있음 : 지원서 작성 화면
     path(
         "student/form/fill/",
         FormFillView.as_view(),
