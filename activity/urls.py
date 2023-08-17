@@ -123,7 +123,7 @@ urlpatterns = [
     ),
     # v 지원 페이지/포트폴리오 있음 : 지원서 작성 화면
     path(
-        "student/form/fill/",
+        "student/form/<int:board_id>/fill/",
         FormFillView.as_view(),
         name="form-fill",
     ),
