@@ -342,6 +342,7 @@ class FormDetailSerializer(FormSerializer):
     profile = StudentUserProfileSerializer(source="student_user.student_user_profile")
     activity = ActivityListSerializer()
     student_user_portfolio = StudentUserPortfolioListSerializer()
+    activity_list = serializers.SerializerMethodField()
 
     class Meta:
         model = Form
@@ -354,7 +355,19 @@ class FormDetailSerializer(FormSerializer):
             "accept_status",
             "profile",
             "student_user_portfolio",
+            "activity_list",
+            "portfolio_list",
         ]
+
+    def get_activity_list(self, obj):
+        board_id = obj.activity.board.pk
+        activities = Activity.objects.filter(board__pk=board_id)
+        return ActivityListSerializer(activities, many=True).data
+
+    def get_portfolio_list(self, obj):
+        user = obj.student_user
+        portfolios = StudentUserPortfolio.objects.filter(student_user=user)
+        return StudentUserPortfolioListSerializer(portfolios, many=True).data
 
 
 class CompanyActivityListSerializer(serializers.ModelSerializer):
