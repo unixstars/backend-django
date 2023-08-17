@@ -324,9 +324,7 @@ class FormCreateSerializer(serializers.ModelSerializer):
 
 class FormDetailSerializer(FormSerializer):
     profile = StudentUserProfileSerializer(source="student_user.student_user_profile")
-    portfolio_list = StudentUserPortfolioListSerializer(
-        source="student_user.student_user_portfolio", many=True
-    )
+    student_user_portfolio = StudentUserPortfolioListSerializer()
 
     class Meta:
         model = Form
@@ -338,7 +336,7 @@ class FormDetailSerializer(FormSerializer):
             "merit",
             "accept_status",
             "profile",
-            "portfolio_list",
+            "student_user_portfolio",
         ]
 
 

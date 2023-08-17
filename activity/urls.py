@@ -127,26 +127,26 @@ urlpatterns = [
         FormFillView.as_view(),
         name="form-fill",
     ),
-    # 지원 페이지/포트폴리오 있음/지원서 제출하기 : 지원서 제출
+    # v 지원 페이지/포트폴리오 있음/지원서 제출하기 : 지원서 제출
     path(
         "student/form/create/",
         FormCreateView.as_view(),
         name="form-create",
     ),
-    # 지원관리/지원완료 : 지원서 제출한 게시물(대외활동) 리스트
+    # v 지원관리/지원완료 : 지원서 제출한 게시물(대외활동) 리스트
     path(
         "student/form/board/",
         FormBoardListView.as_view(),
         name="form-board-list",
     ),
-    # 대외활동 게시글/지원완료 : 지원서 제출한 게시물(대외활동) 하나
+    # v 대외활동 게시글/지원완료 : 지원서 제출한 게시물(대외활동) 하나
     path(
         # form의 pk
         "student/form/board/<int:pk>/",
         FormBoardDetailView.as_view(),
         name="form-board-detail",
     ),
-    # 제출완료 지원서 : 제출완료한 지원서
+    # v 제출완료 지원서 : 제출완료한 지원서
     path(
         # form의 pk, 위의 pk와 같음
         "student/form/<int:pk>/",
