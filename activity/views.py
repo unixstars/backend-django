@@ -307,6 +307,16 @@ class FormCreateView(generics.CreateAPIView):
         else:
             serializer.save(student_user=self.request.user.student_user)
 
+    def create(self, request, *args, **kwargs):
+        user = self.request.user.student_user
+        activity_id = self.request.data.get("activity")
+        exist_form = Form.objects.filter(student_user=user, activity__pk=activity_id)
+        if exist_form:
+            return Response(
+                {"detail": "해당 대외활동에 이미 지원하였습니다."}, status=status.HTTP_400_BAD_REQUEST
+            )
+        return super().create(request, *args, **kwargs)
+
 
 # 지원관리/지원완료 : 지원서 제출한 게시물(대외활동) 리스트
 class FormBoardListView(generics.ListAPIView):
