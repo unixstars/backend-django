@@ -55,14 +55,14 @@ urlpatterns = [
         StudentUserPortfolioDetailView.as_view(),
         name="student-portfolio-update",
     ),
-    # 포트폴리오/포트폴리오1 : 학생 유저 포트폴리오 하나 삭제
+    # v 포트폴리오/포트폴리오1 : 학생 유저 포트폴리오 하나 삭제
     path(
         # DELETE
         "student/portfolio/<int:pk>/delete/",
         StudentUserPortfolioDetailView.as_view(),
         name="student-portfolio-delete",
     ),
-    # 포트폴리오 : 학생 유저 포트폴리오 리스트
+    # v 포트폴리오 : 학생 유저 포트폴리오 리스트
     path(
         "student/portfolio/",
         StudentUserPortfolioListView.as_view(),

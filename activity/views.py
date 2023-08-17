@@ -277,6 +277,7 @@ class ScrapDeleteView(generics.DestroyAPIView):
 
 # 지원 페이지/포트폴리오 있음 : 지원서 작성 화면
 class FormFillView(generics.RetrieveAPIView):
+    queryset = StudentUserProfile.objects.all()
     serializer_class = FormFillSerializer
     permission_classes = [
         IsAuthenticated,
@@ -284,9 +285,10 @@ class FormFillView(generics.RetrieveAPIView):
         IsProfileOwner,
     ]
 
-    def get_queryset(self):
-        user = self.request.user
-        StudentUserProfile.objects.filter(student_user=user.student_user)
+    def get_object(self):
+        user = self.request.user.student_user
+        profile = StudentUserProfile.objects.get(student_user=user)
+        return profile
 
 
 # 지원 페이지/포트폴리오 있음/지원서 제출하기 : 지원서 제출
