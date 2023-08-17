@@ -290,10 +290,20 @@ class FormBoardDetailSerializer(FormSerializer):
         return max(difference.days, -1)
 
 
+class ActivityListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Activity
+        fields = [
+            "id",
+            "title",
+        ]
+
+
 class FormFillSerializer(StudentUserProfileSerializer):
     portfolio_list = StudentUserPortfolioListSerializer(
         source="student_user.student_user_portfolio", many=True
     )
+    activity_list = serializers.SerializerMethodField()
 
     class Meta:
         model = StudentUserProfile
@@ -305,8 +315,14 @@ class FormFillSerializer(StudentUserProfileSerializer):
             "phone_number",
             "university",
             "major",
+            "activity_list",
             "portfolio_list",
         ]
+
+    def get_activity_list(self, obj):
+        board_id = self.context["view"].kwargs.get("board_id")
+        activities = Activity.objects.filter(board__pk=board_id)
+        return ActivityListSerializer(activities, many=True).data
 
 
 class FormCreateSerializer(serializers.ModelSerializer):
