@@ -9,6 +9,7 @@ from .serializers import (
     CompanyManagerEmailVerificationSerializer,
     CompanyManagerPhoneVerificationSerializer,
     CompanyUserRegistrationSerializer,
+    TestStudentRegisterSerializer,
 )
 from .ncloud import get_api_keys
 from dj_rest_auth.registration.views import RegisterView
@@ -239,6 +240,12 @@ class CompanyUserRegisterView(RegisterView):
 class UserLoginView(LoginView):
     throttle_classes = [LoginRateThrottle]
     throttle_field = "email"
+
+
+# 테스트 학생 유저 가입
+class TestStudentRegisterView(RegisterView):
+    serializer_class = TestStudentRegisterSerializer
+    permission_classes = [AllowAny]
 
 
 # 구글 로그인/회원가입 => 프론트 작업 후 수정 예정
