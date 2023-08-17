@@ -74,8 +74,9 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
 
 class TestStudentRegisterSerializer(RegisterSerializer):
     def custom_signup(self, request, user):
-        student_user = StudentUser.objects.create(user=user)
-        student_user.save()
+        if not hasattr(user, "student_user"):
+            student_user = StudentUser.objects.create(user=user)
+            student_user.save()
 
     def save(self, request):
         user = super().save(request)
