@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
-from user.models import CompanyUser
+from user.models import CompanyUser, StudentUser
 from django.core.cache import cache
 from api.utils import hash_function
 from allauth.utils import email_address_exists
@@ -69,4 +69,15 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
             manager_email=self.validated_data.get("manager_email", ""),
             manager_phone=self.validated_data.get("manager_phone", ""),
         )
+        return user
+
+
+class TestStudentRegisterSerializer(RegisterSerializer):
+    def custom_signup(self, request, user):
+        student_user = StudentUser.objects.create(user=user)
+        student_user.save()
+
+    def save(self, request):
+        user = super().save(request)
+        self.custom_signup(request, user)
         return user
