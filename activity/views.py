@@ -298,11 +298,14 @@ class FormCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         selected_portfolio_id = self.request.data.get("student_user_portfolio")
-        portfolio = StudentUserPortfolio.objects.get(id=selected_portfolio_id)
-        serializer.save(
-            student_user=self.request.user.student_user,
-            student_user_portfolio=portfolio,
-        )
+        if selected_portfolio_id:
+            portfolio = StudentUserPortfolio.objects.get(id=selected_portfolio_id)
+            serializer.save(
+                student_user=self.request.user.student_user,
+                student_user_portfolio=portfolio,
+            )
+        else:
+            serializer.save(student_user=self.request.user.student_user)
 
 
 # 지원관리/지원완료 : 지원서 제출한 게시물(대외활동) 리스트
