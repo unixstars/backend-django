@@ -58,7 +58,7 @@ urlpatterns = [
         name="user-login",
     ),
     path(
-        # 테스트 학생 유저 가입
+        # v 테스트 학생 유저 가입
         "student/test/register/",
         TestStudentRegisterView.as_view(),
         name="student-test-register",
