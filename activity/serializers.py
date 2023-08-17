@@ -340,6 +340,7 @@ class FormCreateSerializer(serializers.ModelSerializer):
 
 class FormDetailSerializer(FormSerializer):
     profile = StudentUserProfileSerializer(source="student_user.student_user_profile")
+    activity = ActivityListSerializer()
     student_user_portfolio = StudentUserPortfolioListSerializer()
 
     class Meta:
