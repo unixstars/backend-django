@@ -63,6 +63,7 @@ class BoardListView(generics.ListAPIView):
         "company_name",
         "activity__title",
         "activity__kind",
+        "activity__way",
     ]
 
 
