@@ -57,6 +57,13 @@ class BoardListView(generics.ListAPIView):
     serializer_class = BoardListSerializer
     permission_classes = [AllowAny]
     pagination_class = BoardListPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = [
+        "title",
+        "company_name",
+        "activity__title",
+        "activity__kind",
+    ]
 
 
 # 대외활동 게시글/로그인 전 : 게시글 하나(전부)
@@ -394,7 +401,7 @@ class FormActivityCancelView(generics.UpdateAPIView):
 
 # 학생 프로필 검색
 class CompanyStudentProfileListView(generics.ListAPIView):
-    queryset = StudentUserProfile.objects.all()
+    queryset = StudentUserProfile.objects.order_by("-created_at").all()
     serializer_class = CompanyStudentProfileListSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
     pagination_class = ProfileListPagination
