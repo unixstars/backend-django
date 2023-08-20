@@ -483,8 +483,8 @@ class CompanyStudentPortfolioDetailSerializer(serializers.ModelSerializer):
 
 
 class SuggestionSerializer(serializers.ModelSerializer):
-    company_user = serializers.ReadOnlyField()
-    student_user = serializers.ReadOnlyField()
+    company_user = serializers.IntegerField(read_only=True)
+    student_user = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Suggestion
