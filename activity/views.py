@@ -156,14 +156,13 @@ class CompanyActivityListView(generics.ListAPIView):
 
 
 # 지원관리/대외활동1 : 등록한 대외활동 목록 중 특정 대외활동에 지원한 지원자 목록
-class CompanyActivityFormListView(generics.ListAPIView):
+class CompanyActivityFormListView(generics.RetrieveAPIView):
     serializer_class = CompanyActivityFormListSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def get_queryset(self):
         user = self.request.user.company_user
-        activity_id = self.kwargs.get("activity_id")  # url에서 activity_id를 얻음
-        return Activity.objects.filter(board__company_user=user, pk=activity_id)
+        return Activity.objects.filter(board__company_user=user)
 
 
 # 지원관리/대외활동1/지원자1 : 지원자 한명의 지원서

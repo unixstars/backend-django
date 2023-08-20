@@ -411,8 +411,7 @@ class FormListSerializer(serializers.ModelSerializer):
 
 
 class CompanyActivityFormListSerializer(serializers.ModelSerializer):
-    # related_name으로 역방향 쿼리를 추적할 수 있으므로, source를 표기하지 않음
-    form_list = FormListSerializer(source="form", many=True, read_only=True)
+    form_list = serializers.SerializerMethodField()
 
     class Meta:
         model = Activity
@@ -421,6 +420,12 @@ class CompanyActivityFormListSerializer(serializers.ModelSerializer):
             "title",
             "form_list",
         ]
+
+    def get_form_list(self, obj):
+        forms = Form.objects.filter(activity=obj)
+        if forms:
+            return None
+        return FormListSerializer(forms, many=True).data
 
 
 class CompanyStudentProfileListSerializer(serializers.ModelSerializer):

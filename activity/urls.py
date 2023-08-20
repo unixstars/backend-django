@@ -75,7 +75,7 @@ urlpatterns = [
     ),
     # 지원관리/대외활동1 : 등록한 대외활동 목록 중 특정 대외활동에 지원한 지원자 목록
     path(
-        "company/activity/<int:activity_id>/form/",
+        "company/activity/<int:pk>/form/",
         CompanyActivityFormListView.as_view(),
         name="company-activity-form-list",
     ),
