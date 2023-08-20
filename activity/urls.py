@@ -165,19 +165,19 @@ urlpatterns = [
         FormActivityCancelView.as_view(),
         name="form-activity-cancel",
     ),
-    # 학생 프로필 검색
+    # v 학생 프로필 검색
     path(
         "company/profile/",
         CompanyStudentProfileListView.as_view(),
         name="company-student-profile-list",
     ),
-    # 학생 프로필 검색/프로필1
+    # v 학생 프로필 검색/프로필1
     path(
         "company/profile/<int:profile_id>/",
         CompanyStudentProfileDetailView.as_view(),
         name="company-student-profile-detail",
     ),
-    # 학생 프로필 검색/프로필1/포트폴리오1
+    # v 학생 프로필 검색/프로필1/포트폴리오1
     path(
         "company/profile/<int:profile_id>/portfolio/<int:pk>/",
         CompanyStudentPortfolioDetailView.as_view(),
