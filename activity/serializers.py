@@ -423,8 +423,6 @@ class CompanyActivityFormListSerializer(serializers.ModelSerializer):
 
     def get_form_list(self, obj):
         forms = Form.objects.filter(activity=obj)
-        if not forms:
-            return None
         return FormListSerializer(forms, many=True).data
 
 
