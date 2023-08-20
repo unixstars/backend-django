@@ -403,7 +403,7 @@ class CompanyStudentProfileListView(generics.ListAPIView):
         "name",
         "university",
         "major",
-        "portfolio_list__title",
+        "student_user__student_user_portfolio__title",
     ]
 
 
