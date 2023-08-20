@@ -459,7 +459,7 @@ class CompanyStudentSuggestionCreateView(generics.CreateAPIView):
         company_user = CompanyUser.objects.get(user=user)
         profile_id = self.kwargs.get("profile_id")
         student_user = StudentUser.objects.get(student_user_profile__pk=profile_id)
-        serializer.save(company_user=company_user, student_user=student_user)
+        serializer.save(company_user=company_user.pk, student_user=student_user.pk)
 
 
 # 포트폴리오/지원제안 : 들어온 지원제안
