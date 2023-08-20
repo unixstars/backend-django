@@ -1,4 +1,4 @@
-from rest_framework import generics, status, parsers
+from rest_framework import generics, status, parsers, filters
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from .models import Board, Scrap, Form, Activity, Suggestion
@@ -398,6 +398,13 @@ class CompanyStudentProfileListView(generics.ListAPIView):
     serializer_class = CompanyStudentProfileListSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
     pagination_class = ProfileListPagination
+    filter_backends = [filters.SearchFilter]
+    search_fields = [
+        "name",
+        "university",
+        "major",
+        "title",
+    ]
 
 
 # 학생 프로필 검색/프로필1

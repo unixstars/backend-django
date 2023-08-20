@@ -73,25 +73,25 @@ urlpatterns = [
         CompanyActivityListView.as_view(),
         name="company-activity-list",
     ),
-    # 지원관리/대외활동1 : 등록한 대외활동 목록 중 특정 대외활동에 지원한 지원자 목록
+    # v 지원관리/대외활동1 : 등록한 대외활동 목록 중 특정 대외활동에 지원한 지원자 목록
     path(
         "company/activity/<int:pk>/form/",
         CompanyActivityFormListView.as_view(),
         name="company-activity-form-list",
     ),
-    # 지원관리/대외활동1/지원자1 : 지원자 한명의 지원서
+    # v 지원관리/대외활동1/지원자1 : 지원자 한명의 지원서
     path(
         "company/activity/<int:activity_id>/form/<int:pk>/",
         CompanyActivityFormDetailView.as_view(),
         name="company-activity-form-detail",
     ),
-    # 지원관리/대외활동1/지원자1/합격 : 지원자 한명의 지원서 합격처리
+    # v 지원관리/대외활동1/지원자1/합격 : 지원자 한명의 지원서 합격처리
     path(
         "company/form/<int:pk>/confirm/",
         CompanyActivityFormConfirmView.as_view(),
         name="company-activity-form-confirm",
     ),
-    # 지원관리/대외활동1/지원자1/불합격 : 지원자 한명의 지원서 불합격처리
+    # v 지원관리/대외활동1/지원자1/불합격 : 지원자 한명의 지원서 불합격처리
     path(
         "company/form/<int:pk>/reject/",
         CompanyActivityFormRejectView.as_view(),
