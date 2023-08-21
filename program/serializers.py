@@ -530,6 +530,7 @@ class CompanyProgramNoticeCommentCreateSerializer(serializers.ModelSerializer):
             "id",
             "content",
             "user_type",
+            "created_at",
         ]
 
 
