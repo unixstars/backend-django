@@ -208,7 +208,8 @@ class SubmitCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         assignment_id = self.kwargs.get("assignment_id")
-        serializer.save(assignment__pk=assignment_id)
+        assignment = Assignment.objects.get(pk=assignment_id)
+        serializer.save(assignment=assignment)
 
 
 # 나의활동/활동1/과제/수정: 과제 수정
