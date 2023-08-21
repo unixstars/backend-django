@@ -426,12 +426,12 @@ class CompanyProgramAssignmentApprovalView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         assignment = self.get_object()
 
-        if assignment.prgress_status == Assignment.FINAL_APPROVAL:
+        if assignment.progress_status == Assignment.FINAL_APPROVAL:
             return Response(
                 {"detail": "이미 최종 승인된 상태입니다."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        assignment.prgress_status = Assignment.FINAL_APPROVAL
+        assignment.progress_status = Assignment.FINAL_APPROVAL
         assignment.save()
 
         return Response(status=status.HTTP_200_OK)

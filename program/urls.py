@@ -96,7 +96,7 @@ urlpatterns = [
         SubmitCreateView.as_view(),
         name="assignment-submit",
     ),
-    # 나의활동/활동1/과제/수정: 과제 수정
+    # v 나의활동/활동1/과제/수정: 과제 수정
     path(
         "student/assignment/<int:assignment_id>/submit/update/",
         SubmitUpdateView.as_view(),
