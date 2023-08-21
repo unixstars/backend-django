@@ -402,7 +402,7 @@ class CompanyProgramAssignmentRevisionView(generics.UpdateAPIView):
         if assignment.progress_status == Assignment.IN_PROGRESS:
             assignment.progress_status = Assignment.FIRST_REVISION
             assignment.save()
-        if assignment.progress_status == Assignment.FIRST_REVISION:
+        elif assignment.progress_status == Assignment.FIRST_REVISION:
             assignment.progress_status = Assignment.SECOND_REVISION
             assignment.save()
         else:
