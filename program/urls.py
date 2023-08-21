@@ -175,7 +175,7 @@ urlpatterns = [
         CompanyProgramAssignmentDurationExtendView.as_view(),
         name="company-program-assignment-duration-extend",
     ),
-    # 활동관리/활동1/학생1/과제/수정요구: 과제 수정요구(1,2차)
+    # v 활동관리/활동1/학생1/과제/수정요구: 과제 수정요구(1,2차)
     path(
         "company/program/assignment/<int:pk>/revise/",
         CompanyProgramAssignmentRevisionView.as_view(),

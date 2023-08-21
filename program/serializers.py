@@ -319,6 +319,7 @@ class SubmitCreateSerializer(serializers.ModelSerializer):
 
 
 class SubmitUpdateSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=True)
     submit_file = SubmitFileSerializer(many=True, required=False)
 
     class Meta:
