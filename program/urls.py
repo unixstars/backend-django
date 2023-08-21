@@ -133,7 +133,7 @@ urlpatterns = [
         CompanyProgramWarningCreateView.as_view(),
         name="company-program-applicant-warning-create",
     ),
-    # 활동관리/활동1/학생1/공지: 공지
+    # v 활동관리/활동1/학생1/공지: 공지
     path(
         "company/program/applicant/<int:applicant_id>/notice/<int:pk>/",
         CompanyProgramNoticeDetailView.as_view(),
