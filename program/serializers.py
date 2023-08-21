@@ -517,6 +517,7 @@ class CompanyProgramNoticeCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notice
         fields = [
+            "id",
             "title",
             "content",
         ]
@@ -525,7 +526,10 @@ class CompanyProgramNoticeCreateSerializer(serializers.ModelSerializer):
 class CompanyProgramNoticeCommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = NoticeComment
-        fields = ["content"]
+        fields = [
+            "id",
+            "content",
+        ]
 
 
 class CompanyProgramAssignmentDetailSerializer(serializers.ModelSerializer):
