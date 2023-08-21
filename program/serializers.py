@@ -376,7 +376,7 @@ class CompanyProgramApplicantSerializer(serializers.ModelSerializer):
         ]
 
     def get_student_name(self, obj):
-        return obj.form.student_user.name
+        return obj.form.student_user.student_user_profile.name
 
     def get_warning_count(self, obj) -> int:
         warnings = obj.applicant_warning.all()
