@@ -153,13 +153,13 @@ urlpatterns = [
         FormDetailView.as_view(),
         name="form-detail",
     ),
-    # 대외활동 게시글/확정대기/활동 최종 확정 : 합격한 대외활동 최종 활동 확정
+    # v 대외활동 게시글/확정대기/활동 최종 확정 : 합격한 대외활동 최종 활동 확정
     path(
         "student/form/<int:pk>/accept/",
         FormActivityAcceptView.as_view(),
         name="form-activity-accept",
     ),
-    # 대외활동 게시글/확정대기/활동 취소 : 합격한 대외활동 활동 취소
+    # v 대외활동 게시글/확정대기/활동 취소 : 합격한 대외활동 활동 취소
     path(
         "student/form/<int:pk>/cancel/",
         FormActivityCancelView.as_view(),
@@ -183,13 +183,13 @@ urlpatterns = [
         CompanyStudentPortfolioDetailView.as_view(),
         name="company-student-portfolio-detail",
     ),
-    # 학생 프로필 검색/프로필1/지원제안 보내기
+    # v 학생 프로필 검색/프로필1/지원제안 보내기
     path(
         "company/profile/<int:profile_id>/suggest/",
         CompanyStudentSuggestionCreateView.as_view(),
         name="company-profile-suggest",
     ),
-    # 포트폴리오/지원제안 : 들어온 지원제안
+    # v 포트폴리오/지원제안 : 들어온 지원제안
     path(
         "student/suggestion/",
         SuggestionListView.as_view(),
