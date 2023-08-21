@@ -115,7 +115,7 @@ urlpatterns = [
         CompanyProgramDetailView.as_view(),
         name="company-program-detail",
     ),
-    # 활동관리/활동1/학생1: 공지,과제 리스트
+    # v 활동관리/활동1/학생1: 공지,과제 리스트
     path(
         "company/program/<int:activity_id>/applicant/<int:pk>/",
         CompanyProgramApplicantDetailView.as_view(),
@@ -163,13 +163,13 @@ urlpatterns = [
         CompanyProgramAssignmentCreateView.as_view(),
         name="company-program-assignment-create",
     ),
-    # 활동관리/활동1/학생1/과제/댓글 작성: 과제 댓글 작성
+    # v 활동관리/활동1/학생1/과제/댓글 작성: 과제 댓글 작성
     path(
         "company/program/assignment/<int:assignment_id>/comment/create/",
         CompanyProgramAssignmentCommentCreateView.as_view(),
         name="company-program-assignment-comment-create",
     ),
-    # 활동관리/활동1/학생1/과제: 과제 마감기한 연장
+    # v 활동관리/활동1/학생1/과제: 과제 마감기한 연장
     path(
         "company/program/assignment/<int:pk>/extend/",
         CompanyProgramAssignmentDurationExtendView.as_view(),

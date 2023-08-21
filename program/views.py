@@ -399,11 +399,11 @@ class CompanyProgramAssignmentRevisionView(generics.UpdateAPIView):
     def update(self, request, *args, **kwargs):
         assignment = self.get_object()
 
-        if assignment.prgress_status == Assignment.IN_PROGRESS:
-            assignment.prgress_status = Assignment.FIRST_REVISION
+        if assignment.progress_status == Assignment.IN_PROGRESS:
+            assignment.progress_status = Assignment.FIRST_REVISION
             assignment.save()
-        if assignment.prgress_status == Assignment.FIRST_REVISION:
-            assignment.prgress_status = Assignment.SECOND_REVISION
+        if assignment.progress_status == Assignment.FIRST_REVISION:
+            assignment.progress_status = Assignment.SECOND_REVISION
             assignment.save()
         else:
             return Response(
