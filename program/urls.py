@@ -30,7 +30,7 @@ from .views import (
 
 urlpatterns = [
     ##학생
-    # 나의활동: 진행중,완료활동 리스트
+    # v 나의활동: 진행중,완료활동 리스트
     path(
         "student/program/",
         ProgramListView.as_view(),
@@ -103,7 +103,7 @@ urlpatterns = [
         name="assignment-submit-update",
     ),
     ##기업
-    # 활동관리: 진행중, 완료활동 리스트
+    # v 활동관리: 진행중, 완료활동 리스트
     path(
         "company/program/",
         CompanyProgramListView.as_view(),

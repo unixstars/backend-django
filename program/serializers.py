@@ -11,7 +11,7 @@ from .models import (
     Submit,
     SubmitFile,
 )
-from activity.models import Activity
+from activity.models import Activity, Form
 
 
 class ProgramListSerializer(serializers.ModelSerializer):
@@ -385,9 +385,7 @@ class CompanyProgramDetailSerializer(serializers.ModelSerializer):
     week = serializers.SerializerMethodField()
     total_week = serializers.SerializerMethodField()
     activity_status = serializers.SerializerMethodField()
-    applicant = CompanyProgramApplicantSerializer(
-        many=True, source="form.accepted_applicant"
-    )
+    applicant = serializers.SerializerMethodField()
 
     class Meta:
         model = Activity
@@ -419,6 +417,10 @@ class CompanyProgramDetailSerializer(serializers.ModelSerializer):
     def get_activity_status(self, obj):
         first_form = obj.form.first()
         return first_form.accepted_applicant.activity_status
+
+    def get_applicant(self, obj):
+        applicants = AcceptedApplicant.objects.filter(form__activity=obj)
+        return CompanyProgramApplicantSerializer(applicants, many=True).data
 
 
 class CompanyProgramApplicantDetailSerializer(serializers.ModelSerializer):
