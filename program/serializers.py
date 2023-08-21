@@ -276,6 +276,8 @@ class AssignmentCommentSerializer(serializers.ModelSerializer):
 
 
 class AssignmentCommentCreateSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = AssignmentComment
         fields = [

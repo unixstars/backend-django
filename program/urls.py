@@ -54,19 +54,19 @@ urlpatterns = [
         NoticeDetailView.as_view(),
         name="student-program-notice",
     ),
-    # (학생,기업) 공지 댓글 리스트
+    # v (학생,기업) 공지 댓글 리스트
     path(
         "notice/<int:notice_id>/comment/",
         NoticeCommentListView.as_view(),
         name="notice-comment-list",
     ),
-    # 나의활동/활동1/공지/댓글 작성: 공지 댓글 작성
+    # v 나의활동/활동1/공지/댓글 작성: 공지 댓글 작성
     path(
         "student/notice/<int:notice_id>/comment/create/",
         NoticeCommentCreateView.as_view(),
         name="notice-comment-create",
     ),
-    # 나의활동/활동1/공지/공지 확인: 공지 확인 버튼
+    # v 나의활동/활동1/공지/공지 확인: 공지 확인 버튼
     path(
         "student/notice/<int:pk>/check/",
         NoticeCheckUpdateView.as_view(),
