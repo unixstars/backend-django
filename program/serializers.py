@@ -607,6 +607,7 @@ class CompanyProgramAssignmentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Assignment
         fields = [
+            "id",
             "title",
             "content",
             "duration",
