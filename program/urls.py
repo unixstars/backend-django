@@ -84,7 +84,7 @@ urlpatterns = [
         AssignmentCommentListView.as_view(),
         name="assignment-comment-list",
     ),
-    # 나의활동/활동1/과제/댓글 작성: 과제 댓글 작성
+    # v 나의활동/활동1/과제/댓글 작성: 과제 댓글 작성
     path(
         "student/assignment/<int:assignment_id>/comment/create/",
         AssignmentCommentCreateView.as_view(),
