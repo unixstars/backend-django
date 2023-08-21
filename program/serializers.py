@@ -364,6 +364,9 @@ class CompanyProgramListSerializer(serializers.ModelSerializer):
 
 
 class CompanyProgramApplicantSerializer(serializers.ModelSerializer):
+    student_name = serializers.SerializerMethodField()
+    warning_count = serializers.SerializerMethodField()
+
     class Meta:
         model = AcceptedApplicant
         fields = [
@@ -375,7 +378,7 @@ class CompanyProgramApplicantSerializer(serializers.ModelSerializer):
     def get_student_name(self, obj):
         return obj.form.student_user.name
 
-    def warning_count(self, obj) -> int:
+    def get_warning_count(self, obj) -> int:
         warnings = obj.applicant_warning.all()
         return warnings.count()
 
