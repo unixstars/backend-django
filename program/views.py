@@ -1,6 +1,7 @@
 from rest_framework import generics, status, parsers
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import NotFound
 from django.db.models import Exists, OuterRef
 from django.utils import timezone
 from datetime import timedelta
@@ -224,18 +225,16 @@ class SubmitUpdateView(generics.UpdateAPIView):
     def get_object(self):
         assignment_id = self.kwargs.get("assignment_id")
         # __in을 사용하여 특정 progress_status를 가진 인스턴스만 필터링
-        submit = Submit.objects.filter(
-            assignment__progress_status__in=[
-                Assignment.FIRST_REVISION,
-                Assignment.SECOND_REVISION,
-            ]
-        ).get(assignment__pk=assignment_id)
-        if not submit:
-            return Response(
-                {"detail": "수정할 수 있는 과제 제출물이 존재하지 않습니다."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        return submit
+        try:
+            submit = Submit.objects.filter(
+                assignment__progress_status__in=[
+                    Assignment.FIRST_REVISION,
+                    Assignment.SECOND_REVISION,
+                ]
+            ).get(assignment__pk=assignment_id)
+            return submit
+        except Submit.DoesNotExist:
+            raise NotFound(detail="수정할 수 있는 과제 제출물이 존재하지 않습니다.")
 
 
 ##기업
