@@ -121,7 +121,7 @@ urlpatterns = [
         CompanyProgramApplicantDetailView.as_view(),
         name="company-program-applicant-detail",
     ),
-    # 활동관리/활동1/학생1/경고: 부여한 경고 리스트
+    # v 활동관리/활동1/학생1/경고: 부여한 경고 리스트
     path(
         "company/program/<int:activity_id>/applicant/<int:pk>/warning/",
         CompanyProgramApplicantWarningView.as_view(),
@@ -139,7 +139,7 @@ urlpatterns = [
         CompanyProgramNoticeDetailView.as_view(),
         name="company-program-applicant-notice-detail",
     ),
-    # 활동관리/활동1/학생1/공지/공지 작성: 공지 작성
+    # v 활동관리/활동1/학생1/공지/공지 작성: 공지 작성
     path(
         "company/program/applicant/<int:applicant_id>/notice/create/",
         CompanyProgramNoticeCreateView.as_view(),
