@@ -72,13 +72,13 @@ urlpatterns = [
         NoticeCheckUpdateView.as_view(),
         name="notice-check",
     ),
-    # 나의활동/활동1/과제: 과제
+    # v 나의활동/활동1/과제: 과제
     path(
         "student/program/<int:program_id>/assignment/<int:pk>/",
         AssignmentDetailView.as_view(),
         name="student-program-assignment",
     ),
-    # (학생,기업) 과제 댓글 리스트
+    # v (학생,기업) 과제 댓글 리스트
     path(
         "assignment/<int:assignment_id>/comment/",
         AssignmentCommentListView.as_view(),
@@ -90,7 +90,7 @@ urlpatterns = [
         AssignmentCommentCreateView.as_view(),
         name="assignment-comment-create",
     ),
-    # 나의활동/활동1/과제/과제제출: 과제 제출 버튼
+    # v 나의활동/활동1/과제/과제제출: 과제 제출 버튼
     path(
         "student/assignment/<int:assignment_id>/submit/",
         SubmitCreateView.as_view(),
@@ -151,7 +151,7 @@ urlpatterns = [
         CompanyProgramNoticeCommentCreateView.as_view(),
         name="company-program-notice-comment-create",
     ),
-    # 활동관리/활동1/학생1/과제: 과제
+    # v 활동관리/활동1/학생1/과제: 과제
     path(
         "company/program/applicant/<int:applicant_id>/assignment/<int:pk>/",
         CompanyProgramAssignmentDetailView.as_view(),

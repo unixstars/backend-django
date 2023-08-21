@@ -368,7 +368,7 @@ class CompanyProgramAssignmentCommentCreateView(generics.CreateAPIView):
     def perform_create(self, serializer):
         assignment_id = self.kwargs.get("assignment_id")
         assignment = Assignment.objects.get(pk=assignment_id)
-        serializer.save(assignment=assignment)
+        serializer.save(assignment=assignment, user_type=AssignmentComment.COMPANY)
 
 
 # 활동관리/활동1/학생1/과제: 과제 마감기한 연장
