@@ -118,7 +118,7 @@ class SubmitFile(models.Model):
     def get_upload_path_file(instance, filename):
         return "activity/{}/student/{}/assginment/{}".format(
             instance.submit.assignment.accepted_applicant.form.activity.pk,
-            instance.submit.assignment.accepted_applicant.form.student.pk,
+            instance.submit.assignment.accepted_applicant.form.student_user.pk,
             filename,
         )
 
