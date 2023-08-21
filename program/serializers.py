@@ -171,9 +171,26 @@ class NoticeCommentSerializer(serializers.ModelSerializer):
 
 
 class NoticeCommentCreateSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = NoticeComment
-        fields = ["content"]
+        fields = [
+            "image",
+            "content",
+            "user_type",
+            "created_at",
+        ]
+
+    def get_image(self, obj):
+        user_type = obj.user_type
+        if user_type == NoticeComment.STUDENT:
+            image = (
+                obj.notice.accepted_applicant.form.student_user.student_user_profile.profile_image
+            )
+        else:
+            image = obj.notice.accepted_applicant.form.activity.board.logo
+        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
 
 
 class SubmitFileSerializer(serializers.ModelSerializer):
@@ -260,7 +277,22 @@ class AssignmentCommentSerializer(serializers.ModelSerializer):
 class AssignmentCommentCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = AssignmentComment
-        fields = ["content"]
+        fields = [
+            "user_type",
+            "image",
+            "content",
+            "created_at",
+        ]
+
+    def get_image(self, obj):
+        user_type = obj.user_type
+        if user_type == AssignmentComment.STUDENT:
+            image = (
+                obj.assignment.accepted_applicant.form.student_user.student_user_profile.profile_image
+            )
+        else:
+            image = obj.assignment.accepted_applicant.form.activity.board.logo
+        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
 
 
 class SubmitCreateSerializer(serializers.ModelSerializer):
@@ -524,14 +556,26 @@ class CompanyProgramNoticeCreateSerializer(serializers.ModelSerializer):
 
 
 class CompanyProgramNoticeCommentCreateSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = NoticeComment
         fields = [
-            "id",
+            "image",
             "content",
             "user_type",
             "created_at",
         ]
+
+    def get_image(self, obj):
+        user_type = obj.user_type
+        if user_type == NoticeComment.STUDENT:
+            image = (
+                obj.notice.accepted_applicant.form.student_user.student_user_profile.profile_image
+            )
+        else:
+            image = obj.notice.accepted_applicant.form.activity.board.logo
+        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
 
 
 class CompanyProgramAssignmentDetailSerializer(serializers.ModelSerializer):
@@ -567,6 +611,23 @@ class CompanyProgramAssignmentCreateSerializer(serializers.ModelSerializer):
 
 
 class CompanyProgramAssignmentCommentCreateSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+
     class Meta:
         model = AssignmentComment
-        fields = ["content"]
+        fields = [
+            "image",
+            "content",
+            "user_type",
+            "created_at",
+        ]
+
+    def get_image(self, obj):
+        user_type = obj.user_type
+        if user_type == AssignmentComment.STUDENT:
+            image = (
+                obj.assignment.accepted_applicant.form.student_user.student_user_profile.profile_image
+            )
+        else:
+            image = obj.assignment.accepted_applicant.form.activity.board.logo
+        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
