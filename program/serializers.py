@@ -529,6 +529,7 @@ class CompanyProgramNoticeCommentCreateSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "content",
+            "user_type",
         ]
 
 
