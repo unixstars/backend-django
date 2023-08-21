@@ -11,7 +11,8 @@ from .models import (
     Submit,
     SubmitFile,
 )
-from activity.models import Activity, Form
+from activity.models import Activity
+from api.serializers import DurationFieldInISOFormat
 
 
 class ProgramListSerializer(serializers.ModelSerializer):
@@ -601,6 +602,8 @@ class CompanyProgramAssignmentDetailSerializer(serializers.ModelSerializer):
 
 
 class CompanyProgramAssignmentCreateSerializer(serializers.ModelSerializer):
+    duration = DurationFieldInISOFormat()
+
     class Meta:
         model = Assignment
         fields = [
