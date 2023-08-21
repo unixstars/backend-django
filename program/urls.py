@@ -145,7 +145,7 @@ urlpatterns = [
         CompanyProgramNoticeCreateView.as_view(),
         name="company-program-applicant-notice-create",
     ),
-    # 활동관리/활동1/학생1/공지/댓글 작성: 공지 댓글 작성
+    # v 활동관리/활동1/학생1/공지/댓글 작성: 공지 댓글 작성
     path(
         "company/program/notice/<int:notice_id>/comment/create/",
         CompanyProgramNoticeCommentCreateView.as_view(),
