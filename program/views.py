@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Exists, OuterRef
 from django.utils import timezone
+from django.http import Http404
 from datetime import timedelta
 from api.permissions import (
     IsStudentUser,
@@ -223,13 +224,16 @@ class SubmitUpdateView(generics.UpdateAPIView):
 
     def get_object(self):
         assignment_id = self.kwargs.get("assignment_id")
-        # __in을 사용하여 특정 progress_status를 가진 인스턴스만 필터링
-        return Submit.objects.filter(
-            assignment__progress_status__in=[
-                Assignment.FIRST_REVISION,
-                Assignment.SECOND_REVISION,
-            ]
-        ).get(assignment__pk=assignment_id)
+        try:
+            # __in을 사용하여 특정 progress_status를 가진 인스턴스만 필터링
+            return Submit.objects.filter(
+                assignment__progress_status__in=[
+                    Assignment.FIRST_REVISION,
+                    Assignment.SECOND_REVISION,
+                ]
+            ).get(assignment__pk=assignment_id)
+        except Submit.DoesNotExist:
+            raise Http404("조건에 맞는 제출물이 없습니다.")
 
 
 ##기업
