@@ -221,16 +221,15 @@ class SubmitUpdateView(generics.UpdateAPIView):
         IsSubmitOwnerStudent,
     ]
 
-    def get_queryset(self):
+    def get_object(self):
         assignment_id = self.kwargs.get("assignment_id")
         # __in을 사용하여 특정 progress_status를 가진 인스턴스만 필터링
         return Submit.objects.filter(
-            assignment__pk=assignment_id,
             assignment__progress_status__in=[
                 Assignment.FIRST_REVISION,
                 Assignment.SECOND_REVISION,
-            ],
-        )
+            ]
+        ).get(assignment__pk=assignment_id)
 
 
 ##기업
