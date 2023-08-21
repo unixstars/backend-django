@@ -36,19 +36,19 @@ urlpatterns = [
         ProgramListView.as_view(),
         name="student-program-list",
     ),
-    # 나의활동/활동1: 공지,과제 리스트
+    # v 나의활동/활동1: 공지,과제 리스트
     path(
         "student/program/<int:pk>/",
         ProgramDetailView.as_view(),
         name="student-program-detail",
     ),
-    # 나의활동/활동1/경고: 받은 경고 리스트
+    # v 나의활동/활동1/경고: 받은 경고 리스트
     path(
         "student/program/<int:program_id>/warning/",
         ProgramWarningView.as_view(),
         name="student-program-warning",
     ),
-    # 나의활동/활동1/공지: 공지
+    # v 나의활동/활동1/공지: 공지
     path(
         "student/program/<int:program_id>/notice/<int:pk>/",
         NoticeDetailView.as_view(),
@@ -157,7 +157,7 @@ urlpatterns = [
         CompanyProgramAssignmentDetailView.as_view(),
         name="company-program-assignment-detail",
     ),
-    # 활동관리/활동1/학생1/과제/과제 작성: 과제 작성
+    # v 활동관리/활동1/학생1/과제/과제 작성: 과제 작성
     path(
         "company/program/applicant/<int:applicant_id>/assignment/create/",
         CompanyProgramAssignmentCreateView.as_view(),

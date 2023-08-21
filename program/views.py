@@ -123,7 +123,8 @@ class NoticeCommentCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         notice_id = self.kwargs.get("notice_id")
-        serializer.save(notice__pk=notice_id)
+        notice = Notice.objects.get(pk=notice_id)
+        serializer.save(notice=notice)
 
 
 # 나의활동/활동1/공지/공지 확인: 공지 확인 버튼
