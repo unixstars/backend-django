@@ -233,7 +233,10 @@ class SubmitUpdateView(generics.UpdateAPIView):
                 ]
             ).get(assignment__pk=assignment_id)
         except Submit.DoesNotExist:
-            raise Http404("조건에 맞는 제출물이 없습니다.")
+            return Response(
+                {"detail": "수정할 수 있는 과제 제출물이 존재하지 않습니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
 
 ##기업
