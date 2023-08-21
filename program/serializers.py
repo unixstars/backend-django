@@ -161,13 +161,22 @@ class NoticeCommentSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         user_type = obj.user_type
+        image = None
+
         if user_type == NoticeComment.STUDENT:
-            image = (
-                obj.notice.accepted_applicant.form.student_user.student_user_profile.profile_image
+            student_profile = (
+                obj.notice.accepted_applicant.form.student_user.student_user_profile
             )
+            if student_profile:
+                image = student_profile.profile_image
         else:
-            image = obj.notice.accepted_applicant.form.activity.board.logo
-        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+            board = obj.notice.accepted_applicant.form.activity.board
+            if board:
+                image = board.logo
+
+        if image:
+            return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+        return None
 
 
 class NoticeCommentCreateSerializer(serializers.ModelSerializer):
@@ -184,13 +193,22 @@ class NoticeCommentCreateSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         user_type = obj.user_type
+        image = None
+
         if user_type == NoticeComment.STUDENT:
-            image = (
-                obj.notice.accepted_applicant.form.student_user.student_user_profile.profile_image
+            student_profile = (
+                obj.notice.accepted_applicant.form.student_user.student_user_profile
             )
+            if student_profile:
+                image = student_profile.profile_image
         else:
-            image = obj.notice.accepted_applicant.form.activity.board.logo
-        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+            board = obj.notice.accepted_applicant.form.activity.board
+            if board:
+                image = board.logo
+
+        if image:
+            return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+        return None
 
 
 class SubmitFileSerializer(serializers.ModelSerializer):
@@ -265,13 +283,22 @@ class AssignmentCommentSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         user_type = obj.user_type
+        image = None
+
         if user_type == AssignmentComment.STUDENT:
-            image = (
-                obj.assignment.accepted_applicant.form.student_user.student_user_profile.profile_image
+            student_profile = (
+                obj.assignment.accepted_applicant.form.student_user.student_user_profile
             )
+            if student_profile:
+                image = student_profile.profile_image
         else:
-            image = obj.assignment.accepted_applicant.form.activity.board.logo
-        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+            board = obj.assignment.accepted_applicant.form.activity.board
+            if board:
+                image = board.logo
+
+        if image:
+            return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+        return None
 
 
 class AssignmentCommentCreateSerializer(serializers.ModelSerializer):
@@ -286,13 +313,22 @@ class AssignmentCommentCreateSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         user_type = obj.user_type
+        image = None
+
         if user_type == AssignmentComment.STUDENT:
-            image = (
-                obj.assignment.accepted_applicant.form.student_user.student_user_profile.profile_image
+            student_profile = (
+                obj.assignment.accepted_applicant.form.student_user.student_user_profile
             )
+            if student_profile:
+                image = student_profile.profile_image
         else:
-            image = obj.assignment.accepted_applicant.form.activity.board.logo
-        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+            board = obj.assignment.accepted_applicant.form.activity.board
+            if board:
+                image = board.logo
+
+        if image:
+            return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+        return None
 
 
 class SubmitCreateSerializer(serializers.ModelSerializer):
@@ -569,13 +605,22 @@ class CompanyProgramNoticeCommentCreateSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         user_type = obj.user_type
+        image = None
+
         if user_type == NoticeComment.STUDENT:
-            image = (
-                obj.notice.accepted_applicant.form.student_user.student_user_profile.profile_image
+            student_profile = (
+                obj.notice.accepted_applicant.form.student_user.student_user_profile
             )
+            if student_profile:
+                image = student_profile.profile_image
         else:
-            image = obj.notice.accepted_applicant.form.activity.board.logo
-        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+            board = obj.notice.accepted_applicant.form.activity.board
+            if board:
+                image = board.logo
+
+        if image:
+            return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+        return None
 
 
 class CompanyProgramAssignmentDetailSerializer(serializers.ModelSerializer):
@@ -624,10 +669,19 @@ class CompanyProgramAssignmentCommentCreateSerializer(serializers.ModelSerialize
 
     def get_image(self, obj):
         user_type = obj.user_type
+        image = None
+
         if user_type == AssignmentComment.STUDENT:
-            image = (
-                obj.assignment.accepted_applicant.form.student_user.student_user_profile.profile_image
+            student_profile = (
+                obj.assignment.accepted_applicant.form.student_user.student_user_profile
             )
+            if student_profile:
+                image = student_profile.profile_image
         else:
-            image = obj.assignment.accepted_applicant.form.activity.board.logo
-        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+            board = obj.assignment.accepted_applicant.form.activity.board
+            if board:
+                image = board.logo
+
+        if image:
+            return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+        return None
