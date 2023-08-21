@@ -195,6 +195,8 @@ class NoticeCommentCreateSerializer(serializers.ModelSerializer):
 
 
 class SubmitFileSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)
+
     class Meta:
         model = SubmitFile
         fields = [
@@ -319,7 +321,6 @@ class SubmitCreateSerializer(serializers.ModelSerializer):
 
 
 class SubmitUpdateSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(required=True)
     submit_file = SubmitFileSerializer(many=True, required=False)
 
     class Meta:
