@@ -67,43 +67,43 @@ urlpatterns = [
         name="student-test-register",
     ),
     path(
-        # 찾기/휴대전화인증/인증코드 전송: 휴대전화 인증코드 전송 버튼
+        # v 찾기/휴대전화인증/인증코드 전송: 휴대전화 인증코드 전송 버튼
         "company/find/phone/send/",
         CompanyUserInfoFindPhoneSendView.as_view(),
         name="company-find-phone-send",
     ),
     path(
-        # 찾기/휴대전화인증/확인: 확인 버튼
+        # v 찾기/휴대전화인증/확인: 확인 버튼
         "company/find/phone/verify/",
         CompanyUserInfoFindVerificationView.as_view(),
         name="company-find-phone-verify",
     ),
     path(
-        # 정보 찾기 및 재설정: 비밀번호 변경
+        # v 정보 찾기 및 재설정: 비밀번호 변경
         "company/find/password/change/",
         CompanyUserInfoPasswordChangeView.as_view(),
         name="company-find-password-change",
     ),
     path(
-        # 학생로그인/구글
+        # 학생로그인/구글: 로그인 또는 회원가입
         "student/google/signin/",
         GoogleLoginView.as_view(),
         name="google-signin",
     ),
     path(
-        # 학생로그인/애플
+        # 학생로그인/애플: 로그인 또는 회원가입
         "student/apple/signin/",
         AppleLoginView.as_view(),
         name="apple-signin",
     ),
     path(
-        # 학생로그인/카카오
+        # 학생로그인/카카오: 로그인 또는 회원가입
         "student/kakao/signin/",
         KakaoLoginView.as_view(),
         name="kakao-signin",
     ),
     path(
-        # 학생로그인/네이버
+        # 학생로그인/네이버: 로그인 또는 회원가입
         "student/naver/signin/",
         NaverLoginView.as_view(),
         name="naver-signin",
