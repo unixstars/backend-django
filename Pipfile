@@ -19,6 +19,8 @@ mysqlclient = "==2.1.0"
 dj-rest-auth = "*"
 django-allauth = "*"
 django-crontab = "*"
+google-auth = "*"
+google-auth-oauthlib = "*"
 
 [dev-packages]
 black = "*"

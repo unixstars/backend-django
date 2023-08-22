@@ -181,7 +181,7 @@ urlpatterns = [
         CompanyProgramAssignmentRevisionView.as_view(),
         name="company-program-assignment-revise",
     ),
-    # 활동관리/활동1/학생1/과제/최종 승인: 과제 최종승인
+    # v 활동관리/활동1/학생1/과제/최종 승인: 과제 최종승인
     path(
         "company/program/assignment/<int:pk>/approve/",
         CompanyProgramAssignmentApprovalView.as_view(),
