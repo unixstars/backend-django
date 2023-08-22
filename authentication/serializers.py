@@ -72,6 +72,11 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
         return user
 
 
+class CompanyUserInfoFindVerificationSerializer(serializers.Serializer):
+    register_phone = serializers.CharField(max_length=20)
+    auth_number = serializers.IntegerField()
+
+
 class TestStudentRegisterSerializer(RegisterSerializer):
     def custom_signup(self, request, user):
         if not hasattr(user, "student_user"):

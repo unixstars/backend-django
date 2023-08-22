@@ -10,17 +10,19 @@ from .serializers import (
     CompanyManagerPhoneVerificationSerializer,
     CompanyUserRegistrationSerializer,
     TestStudentRegisterSerializer,
+    CompanyUserInfoFindVerificationSerializer,
 )
 from .ncloud import get_api_keys
 from dj_rest_auth.registration.views import RegisterView
 from rest_framework.permissions import AllowAny
 
 from django.utils.translation import gettext_lazy as _
-from dj_rest_auth.views import LoginView
+from dj_rest_auth.views import LoginView, PasswordChangeView
 
 from rest_framework_simplejwt.tokens import RefreshToken
-from user.models import User, StudentUser
-from jwt.algorithms import RSAAlgorithm
+from user.models import User, StudentUser, CompanyUser
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 
 
 # 기업회원 회원가입/법인 기업 인증 : 법인 인증
@@ -238,6 +240,7 @@ class CompanyUserRegisterView(RegisterView):
 
 # 기업회원 참여하기/로그인 : 기업회원 로그인
 class UserLoginView(LoginView):
+    permission_classes = [AllowAny]
     throttle_classes = [LoginRateThrottle]
     throttle_field = "email"
 
@@ -248,77 +251,207 @@ class TestStudentRegisterView(RegisterView):
     permission_classes = [AllowAny]
 
 
-# 구글 로그인/회원가입 => 프론트 작업 후 수정 예정
-class GoogleLoginView(views.APIView):
+# 찾기/휴대전화인증/인증코드 전송: 휴대전화 인증코드 전송 버튼
+class CompanyUserInfoFindPhoneSendView(views.APIView):
+    permission_classes = [AllowAny]
+    throttle_classes = [SendRateThrottle]
+    throttle_field = "register_phone"
+
     def post(self, request):
-        access_token = request.data.get("access_token", None)
-        if access_token is None:
-            return Response(
-                {"error": "Access token is required"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+        register_phone = request.data.get("register_phone")
+        register_phone_auth_number = random.randint(100000, 999999)
+        cache.set(hash_function(register_phone), register_phone_auth_number, 60 * 5)
 
-        url = f"https://www.googleapis.com/oauth2/v1/tokeninfo?access_token={access_token}"
+        # 네이버 클라우드 SMS API
         try:
-            response = requests.get(url)
-            response.raise_for_status()
-        except requests.exceptions.HTTPError as err:
-            return Response({"error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
+            service_id = os.getenv("SMS_SERVICE_ID")
+            uri = f"/sms/v2/services/{service_id}/messages"
+            timestamp, access_key, signing_key = get_api_keys(uri, "POST")
 
-        data = response.json()
-        email = data.get("email", None)
-        client_id = data.get(
-            "user_id", None
-        )  # Note: Google uses 'user_id' instead of 'id'
-
-        if not email or not client_id:
-            return Response(
-                {"error": "Email or client_id missing from provider"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        try:
-            user = User.objects.get(email=email, username=client_id)
-        except User.DoesNotExist:
-            user = User.objects.create(email=email, username=client_id)
-            student_user = StudentUser.objects.create(user=user)
-            student_user.save()
-
-        refresh = RefreshToken.for_user(user)
-
-        response = Response(
-            {
-                "access": str(refresh.access_token),
+            headers = {
+                "Content-Type": "application/json; charset=utf-8",
+                "x-ncp-apigw-timestamp": timestamp,
+                "x-ncp-iam-access-key": access_key,
+                "x-ncp-apigw-signature-v2": signing_key,
             }
-        )
-        response.set_cookie(key="refresh", value=str(refresh), httponly=True)
-        return response
+
+            data = {
+                "type": "SMS",
+                "contentType": "COMM",
+                "from": os.getenv("SMS_CALLING_NUM"),
+                "subject": "[유니스타 기업회원정보 찾기 인증]",
+                "content": f"유니스타 기업회원정보 찾기 인증번호는 [{register_phone_auth_number}]입니다. 인증번호를 정확히 입력해주세요.",
+                "messages": [{"to": f"{register_phone}"}],
+            }
+
+            response = requests.post(
+                f"https://sens.apigw.ntruss.com{uri}",
+                headers=headers,
+                json=data,
+            )
+            response.raise_for_status()
+
+        except requests.exceptions.HTTPError as err:
+            if response.status_code != 202:
+                return Response({"detail": str(err)}, status=response.status_code)
+
+        return Response(response.json())
 
 
-# 애플 로그인/회원가입 => 프론트 작업 후 수정 예정
-class AppleLoginView(views.APIView):
+# 찾기/휴대전화인증/확인: 확인 버튼
+class CompanyUserInfoFindVerificationView(views.APIView):
+    serializer_class = CompanyUserInfoFindVerificationSerializer
+    permission_classes = [AllowAny]
+
     def post(self, request):
-        access_token = request.data.get("access_token", None)
-        if access_token is None:
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        register_phone = serializer.validated_data.get("register_phone")
+        auth_number = serializer.validated_data.get("auth_number")
+
+        correct_auth_number = cache.get(hash_function(register_phone))
+
+        if correct_auth_number is None:
+            return Response({"detail": "인증번호가 만료되었습니다."}, status=400)
+        elif correct_auth_number != auth_number:
+            return Response({"detail": "잘못된 인증번호 입니다."}, status=400)
+        else:
+            # 인증여부 및 등록 번호 캐시에 추가(비밀번호 변경에 활용)
+            cache.set(
+                hash_function(register_phone) + "_authenticated",
+                register_phone,
+                60 * 60,
+            )
             return Response(
-                {"error": "Access token is required"},
+                {"detail": "인증에 성공하였습니다.", "register_phone": f"{register_phone}"}
+            )
+
+
+# 정보 찾기 및 재설정: 비밀번호 변경
+class CompanyUserInfoPasswordChangeView(PasswordChangeView):
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        # 캐시에서 인증된 전화번호 가져오기
+        authenticated_phone = cache.get(
+            hash_function(request.data.get("register_phone")) + "_authenticated"
+        )
+
+        if not authenticated_phone:
+            return Response(
+                {"error": "전화번호가 인증되지 않았습니다."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        # 인증된 전화번호를 가진 회사 사용자 찾기
+        try:
+            company_user = CompanyUser.objects.get(manager_phone=authenticated_phone)
+            user = company_user.user
+        except CompanyUser.DoesNotExist:
+            return Response(
+                {"error": "해당 전화번호를 가진 회사 사용자를 찾을 수 없습니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # user의 request.user를 인증된 회사 사용자로 설정(PasswordChangeView의 기본 유저를 바꾸기)
+        request.user = user
+
+        # 원래 PasswordChangeView의 post 메서드 호출
+        return super().post(request, *args, **kwargs)
+
+
+# 구글 로그인/회원가입
+class GoogleLoginView(views.APIView):
+    permission_classes = [AllowAny]
+    throttle_classes = [LoginRateThrottle]
+
+    def post(self, request):
+        id_token_str = request.data.get("idToken", None)
+        if id_token_str is None:
+            return Response(
+                {"error": "idToken이 필요합니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Google의 공개 키로 idToken을 검증
+        try:
+            # YOUR_GOOGLE_CLIENT_ID는 당신의 Google OAuth 2.0 클라이언트 ID를 사용해야 합니다.
+            payload = id_token.verify_oauth2_token(
+                id_token_str, google_requests.Request(), os.getenv("GOOGLE_CLIENT_ID")
+            )
+
+            # 토큰이 Google 계정으로부터 발급된 것인지 확인합니다.
+            if "https://accounts.google.com" in payload["iss"]:
+                email = payload["email"]
+                client_id = payload["sub"]  # Google의 고유 사용자 ID는 'sub'에 있습니다.
+
+                try:
+                    user = User.objects.get(email=email, username=client_id)
+                except User.DoesNotExist:
+                    user = User.objects.create(email=email, username=client_id)
+                    student_user = StudentUser.objects.create(user=user)
+                    student_user.save()
+
+                refresh = RefreshToken.for_user(user)
+
+                return Response(
+                    {"access": str(refresh.access_token), "refresh": str(refresh)}
+                )
+
+            else:
+                return Response(
+                    {"error": "유효하지 않은 idToken 입니다."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        except ValueError as e:
+            # idToken이 유효하지 않은 경우
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+# 애플 로그인/회원가입
+class AppleLoginView(views.APIView):
+    permission_classes = [AllowAny]
+    throttle_classes = [LoginRateThrottle]
+
+    def post(self, request):
+        id_token = request.data.get("idToken", None)
+        if id_token is None:
+            return Response(
+                {"error": "idToken이 필요합니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # 애플의 공개키 가져오기
         url = f"https://appleid.apple.com/auth/keys"
         try:
             response = requests.get(url)
             response.raise_for_status()
+            key_data = response.json()["keys"]
         except requests.exceptions.HTTPError as err:
             return Response({"error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
 
-        data = response.json()
-        public_key_data = data["keys"][0]
-        public_key = RSAAlgorithm.from_jwk(json.dumps(public_key_data))
+        # idToken 검증을 위해 헤더로부터 값 가져오기
+        header = jwt.get_unverified_header(id_token)
+        kid = header["kid"]
+
+        # idToken의 헤더 값이 존재하는지 검증
+        apple_key = next((key for key in key_data if key["kid"] == kid), None)
+        if not apple_key:
+            return Response(
+                {"error": "유효하지 않은 key ID 입니다."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 공개키로부터 idToken 복호화 및 검증
+        public_key = jwt.algorithms.RSAAlgorithm.from_jwk(json.dumps(apple_key))
 
         try:
             payload = jwt.decode(
-                access_token, public_key, algorithms=["RS256"], audience="YOUR_AUDIENCE"
+                id_token,
+                public_key,
+                algorithms=["RS256"],
+                audience=os.getenv("APPLE_CLIENT_ID"),
             )
         except jwt.exceptions.InvalidTokenError as err:
             return Response({"error": str(err)}, status=status.HTTP_400_BAD_REQUEST)
@@ -328,7 +461,7 @@ class AppleLoginView(views.APIView):
 
         if not email or not client_id:
             return Response(
-                {"error": "Email or client_id missing from provider"},
+                {"error": "이메일이나 Cleint ID가 Provider로부터 제공되지 않았습니다."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -342,11 +475,8 @@ class AppleLoginView(views.APIView):
         refresh = RefreshToken.for_user(user)
 
         response = Response(
-            {
-                "access": str(refresh.access_token),
-            }
+            {"access": str(refresh.access_token), "refresh": str(refresh)}
         )
-        response.set_cookie(key="refresh", value=str(refresh), httponly=True)
         return response
 
 
