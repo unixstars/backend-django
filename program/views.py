@@ -194,7 +194,11 @@ class SubmitCreateView(generics.CreateAPIView):
         IsStudentUser,
         IsSubmitOwnerStudent,
     ]
-    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+    parser_classes = [
+        parsers.MultiPartParser,
+        parsers.FormParser,
+        parsers.JSONParser,
+    ]
 
     def create(self, request, *args, **kwargs):
         assignment_id = self.kwargs.get("assignment_id")
