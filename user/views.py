@@ -16,7 +16,11 @@ class StudentUserPortFolioCreateView(generics.CreateAPIView):
     queryset = StudentUserPortfolio.objects.all()
     serializer_class = StudentUserPortfolioSerializer
     permission_classes = [IsAuthenticated, IsStudentUser]
-    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+    parser_classes = [
+        parsers.MultiPartParser,
+        parsers.FormParser,
+        parsers.JSONParser,
+    ]
 
     def perform_create(self, serializer):
         serializer.save(student_user=self.request.user.student_user)
@@ -31,7 +35,11 @@ class StudentUserPortfolioDetailView(generics.RetrieveUpdateDestroyAPIView):
         IsStudentUser,
         IsPortFolioOwner,
     ]
-    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+    parser_classes = [
+        parsers.MultiPartParser,
+        parsers.FormParser,
+        parsers.JSONParser,
+    ]
 
 
 # 포트폴리오 : 학생 유저 포트폴리오 리스트
@@ -50,7 +58,11 @@ class StudentUserProfileCreateView(generics.CreateAPIView):
     queryset = StudentUserProfile.objects.all()
     serializer_class = StudentUserProfileSerializer
     permission_classes = [IsAuthenticated, IsStudentUser]
-    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+    parser_classes = [
+        parsers.MultiPartParser,
+        parsers.FormParser,
+        parsers.JSONParser,
+    ]
 
     def perform_create(self, serializer):
         serializer.save(student_user=self.request.user.student_user)
@@ -65,4 +77,8 @@ class StudentUserProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
         IsStudentUser,
         IsProfileOwner,
     ]
-    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+    parser_classes = [
+        parsers.MultiPartParser,
+        parsers.FormParser,
+        parsers.JSONParser,
+    ]
