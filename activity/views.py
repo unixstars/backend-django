@@ -87,7 +87,11 @@ class BoardCreateView(generics.CreateAPIView):
     queryset = Board.objects.all()
     serializer_class = BoardCreateSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
-    parser_classes = [parsers.MultiPartParser, parsers.FormParser]
+    parser_classes = [
+        parsers.MultiPartParser,
+        parsers.FormParser,
+        parsers.JSONParser,
+    ]
 
     def perform_create(self, serializer):
         company_user = CompanyUser.objects.get(user=self.request.user)
