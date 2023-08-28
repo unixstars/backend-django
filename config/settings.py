@@ -283,3 +283,27 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 MEDIA_LOCATION = "media"
 DEFAULT_FILE_STORAGE = "mystorages.MediaStorage"
 MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{MEDIA_LOCATION}/"
+
+# 오류 로그
+LOGGING_DIR = os.path.join(BASE_DIR, "logs")
+if not os.path.exists(LOGGING_DIR):
+    os.makedirs(LOGGING_DIR)
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "file": {
+            "level": "ERROR",  # 오류만 로그로 캡처합니다. 필요에 따라 다른 로그 레벨로 변경할 수 있습니다.
+            "class": "logging.FileHandler",
+            "filename": os.path.join(LOGGING_DIR, "django_errors.log"),
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["file"],
+            "level": "ERROR",  # 오류만 로그로 캡처합니다.
+            "propagate": True,
+        },
+    },
+}
