@@ -34,11 +34,14 @@ class CompanyVerificationView(views.APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        try:
-            url = "https://api.odcloud.kr/api/nts-businessman/v1"
-            service_key = os.getenv("BUSINESS_SERVICE_KEY")
-            business_number = serializer.validated_data.get("business_number")
+        url = "https://api.odcloud.kr/api/nts-businessman/v1"
+        service_key = os.getenv("BUSINESS_SERVICE_KEY")
+        business_number = serializer.validated_data.get("business_number")
 
+        if CompanyUser.objects.filter(business_number=business_number).exists():
+            return Response({"detail": "이미 등록된 사업자 번호입니다."}, status=400)
+
+        try:
             # 사업자등록 상태조회 API
             response_b_status = requests.post(
                 f"{url}/status?serviceKey={service_key}",
