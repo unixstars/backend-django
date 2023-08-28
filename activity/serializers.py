@@ -143,8 +143,8 @@ class BoardDetailSerializer(BoardSerializer):
 
 class BoardCreateSerializer(BoardSerializer):
     activity = ActivitySerializer(many=True)
-    logo = serializers.ImageField()
-    banner = serializers.ImageField()
+    logo = serializers.ImageField(required=False)
+    banner = serializers.ImageField(required=False)
     duration = DurationFieldInISOFormat()
 
     class Meta:
