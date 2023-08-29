@@ -605,14 +605,3 @@ class UserDeactivateView(generics.GenericAPIView):
         request.user.is_active = False
         request.user.save()
         return Response({"message": "회원탈퇴가 완료되었습니다."}, status=status.HTTP_200_OK)
-
-
-class TestView(views.APIView):
-    permission_classes = [AllowAny]
-
-    def post(self, request):
-        email = request.data.get("email", None)
-        user = User.objects.get(email=email)
-        refresh = RefreshToken.for_user(user)
-        token_data = {"access": str(refresh.access_token), "refresh": str(refresh)}
-        return Response(token_data)
