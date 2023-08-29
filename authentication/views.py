@@ -1,5 +1,6 @@
-from rest_framework import views, status
+from rest_framework import views, status, generics
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from django.core.cache import cache
 import requests, os, random, jwt, json
 from api.utils import hash_function
@@ -11,6 +12,7 @@ from .serializers import (
     CompanyUserRegistrationSerializer,
     TestStudentRegisterSerializer,
     CompanyUserInfoFindVerificationSerializer,
+    UserDeactivateSerializer,
 )
 from .ncloud import get_api_keys
 from dj_rest_auth.registration.views import RegisterView
@@ -578,3 +580,16 @@ class NaverLoginView(views.APIView):
         )
         response.set_cookie(key="refresh", value=str(refresh), httponly=True)
         return response
+
+
+# 회원탈퇴
+class UserDeactivateView(generics.GenericAPIView):
+    serializer_class = UserDeactivateSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        request.user.is_active = False
+        request.user.save()
+        return Response({"message": "회원탈퇴가 완료되었습니다."}, status=status.HTTP_200_OK)
