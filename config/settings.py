@@ -95,7 +95,7 @@ MIDDLEWARE = [
 ]
 
 # CORS 설정
-CORS_ORIGIN_ORIGINS = [
+CORS_ALLOWED_ORIGINS = [
     "http://211.48.72.120:3000",
 ]
 
