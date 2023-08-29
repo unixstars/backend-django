@@ -411,19 +411,12 @@ class GoogleLoginView(views.APIView):
                     student_user.save()
 
                 refresh = RefreshToken.for_user(user)
-
                 token_data = {
-                    "access": f"{refresh.access_token}",
-                    "refresh": f"{refresh}",
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
                 }
 
-                serializer = TokenSerializer(data=token_data)
-                if serializer.is_valid():
-                    return Response(serializer.validated_data)
-                else:
-                    return Response(
-                        serializer.errors, status=status.HTTP_400_BAD_REQUEST
-                    )
+                return Response(token_data)
 
             else:
                 return Response(
@@ -501,11 +494,7 @@ class AppleLoginView(views.APIView):
         refresh = RefreshToken.for_user(user)
         token_data = {"access": str(refresh.access_token), "refresh": str(refresh)}
 
-        serializer = TokenSerializer(data=token_data)
-        if serializer.is_valid():
-            return Response(serializer.validated_data)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(token_data)
 
 
 # 카카오 로그인/회원가입 => 프론트 작업 후 수정 예정
