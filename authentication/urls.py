@@ -16,6 +16,7 @@ from .views import (
     KakaoLoginView,
     NaverLoginView,
     UserDeactivateView,
+    TestView,
 )
 
 urlpatterns = [
@@ -114,5 +115,10 @@ urlpatterns = [
         "deactivate/",
         UserDeactivateView.as_view(),
         name="user-deactive",
+    ),
+    path(
+        "findtest/",
+        TestView.as_view(),
+        name="key-value-error-find",
     ),
 ]
