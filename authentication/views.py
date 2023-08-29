@@ -13,6 +13,7 @@ from .serializers import (
     TestStudentRegisterSerializer,
     CompanyUserInfoFindVerificationSerializer,
     UserDeactivateSerializer,
+    TokenSerializer,
 )
 from .ncloud import get_api_keys
 from dj_rest_auth.registration.views import RegisterView
@@ -411,11 +412,18 @@ class GoogleLoginView(views.APIView):
 
                 refresh = RefreshToken.for_user(user)
 
-                return Response(
-                    {"access": f"{refresh.access_token}", "refresh": f"{refresh}"},
-                    status=status.HTTP_200_OK,
-                    content_type="application/json",
-                )
+                token_data = {
+                    "access": str(refresh.access_token),
+                    "refresh": str(refresh),
+                }
+
+                serializer = TokenSerializer(data=token_data)
+                if serializer.is_valid():
+                    return Response(serializer.validated_data)
+                else:
+                    return Response(
+                        serializer.errors, status=status.HTTP_400_BAD_REQUEST
+                    )
 
             else:
                 return Response(
@@ -491,13 +499,13 @@ class AppleLoginView(views.APIView):
             student_user.save()
 
         refresh = RefreshToken.for_user(user)
+        token_data = {"access": str(refresh.access_token), "refresh": str(refresh)}
 
-        response = Response(
-            {"access": f"{refresh.access_token}", "refresh": f"{refresh}"},
-            status=status.HTTP_200_OK,
-            content_type="application/json",
-        )
-        return response
+        serializer = TokenSerializer(data=token_data)
+        if serializer.is_valid():
+            return Response(serializer.validated_data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # 카카오 로그인/회원가입 => 프론트 작업 후 수정 예정
