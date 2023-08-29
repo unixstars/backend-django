@@ -373,9 +373,21 @@ class GoogleLoginView(views.APIView):
 
     def post(self, request):
         id_token_str = request.data.get("idToken", None)
-        if id_token_str is None:
+        client_type = request.data.get("clientType", None)  # 예: 'android', 'ios'
+
+        if id_token_str is None or client_type is None:
             return Response(
-                {"error": "idToken이 필요합니다."},
+                {"error": "idToken과 clientType이 필요합니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+            # client_type에 따른 Google client ID 선택
+        if client_type == "android":
+            google_client_id = os.getenv("GOOGLE_CLIENT_ID_ANDROID")
+        elif client_type == "ios":
+            google_client_id = os.getenv("GOOGLE_CLIENT_ID_IOS")
+        else:
+            return Response(
+                {"error": "알 수 없는 clientType입니다."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -383,25 +395,28 @@ class GoogleLoginView(views.APIView):
         try:
             # YOUR_GOOGLE_CLIENT_ID는 당신의 Google OAuth 2.0 클라이언트 ID를 사용해야 합니다.
             payload = id_token.verify_oauth2_token(
-                id_token_str, google_requests.Request(), os.getenv("GOOGLE_CLIENT_ID")
+                id_token_str, google_requests.Request(), google_client_id
             )
 
             # 토큰이 Google 계정으로부터 발급된 것인지 확인합니다.
             if "https://accounts.google.com" in payload["iss"]:
                 email = payload["email"]
-                client_id = payload["sub"]  # Google의 고유 사용자 ID는 'sub'에 있습니다.
 
                 try:
-                    user = User.objects.get(email=email, username=client_id)
+                    user = User.objects.get(email=email)
                 except User.DoesNotExist:
-                    user = User.objects.create(email=email, username=client_id)
+                    user = User.objects.create(email=email)
                     student_user = StudentUser.objects.create(user=user)
                     student_user.save()
 
                 refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
 
                 return Response(
-                    {"access": str(refresh.access_token), "refresh": str(refresh)}
+                    {
+                        "access": access_token,
+                        "refresh": str(refresh),
+                    }
                 )
 
             else:
@@ -478,9 +493,13 @@ class AppleLoginView(views.APIView):
             student_user.save()
 
         refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
 
         response = Response(
-            {"access": str(refresh.access_token), "refresh": str(refresh)}
+            {
+                "access": access_token,
+                "refresh": str(refresh),
+            }
         )
         return response
 
