@@ -96,7 +96,7 @@ MIDDLEWARE = [
 
 # CORS 설정
 CORS_ALLOWED_ORIGINS = [
-    "http://211.48.72.120:3000",
+    "http://localhost:3000",
 ]
 
 # REST_FRAMEWORK 설정
