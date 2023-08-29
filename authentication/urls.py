@@ -15,6 +15,7 @@ from .views import (
     AppleLoginView,
     KakaoLoginView,
     NaverLoginView,
+    UserDeactivateView,
 )
 
 urlpatterns = [
@@ -107,5 +108,11 @@ urlpatterns = [
         "student/naver/signin/",
         NaverLoginView.as_view(),
         name="naver-signin",
+    ),
+    path(
+        # v 회원탈퇴
+        "deactivate/",
+        UserDeactivateView.as_view(),
+        name="user-deactive",
     ),
 ]

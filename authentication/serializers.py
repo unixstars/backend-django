@@ -87,3 +87,12 @@ class TestStudentRegisterSerializer(RegisterSerializer):
         user = super().save(request)
         self.custom_signup(request, user)
         return user
+
+
+class UserDeactivateSerializer(serializers.Serializer):
+    confirm = serializers.BooleanField()
+
+    def validate_confirm(self, value):
+        if not value:
+            raise serializers.ValidationError("confirm이 True여야 합니다.")
+        return value
