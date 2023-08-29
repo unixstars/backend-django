@@ -410,13 +410,11 @@ class GoogleLoginView(views.APIView):
                     student_user.save()
 
                 refresh = RefreshToken.for_user(user)
-                access_token = str(refresh.access_token)
 
                 return Response(
-                    {
-                        "access": access_token,
-                        "refresh": str(refresh),
-                    }
+                    {"access": f"{refresh.access_token}", "refresh": f"{refresh}"},
+                    status=status.HTTP_200_OK,
+                    content_type="application/json",
                 )
 
             else:
@@ -493,13 +491,11 @@ class AppleLoginView(views.APIView):
             student_user.save()
 
         refresh = RefreshToken.for_user(user)
-        access_token = str(refresh.access_token)
 
         response = Response(
-            {
-                "access": access_token,
-                "refresh": str(refresh),
-            }
+            {"access": f"{refresh.access_token}", "refresh": f"{refresh}"},
+            status=status.HTTP_200_OK,
+            content_type="application/json",
         )
         return response
 
