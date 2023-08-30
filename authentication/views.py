@@ -404,6 +404,11 @@ class GoogleLoginView(views.APIView):
 
                 try:
                     user = User.objects.get(email=email)
+                    if not user.is_active:
+                        return Response(
+                            {"error": "회원탈퇴한 유저입니다."},
+                            status=status.HTTP_400_BAD_REQUEST,
+                        )
                 except User.DoesNotExist:
                     user = User.objects.create(email=email)
                     student_user = StudentUser.objects.create(user=user)
@@ -485,6 +490,11 @@ class AppleLoginView(views.APIView):
 
         try:
             user = User.objects.get(email=email)
+            if not user.is_active:
+                return Response(
+                    {"error": "회원탈퇴한 유저입니다."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
         except User.DoesNotExist:
             user = User.objects.create(email=email)
             student_user = StudentUser.objects.create(user=user)

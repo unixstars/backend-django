@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from dj_rest_auth.registration.serializers import RegisterSerializer
-from user.models import CompanyUser, StudentUser
+from user.models import CompanyUser, StudentUser, User
 from django.core.cache import cache
 from api.utils import hash_function
 from allauth.utils import email_address_exists
@@ -37,6 +37,17 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
 
         business_number = attrs.get("business_number", "")
         manager_email = attrs.get("manager_email", "")
+
+        # 회원탈퇴한 유저인지 확인
+        try:
+            user = User.objects.get(email=manager_email)
+            if not user.is_active:
+                raise serializers.ValidationError(
+                    {"non_field_errors": ["회원탈퇴한 유저입니다."]}
+                )
+        except User.DoesNotExist:
+            pass
+
         if email_address_exists(manager_email):
             raise serializers.ValidationError(
                 ("해당 이메일로 가입된 유저가 이미 존재합니다."),
