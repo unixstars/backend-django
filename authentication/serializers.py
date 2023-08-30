@@ -89,11 +89,6 @@ class TestStudentRegisterSerializer(RegisterSerializer):
         return user
 
 
-class TokenSerializer(serializers.Serializer):
-    access = serializers.CharField()
-    refresh = serializers.CharField()
-
-
 class UserDeactivateSerializer(serializers.Serializer):
     confirm = serializers.BooleanField()
 

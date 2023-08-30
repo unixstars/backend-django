@@ -97,18 +97,18 @@ urlpatterns = [
         AppleLoginView.as_view(),
         name="apple-signin",
     ),
-    path(
-        # 학생로그인/카카오: 로그인 또는 회원가입
-        "student/kakao/signin/",
-        KakaoLoginView.as_view(),
-        name="kakao-signin",
-    ),
-    path(
-        # 학생로그인/네이버: 로그인 또는 회원가입
-        "student/naver/signin/",
-        NaverLoginView.as_view(),
-        name="naver-signin",
-    ),
+    # path(
+    # 학생로그인/카카오: 로그인 또는 회원가입
+    # "student/kakao/signin/",
+    # KakaoLoginView.as_view(),
+    # name="kakao-signin",
+    # ),
+    # path(
+    # 학생로그인/네이버: 로그인 또는 회원가입
+    # "student/naver/signin/",
+    # NaverLoginView.as_view(),
+    # name="naver-signin",
+    # ),
     path(
         # v 회원탈퇴
         "deactivate/",
