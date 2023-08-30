@@ -121,6 +121,7 @@ class BoardListSerializer(BoardSerializer):
 
 class BoardDetailSerializer(BoardSerializer):
     activity = ActivitySerializer(many=True, read_only=True)
+    is_scrapped = serializers.SerializerMethodField()
 
     class Meta:
         model = Board
@@ -136,9 +137,21 @@ class BoardDetailSerializer(BoardSerializer):
             "address",
             "views",
             "scrap_count",
+            "is_scrapped",
             "d_day",
             "activity",
         ]
+
+        def get_is_scrapped(self, obj) -> bool:
+            request = self.context.get("request")
+            student_user = request.user.student_user
+            if student_user:
+                if Scrap.objects.filter(board=obj, student_user=student_user).exists():
+                    return True
+                else:
+                    return False
+            else:
+                return False
 
 
 class BoardCreateSerializer(BoardSerializer):
