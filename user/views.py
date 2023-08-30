@@ -1,4 +1,5 @@
-from rest_framework import generics, parsers
+from rest_framework import generics, parsers, views, status
+from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from api.permissions import IsStudentUser, IsPortFolioOwner, IsProfileOwner
 from .models import StudentUserPortfolio, StudentUserProfile
@@ -82,3 +83,14 @@ class StudentUserProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
         parsers.FormParser,
         parsers.JSONParser,
     ]
+
+
+class CheckStudentUserProfileView(views.APIView):
+    permission_classes = [IsAuthenticated, IsStudentUser]
+
+    def get(self, request, *args, **kwargs):
+        student_user = request.user.student_user
+        profile_exists = StudentUserProfile.objects.filter(
+            student_user=student_user
+        ).exists()
+        return Response({"exists": profile_exists}, status=status.HTTP_200_OK)

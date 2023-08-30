@@ -138,6 +138,12 @@ class Scrap(models.Model):
         StudentUser, on_delete=models.CASCADE, related_name="scrap"
     )
 
+    class Meta:
+        unique_together = [
+            "board",
+            "student_user",
+        ]
+
 
 class Form(models.Model):
     student_user = models.ForeignKey(

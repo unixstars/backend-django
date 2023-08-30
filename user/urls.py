@@ -5,6 +5,7 @@ from .views import (
     StudentUserPortFolioCreateView,
     StudentUserPortfolioDetailView,
     StudentUserPortfolioListView,
+    CheckStudentUserProfileView,
 )
 
 urlpatterns = [
@@ -67,5 +68,11 @@ urlpatterns = [
         "student/portfolio/",
         StudentUserPortfolioListView.as_view(),
         name="student-portfolio-list",
+    ),
+    # v 학생 프로필 존재 여부
+    path(
+        "student/profile/exists/",
+        CheckStudentUserProfileView.as_view(),
+        name="student-profile-check",
     ),
 ]

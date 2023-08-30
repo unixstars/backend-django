@@ -1,6 +1,6 @@
 from rest_framework import generics, status, parsers, filters
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.exceptions import PermissionDenied
+from rest_framework.exceptions import PermissionDenied, APIException
 from .models import Board, Scrap, Form, Activity, Suggestion
 from .paginations import BoardListPagination, ProfileListPagination
 from user.models import (
@@ -268,6 +268,11 @@ class ScrapCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, IsStudentUser]
 
     def perform_create(self, serializer):
+        if Scrap.objects.filter(
+            board=serializer.validated_data["board"],
+            student_user=self.request.user.student_user,
+        ).exists():
+            raise APIException("이미 스크랩이 존재합니다.", code=status.HTTP_400_BAD_REQUEST)
         serializer.save(student_user=self.request.user.student_user)
 
 
