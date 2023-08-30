@@ -13,8 +13,6 @@ from .views import (
     TestStudentRegisterView,
     GoogleLoginView,
     AppleLoginView,
-    KakaoLoginView,
-    NaverLoginView,
     UserDeactivateView,
 )
 
