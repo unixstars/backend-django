@@ -122,6 +122,7 @@ class BoardListSerializer(BoardSerializer):
 class BoardDetailSerializer(BoardSerializer):
     activity = ActivitySerializer(many=True, read_only=True)
     is_scrapped = serializers.SerializerMethodField()
+    is_submitted = serializers.SerializerMethodField()
 
     class Meta:
         model = Board
@@ -138,6 +139,7 @@ class BoardDetailSerializer(BoardSerializer):
             "views",
             "scrap_count",
             "is_scrapped",
+            "is_submitted",
             "d_day",
             "activity",
         ]
@@ -147,6 +149,19 @@ class BoardDetailSerializer(BoardSerializer):
             student_user = request.user.student_user
             if student_user:
                 if Scrap.objects.filter(board=obj, student_user=student_user).exists():
+                    return True
+                else:
+                    return False
+            else:
+                return False
+
+        def get_is_submitted(self, obj) -> bool:
+            request = self.context.get("request")
+            student_user = request.user.student_user
+            if student_user:
+                if Form.objects.filter(
+                    activity__board=obj, student_user=student_user
+                ).exists():
                     return True
                 else:
                     return False
