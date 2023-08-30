@@ -328,10 +328,8 @@ class ActivityListSerializer(serializers.ModelSerializer):
 
 
 class FormFillSerializer(StudentUserProfileSerializer):
-    portfolio_list = StudentUserPortfolioListSerializer(
-        source="student_user.student_user_portfolio", many=True
-    )
     activity_list = serializers.SerializerMethodField()
+    portfolio_list = serializers.SerializerMethodField()
 
     class Meta:
         model = StudentUserProfile
@@ -351,6 +349,13 @@ class FormFillSerializer(StudentUserProfileSerializer):
         board_id = self.context["view"].kwargs.get("board_id")
         activities = Activity.objects.filter(board__pk=board_id)
         return ActivityListSerializer(activities, many=True).data
+
+    def get_portfolio_list(self, obj):
+        portfolios = StudentUserPortfolio.objects.filter(student_user=obj.student_user)
+        if portfolios.exists():
+            return StudentUserPortfolioListSerializer(portfolios, many=True).data
+        else:
+            return []
 
 
 class FormCreateSerializer(serializers.ModelSerializer):
