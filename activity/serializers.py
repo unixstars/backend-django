@@ -146,25 +146,19 @@ class BoardDetailSerializer(BoardSerializer):
 
     def get_is_scrapped(self, obj) -> bool:
         request = self.context.get("request")
-        student_user = request.user.student_user
-        if student_user:
-            if Scrap.objects.filter(board=obj, student_user=student_user).exists():
-                return True
-            else:
-                return False
+        if request and request.user.is_authenticated:
+            student_user = request.user.student_user
+            return Scrap.objects.filter(board=obj, student_user=student_user).exists()
         else:
             return False
 
     def get_is_submitted(self, obj) -> bool:
         request = self.context.get("request")
-        student_user = request.user.student_user
-        if student_user:
-            if Form.objects.filter(
+        if request and request.user.is_authenticated:
+            student_user = request.user.student_user
+            return Form.objects.filter(
                 activity__board=obj, student_user=student_user
-            ).exists():
-                return True
-            else:
-                return False
+            ).exists()
         else:
             return False
 
