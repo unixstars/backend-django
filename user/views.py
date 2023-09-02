@@ -1,6 +1,7 @@
 from rest_framework import generics, parsers, views, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import NotFound
 from api.permissions import IsStudentUser, IsPortFolioOwner, IsProfileOwner
 from .models import StudentUserPortfolio, StudentUserProfile
 from .serializers import (
@@ -71,7 +72,6 @@ class StudentUserProfileCreateView(generics.CreateAPIView):
 
 # 프로필 : 학생 유저 프로필 하나 보기,수정,삭제
 class StudentUserProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = StudentUserProfile.objects.all()
     serializer_class = StudentUserProfileUpdateSerializer
     permission_classes = [
         IsAuthenticated,
@@ -83,6 +83,14 @@ class StudentUserProfileDetailView(generics.RetrieveUpdateDestroyAPIView):
         parsers.FormParser,
         parsers.JSONParser,
     ]
+
+    def get_object(self):
+        try:
+            student_user = self.request.user.student_user
+            profile = StudentUserProfile.objects.get(student_user=student_user)
+            return profile
+        except StudentUserProfile.DoesNotExist:
+            raise NotFound(detail="학생 프로필이 존재하지 않습니다.")
 
 
 class CheckStudentUserProfileView(views.APIView):
