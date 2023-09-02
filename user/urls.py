@@ -18,21 +18,21 @@ urlpatterns = [
     # v 프로필 : 학생 유저 프로필 하나 보기
     path(
         # GET
-        "student/profile/<int:pk>/",
+        "student/profile/",
         StudentUserProfileDetailView.as_view(),
         name="student-profile-detail",
     ),
     # v 프로필 : 학생 유저 프로필 하나 수정
     path(
         # PUT
-        "student/profile/<int:pk>/update/",
+        "student/profile/update/",
         StudentUserProfileDetailView.as_view(),
         name="student-profile-update",
     ),
     # v 프로필 : 학생 유저 프로필 하나 삭제
     path(
         # DELETE
-        "student/profile/<int:pk>/delete/",
+        "student/profile/delete/",
         StudentUserProfileDetailView.as_view(),
         name="student-profile-delete",
     ),
