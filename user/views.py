@@ -46,13 +46,16 @@ class StudentUserPortfolioDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 # 포트폴리오 : 학생 유저 포트폴리오 리스트
 class StudentUserPortfolioListView(generics.ListAPIView):
-    queryset = StudentUserPortfolio.objects.all()
     serializer_class = StudentUserPortfolioListSerializer
     permission_classes = [
         IsAuthenticated,
         IsStudentUser,
         IsPortFolioOwner,
     ]
+
+    def get_queryset(self):
+        user = self.request.user.student_user
+        return StudentUserPortfolio.objects.filter(student_user=user)
 
 
 # 프로필/수정페이지 : 학생 유저 프로필 생성
