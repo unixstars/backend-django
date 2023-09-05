@@ -482,6 +482,8 @@ class CompanyActivityFormDetailSerializer(serializers.ModelSerializer):
 
     def get_portfolio(self, obj):
         portfolio = obj.student_user_portfolio
+        if not portfolio:
+            return None
         return StudentUserPortfolioSerializer(portfolio).data
 
 
