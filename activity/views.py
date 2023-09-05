@@ -22,6 +22,7 @@ from .serializers import (
     FormDetailSerializer,
     CompanyActivityListSerializer,
     CompanyActivityFormListSerializer,
+    CompanyActivityFormDetailSerializer,
     CompanyStudentProfileListSerializer,
     CompanyStudentProfileDetailSerializer,
     CompanyStudentPortfolioDetailSerializer,
@@ -179,7 +180,7 @@ class CompanyActivityFormListView(generics.RetrieveAPIView):
 
 # 지원관리/대외활동1/지원자1 : 지원자 한명의 지원서
 class CompanyActivityFormDetailView(generics.RetrieveAPIView):
-    serializer_class = FormSerializer
+    serializer_class = CompanyActivityFormDetailSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def get_queryset(self):

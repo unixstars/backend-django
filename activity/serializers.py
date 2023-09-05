@@ -9,9 +9,10 @@ from datetime import timedelta
 from user.serializers import (
     StudentUserProfileSerializer,
     StudentUserPortfolioListSerializer,
+    StudentUserProfileShowSerializer,
 )
 from user.models import StudentUserProfile, StudentUserPortfolio
-from user.serializers import PortfolioFileSerializer
+from user.serializers import PortfolioFileSerializer, StudentUserPortfolioSerializer
 
 
 class BoardSerializer(serializers.ModelSerializer):
@@ -459,6 +460,29 @@ class CompanyActivityFormListSerializer(serializers.ModelSerializer):
     def get_form_list(self, obj):
         forms = Form.objects.filter(activity=obj)
         return FormListSerializer(forms, many=True).data
+
+
+class CompanyActivityFormDetailSerializer(serializers.ModelSerializer):
+    profile = StudentUserProfileShowSerializer(
+        source="student_user.student_user_profile"
+    )
+    student_user_portfolio = StudentUserPortfolioListSerializer()
+
+    class Meta:
+        model = Form
+        fields = [
+            "id",
+            "introduce",
+            "reason",
+            "merit",
+            "accept_status",
+            "profile",
+            "student_user_portfolio",
+        ]
+
+    def get_portfolio(self, obj):
+        portfolio = obj.student_user_portfolio
+        return StudentUserPortfolioSerializer(portfolio).data
 
 
 class CompanyStudentProfileListSerializer(serializers.ModelSerializer):
