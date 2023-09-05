@@ -466,7 +466,7 @@ class CompanyActivityFormDetailSerializer(serializers.ModelSerializer):
     profile = StudentUserProfileShowSerializer(
         source="student_user.student_user_profile"
     )
-    student_user_portfolio = StudentUserPortfolioListSerializer()
+    portfolio = serializers.SerializerMethodField()
 
     class Meta:
         model = Form
