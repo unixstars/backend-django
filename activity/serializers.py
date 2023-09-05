@@ -477,7 +477,7 @@ class CompanyActivityFormDetailSerializer(serializers.ModelSerializer):
             "merit",
             "accept_status",
             "profile",
-            "student_user_portfolio",
+            "portfolio",
         ]
 
     def get_portfolio(self, obj):
