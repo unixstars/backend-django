@@ -186,6 +186,12 @@ class Form(models.Model):
     )
     submitted_at = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        unique_together = [
+            "student_user",
+            "activity",
+        ]
+
 
 class Suggestion(models.Model):
     company_user = models.ForeignKey(
