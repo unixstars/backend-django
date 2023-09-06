@@ -369,7 +369,8 @@ class FormFillSerializer(StudentUserProfileSerializer):
         student_user = obj.student_user
         try:
             form = student_user.form
-            activities = Activity.objects.filter(board__pk=board_id, form=form)
+            board = Board.objects.get(pk=board_id)
+            activities = Activity.objects.filter(board=board, form=form)
             return ActivityListSerializer(activities, many=True).data
         except Form.DoesNotExist:
             return []
