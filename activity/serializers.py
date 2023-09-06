@@ -165,9 +165,11 @@ class BoardDetailSerializer(BoardSerializer):
             and not request.user.is_company_user
         ):
             student_user = request.user.student_user
-            return Form.objects.filter(
+            form_count = Form.objects.filter(
                 activity__board=obj, student_user=student_user
-            ).exists()
+            ).count()
+            activity_count = Activity.objects.filter(board=obj).count()
+            return form_count == activity_count
         else:
             return False
 
@@ -333,6 +335,7 @@ class ActivityListSerializer(serializers.ModelSerializer):
 class FormFillSerializer(StudentUserProfileSerializer):
     activity_list = serializers.SerializerMethodField()
     portfolio_list = serializers.SerializerMethodField()
+    submit_activity_list = serializers.SerializerMethodField()
 
     class Meta:
         model = StudentUserProfile
@@ -346,6 +349,7 @@ class FormFillSerializer(StudentUserProfileSerializer):
             "major",
             "activity_list",
             "portfolio_list",
+            "submit_activity_list",
         ]
 
     def get_activity_list(self, obj):
@@ -358,6 +362,16 @@ class FormFillSerializer(StudentUserProfileSerializer):
         if portfolios.exists():
             return StudentUserPortfolioListSerializer(portfolios, many=True).data
         else:
+            return []
+
+    def get_submit_activity_list(self, obj):
+        board_id = self.context["view"].kwargs.get("board_id")
+        student_user = obj.student_user
+        try:
+            form = student_user.form
+            activities = Activity.objects.filter(board__pk=board_id, form=form)
+            return ActivityListSerializer(activities, many=True).data
+        except Form.DoesNotExist:
             return []
 
 
