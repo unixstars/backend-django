@@ -14,7 +14,6 @@ from .serializers import (
     BoardCreateSerializer,
     BoardDetailSerializer,
     ScrapSerializer,
-    FormSerializer,
     FormBoardListSerializer,
     FormBoardDetailSerializer,
     FormFillSerializer,
