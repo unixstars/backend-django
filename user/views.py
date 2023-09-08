@@ -242,7 +242,9 @@ class CompanyUserInfoChangeView(views.APIView):
         new_manager_phone = serializer.validated_data.get("new_manager_phone")
 
         if new_manager_phone:
-            authenticated = cache.get(f"auth_{new_manager_phone}_authenticated")
+            authenticated = cache.get(
+                hash_function(new_manager_phone) + "_authenticated"
+            )
             if not authenticated:
                 return Response(
                     {"detail": "담당자 전화번호 인증이 필요합니다."},
