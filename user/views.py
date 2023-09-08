@@ -140,6 +140,9 @@ class CompanyUserInfoAuthView(views.APIView):
             email=request.user.email, password=request.data.get("password")
         )
         if user is not None:
+            cache.set(
+                hash_function(request.user.email) + "_authenticated", True, 10 * 60
+            )
             return Response({"detail": "비밀번호가 유효합니다."}, status=status.HTTP_200_OK)
         return Response(
             {"detail": "비밀번호가 유효하지 않습니다."}, status=status.HTTP_400_BAD_REQUEST
@@ -148,7 +151,7 @@ class CompanyUserInfoAuthView(views.APIView):
 
 # 회원정보 /비밀번호 변경:담당자 연락처 인증번호 전송
 class CompanyUserInfoChangePhoneSendView(views.APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsCompanyUser]
     throttle_classes = [SendRateThrottle]
     throttle_field = "new_manager_phone"
 
@@ -156,6 +159,12 @@ class CompanyUserInfoChangePhoneSendView(views.APIView):
         new_manager_phone = request.data.get("new_manager_phone")
         new_manager_phone_auth_number = random.randint(100000, 999999)
         cache.set(hash_function(new_manager_phone), new_manager_phone, 60 * 5)
+
+        auth_info = cache.get(
+            hash_function(request.user.email) + "_authenticated", True, 10 * 60
+        )
+        if auth_info is None:
+            return Response({"detail": "비밀번호 인증이 되지 않았습니다."}, status=400)
 
         # 네이버 클라우드 SMS API
         try:
@@ -196,7 +205,7 @@ class CompanyUserInfoChangePhoneSendView(views.APIView):
 # 회원정보 /비밀번호 변경:담당자 연락처 인증번호 인증
 class CompanyUserInfoChangePhoneVerificationView(views.APIView):
     serializer_class = CompanyUserInfoChangePhoneVerificationSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
@@ -222,7 +231,7 @@ class CompanyUserInfoChangePhoneVerificationView(views.APIView):
 # 회원정보/비밀번호 변경: 회원정보/비밀번호 변경 버튼
 class CompanyUserInfoChangeView(views.APIView):
     serializer_class = CompanyUserInfoChangeSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
