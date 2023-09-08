@@ -6,6 +6,11 @@ from .views import (
     StudentUserPortfolioDetailView,
     StudentUserPortfolioListView,
     CheckStudentUserProfileView,
+    CompanyUserInfoView,
+    CompanyUserInfoAuthView,
+    CompanyUserInfoChangePhoneSendView,
+    CompanyUserInfoChangePhoneVerificationView,
+    CompanyUserInfoChangeView,
 )
 
 urlpatterns = [
@@ -74,5 +79,35 @@ urlpatterns = [
         "student/profile/exists/",
         CheckStudentUserProfileView.as_view(),
         name="student-profile-check",
+    ),
+    # 내 정보/기업회원
+    path(
+        "company/info/",
+        CompanyUserInfoView.as_view(),
+        name="company-info",
+    ),
+    # 회원정보 변경 인증(비밀번호)
+    path(
+        "company/info/change/auth/",
+        CompanyUserInfoAuthView.as_view(),
+        name="company-info-change-auth",
+    ),
+    # 회원정보 /비밀번호 변경:담당자 연락처 인증번호 전송
+    path(
+        "company/info/change/phone/send/",
+        CompanyUserInfoChangePhoneSendView.as_view(),
+        name="company-info-change-phone-send",
+    ),
+    # 회원정보 /비밀번호 변경:담당자 연락처 인증번호 인증
+    path(
+        "company/info/change/phone/verify/",
+        CompanyUserInfoChangePhoneVerificationView.as_view(),
+        name="company-info-change-phone-verifiy",
+    ),
+    # 회원정보/비밀번호 변경: 회원정보/비밀번호 변경 버튼
+    path(
+        "company/info/change/",
+        CompanyUserInfoChangeView.as_view(),
+        name="company-info-change",
     ),
 ]
