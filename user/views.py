@@ -174,8 +174,8 @@ class CompanyUserInfoChangePhoneSendView(views.APIView):
                 "type": "SMS",
                 "contentType": "COMM",
                 "from": os.getenv("SMS_CALLING_NUM"),
-                "subject": "[유니스타 기업회원가입 담당자 인증]",
-                "content": f"유니스타 기업회원가입 인증번호는 [{new_manager_phone_auth_number}]입니다. 인증번호를 정확히 입력해주세요.",
+                "subject": "[유니스타 기업정보변경 담당자 번호인증]",
+                "content": f"유니스타 기업정보변경 인증번호는 [{new_manager_phone_auth_number}]입니다. 인증번호를 정확히 입력해주세요.",
                 "messages": [{"to": f"{new_manager_phone}"}],
             }
 
