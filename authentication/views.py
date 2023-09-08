@@ -267,6 +267,11 @@ class CompanyUserInfoFindPhoneSendView(views.APIView):
         register_phone_auth_number = random.randint(100000, 999999)
         cache.set(hash_function(register_phone), register_phone_auth_number, 60 * 5)
 
+        try:
+            CompanyUser.objects.get(manager_phone=register_phone)
+        except CompanyUser.DoesNotExist:
+            return Response({"detail": "등록 번호와 일치하는 기업 유저가 존재하지 않습니다."}, status=400)
+
         # 네이버 클라우드 SMS API
         try:
             service_id = os.getenv("SMS_SERVICE_ID")
@@ -328,8 +333,14 @@ class CompanyUserInfoFindVerificationView(views.APIView):
                 register_phone,
                 60 * 60,
             )
+            company_user = CompanyUser.objects.get(manager_phone=register_phone)
+            email = company_user.user.email
             return Response(
-                {"detail": "인증에 성공하였습니다.", "register_phone": f"{register_phone}"}
+                {
+                    "detail": "인증에 성공하였습니다.",
+                    "register_phone": f"{register_phone}",
+                    "email": f"{email}",
+                }
             )
 
 

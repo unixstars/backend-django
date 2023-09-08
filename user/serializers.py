@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import StudentUserProfile, StudentUserPortfolio, PortfolioFile
+from .models import StudentUserProfile, StudentUserPortfolio, PortfolioFile, CompanyUser
 from api.utils import generate_presigned_url
 from django.conf import settings
 
@@ -235,3 +235,43 @@ class StudentUserPortfolioListSerializer(serializers.ModelSerializer):
             "id",
             "title",
         ]
+
+
+class CompanyUserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CompanyUser
+        fields = [
+            "business_number",
+            "ceo_name",
+            "start_date",
+            "corporate_number",
+            "manager_email",
+            "manager_phone",
+        ]
+
+
+class CompanyUserInfoChangePhoneVerificationSerializer(serializers.Serializer):
+    new_manager_phone = serializers.CharField(max_length=20)
+    auth_number = serializers.IntegerField()
+
+
+class CompanyUserInfoChangeSerializer(serializers.ModelSerializer):
+    new_password1 = serializers.CharField(write_only=True, required=False)
+    new_password2 = serializers.CharField(write_only=True, required=False)
+    new_manager_phone = serializers.CharField(required=False)
+
+    class Meta:
+        model = CompanyUser
+        fields = ["new_password1", "new_password2", "new_manager_phone"]
+
+    def validate(self, data):
+        new_password1 = data.get("new_password1")
+        new_password2 = data.get("new_password2")
+
+        if new_password1 or new_password2:
+            if not new_password1 or not new_password2:
+                raise serializers.ValidationError("두 비밀번호 모두 입력해야 합니다.")
+            if new_password1 != new_password2:
+                raise serializers.ValidationError("비밀번호가 일치하지 않습니다.")
+
+        return data
