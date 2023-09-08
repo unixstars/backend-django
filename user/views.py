@@ -156,15 +156,15 @@ class CompanyUserInfoChangePhoneSendView(views.APIView):
     throttle_field = "new_manager_phone"
 
     def post(self, request):
+        auth_info = cache.get(hash_function(request.user.email) + "_authenticated")
+        if not auth_info:
+            return Response({"detail": "비밀번호 인증이 되지 않았습니다."}, status=400)
+
         new_manager_phone = request.data.get("new_manager_phone")
         new_manager_phone_auth_number = random.randint(100000, 999999)
-        cache.set(hash_function(new_manager_phone), new_manager_phone, 60 * 5)
-
-        auth_info = cache.get(
-            hash_function(request.user.email) + "_authenticated", True, 10 * 60
+        cache.set(
+            hash_function(new_manager_phone), new_manager_phone_auth_number, 60 * 5
         )
-        if auth_info is None:
-            return Response({"detail": "비밀번호 인증이 되지 않았습니다."}, status=400)
 
         # 네이버 클라우드 SMS API
         try:
