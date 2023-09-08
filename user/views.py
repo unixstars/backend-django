@@ -208,10 +208,6 @@ class CompanyUserInfoChangePhoneVerificationView(views.APIView):
     permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def post(self, request):
-        auth_info = cache.get(hash_function(request.user.email) + "_authenticated")
-        if not auth_info:
-            return Response({"detail": "비밀번호 인증이 되지 않았습니다."}, status=400)
-
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
@@ -238,6 +234,10 @@ class CompanyUserInfoChangeView(views.APIView):
     permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def post(self, request, *args, **kwargs):
+        auth_info = cache.get(hash_function(request.user.email) + "_authenticated")
+        if not auth_info:
+            return Response({"detail": "비밀번호 인증이 되지 않았습니다."}, status=400)
+
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
 
