@@ -150,7 +150,7 @@ class CompanyUserInfoAuthView(views.APIView):
 class CompanyUserInfoChangePhoneSendView(views.APIView):
     permission_classes = [AllowAny]
     throttle_classes = [SendRateThrottle]
-    throttle_field = "manager_phone"
+    throttle_field = "new_manager_phone"
 
     def post(self, request):
         new_manager_phone = request.data.get("new_manager_phone")
