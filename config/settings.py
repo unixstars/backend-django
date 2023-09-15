@@ -33,6 +33,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     ".ap-northeast-2.compute.amazonaws.com",
     "unistar-backend-dev.com",
+    "172.31.41.0",
     "127.0.0.1",
 ]
 
