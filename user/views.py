@@ -1,10 +1,11 @@
-import os, requests, random
+import os, requests, random, string
 from rest_framework import generics, parsers, views, status
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.exceptions import NotFound
 from django.contrib.auth import authenticate
 from django.core.cache import cache
+from django.utils import timezone
 from authentication.utils import SendRateThrottle
 from authentication.ncloud import get_api_keys
 from api.permissions import (
@@ -119,6 +120,89 @@ class CheckStudentUserProfileView(views.APIView):
             student_user=student_user
         ).exists()
         return Response({"exists": profile_exists}, status=status.HTTP_200_OK)
+
+
+# 프로필/수정페이지/계좌인증
+class StudentBankAccountCheckView(views.APIView):
+    permission_classes = [IsAuthenticated, IsStudentUser]
+
+    BANK_CODE_MAP = {
+        "한국은행": "001",
+        "산업은행": "002",
+        "기업은행": "003",
+        "국민은행": "004",
+        "NH농협은행": "011",
+        "우리은행": "020",
+        "새마을금고": "045",
+        "하나은행": "081",
+        "신한은행": "088",
+        "카카오뱅크": "090",
+        "토스뱅크": "092",
+    }
+
+    def post(self, request):
+        bank_name = request.data.get("bank")
+        account_num = request.data.get("account_number")
+        account_holder_info = request.data.get("social_number")
+        account_holder_name = request.data.get("name")
+
+        if not all([bank_name, account_num, account_holder_info, account_holder_name]):
+            return Response(
+                {"error": "필수 파라미터가 누락되었습니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        bank_code_std = self.BANK_CODE_MAP.get(bank_name)
+        if not bank_code_std:
+            return Response(
+                {"error": "Invalid bank name"}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        tran_dtime = timezone.now().strftime("%Y%m%d%H%M%S")
+        bank_tran_id = (
+            os.getenv("UNIQUE_CODE")
+            + "U"
+            + "".join(random.choices(string.ascii_uppercase + string.digits, k=9))
+        )
+
+        payload = {
+            "bank_tran_id": bank_tran_id,
+            "bank_code_std": bank_code_std,
+            "account_num": account_num,
+            "account_holder_info_type": " ",
+            "account_holder_info": account_holder_info,
+            "tran_dtime": tran_dtime,
+        }
+
+        headers = {
+            "Content-Type": "application/json; charset=UTF-8",
+            "Authorization": f"Bearer {os.getenv('ACCESS_TOKEN')}",
+        }
+
+        response = requests.post(
+            "https://openapi.openbanking.or.kr/v2.0/inquiry/real_name",
+            json=payload,
+            headers=headers,
+        )
+        if response.status_code == 200:
+            resp_data = response.json()
+            if resp_data.get(
+                "account_holder_name"
+            ) == account_holder_name and resp_data.get("account_type") in {
+                "1",
+                "2",
+                "6",
+            }:
+                return Response({"detail": "인증이 완료되었습니다."}, status=status.HTTP_200_OK)
+            else:
+                return Response(
+                    {"detail": "인증이 실패하였습니다."}, status=status.HTTP_400_BAD_REQUEST
+                )
+        else:
+            return Response(
+                {"detail": "인증 서버에서 오류가 발생했습니다."},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            )
 
 
 # 내 정보/기업회원

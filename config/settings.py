@@ -132,8 +132,24 @@ REST_FRAMEWORK = {
     },
 }
 
-# 만료 토큰 삭제 반복작업
-CRONJOBS = [("0 0 * * *", "authentication.cron.delete_expired_tokens")]
+# 반복작업
+CRONJOBS = [
+    (
+        "0 0 * * *",
+        "authentication.cron.delete_expired_tokens",
+        "> /var/log/uwsgi/cron/delete_expired_tokens.log",
+    ),
+    (
+        "*/60 * * * *",
+        "activity.cron.close_expired_boards",
+        "> /var/log/uwsgi/cron/close_update.log",
+    ),
+    (
+        "0 0 * * *",
+        "program.cron.update_accepted_applicants",
+        "> /var/log/uwsgi/cron/update_accepted_applicants.log",
+    ),
+]
 
 
 # Email 로그인 관련(dj-rest-auth 설정)

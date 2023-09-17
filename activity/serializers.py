@@ -76,6 +76,7 @@ class ActivitySerializer(serializers.ModelSerializer):
             "period",
             "recruit",
             "payment",
+            "is_closed",
         ]
 
 
@@ -117,6 +118,7 @@ class BoardListSerializer(BoardSerializer):
             "views",
             "scrap_count",
             "d_day",
+            "is_closed",
         ]
 
 
@@ -139,6 +141,7 @@ class BoardDetailSerializer(BoardSerializer):
             "address",
             "views",
             "scrap_count",
+            "is_closed",
             "is_scrapped",
             "is_submitted",
             "d_day",
@@ -329,6 +332,7 @@ class ActivityListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
+            "is_closed",
         ]
 
 
@@ -431,6 +435,7 @@ class CompanyActivityListSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "deadline",
+            "is_closed",
             "form_count",
         ]
 
@@ -438,7 +443,7 @@ class CompanyActivityListSerializer(serializers.ModelSerializer):
         board = obj.board
         deadline = board.created_at + board.duration
         if timezone.now() > deadline:
-            return "마감됨"
+            return 0
         return deadline.date()
 
     def get_form_count(self, obj):
@@ -468,6 +473,7 @@ class CompanyActivityFormListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
+            "is_closed",
             "form_list",
         ]
 

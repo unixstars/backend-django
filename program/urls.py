@@ -14,6 +14,7 @@ from .views import (
     SubmitUpdateView,
     CompanyProgramListView,
     CompanyProgramDetailView,
+    CompanyProgramStartView,
     CompanyProgramApplicantDetailView,
     CompanyProgramApplicantWarningView,
     CompanyProgramWarningCreateView,
@@ -114,6 +115,12 @@ urlpatterns = [
         "company/program/<int:pk>/",
         CompanyProgramDetailView.as_view(),
         name="company-program-detail",
+    ),
+    # 활동관리/활동1/활동 시작: 대외활동 시작
+    path(
+        "company/program/<int:pk>/start/",
+        CompanyProgramStartView.as_view(),
+        name="company-program-start",
     ),
     # v 활동관리/활동1/학생1: 공지,과제 리스트
     path(

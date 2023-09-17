@@ -279,6 +279,23 @@ class CompanyProgramDetailView(generics.RetrieveAPIView):
         )
 
 
+# 활동관리/활동1/활동 시작: 대외활동 시작
+class CompanyProgramStartView(generics.UpdateAPIView):
+    queryset = Activity.objects.all()
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def update(self, request, *args, **kwargs):
+        activity = self.get_object()
+        applicants = AcceptedApplicant.objects.filter(form__activity=activity)
+
+        for applicant in applicants:
+            applicant.week = 1
+            applicant.start_date = timezone.now().date()
+            applicant.save()
+
+        return Response(status=status.HTTP_200_OK)
+
+
 # 활동관리/활동1/학생1: 공지,과제 리스트
 class CompanyProgramApplicantDetailView(generics.RetrieveAPIView):
     serializer_class = CompanyProgramApplicantDetailSerializer
@@ -388,12 +405,20 @@ class CompanyProgramAssignmentDurationExtendView(generics.UpdateAPIView):
         assignment = self.get_object()
         original_deadline = assignment.created_at + assignment.duration
 
+        if assignment.duration_extended >= 3:
+            return Response(
+                {"detail": "기한연장은 최대 3번까지만 가능합니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
         if original_deadline > timezone.now():
             assignment.duration += timedelta(days=3)
+            assignment.duration_extended += 1
         else:
             assignment.duration = (
                 timezone.now() - assignment.created_at + timedelta(days=3)
             )
+            assignment.duration_extended += 1
 
         assignment.save()
         return Response(status=status.HTTP_200_OK)

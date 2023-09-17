@@ -17,6 +17,7 @@ from .views import (
     FormDetailView,
     CompanyActivityListView,
     CompanyActivityFormListView,
+    CompanyActivityCloseView,
     CompanyActivityFormDetailView,
     CompanyActivityFormConfirmView,
     CompanyActivityFormRejectView,
@@ -78,6 +79,12 @@ urlpatterns = [
         "company/activity/<int:pk>/form/",
         CompanyActivityFormListView.as_view(),
         name="company-activity-form-list",
+    ),
+    # 지원관리/대외활동1/지원마감 : 지원마감 버튼
+    path(
+        "company/activity/<int:pk>/close/",
+        CompanyActivityCloseView.as_view(),
+        name="company-activity-close",
     ),
     # v 지원관리/대외활동1/지원자1 : 지원자 한명의 지원서
     path(

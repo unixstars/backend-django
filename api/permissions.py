@@ -69,3 +69,8 @@ class IsAssignmentCommentCompany(permissions.BasePermission):
 class IsSubmitOwnerStudent(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
         return obj.assignment.accepted_applicant.form.student_user.user == request.user
+
+
+class IsStaff(permissions.BasePermission):
+    def has_permission(self, request, view):
+        return request.user and request.user.is_staff

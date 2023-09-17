@@ -83,6 +83,7 @@ class Assignment(models.Model):
         default=IN_PROGRESS,
     )
     duration = models.DurationField()
+    duration_extended = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
