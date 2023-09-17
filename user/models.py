@@ -121,7 +121,7 @@ class StudentUserProfile(models.Model):
     univ_certificate = models.FileField(upload_to=get_upload_path_certificate)
     bank = models.CharField(max_length=20)
     account_number = models.CharField(max_length=100)
-    social_number = models.CharField(max_length=13)
+    social_number = models.CharField(max_length=13, default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
