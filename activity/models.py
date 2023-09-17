@@ -110,9 +110,12 @@ class Board(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     duration_extended = models.IntegerField(default=0)
+    is_closed = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.company_name
+        company = self.company_name
+        title = self.title
+        return f"{company}의 {title}"
 
 
 class Activity(models.Model):
@@ -130,6 +133,7 @@ class Activity(models.Model):
         max_length=50,
         default="없음",
     )
+    is_closed = models.BooleanField(default=False)
 
 
 class Scrap(models.Model):

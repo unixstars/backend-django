@@ -16,6 +16,7 @@ class StudentUserProfileSerializer(serializers.ModelSerializer):
             "university",
             "major",
             "univ_certificate",
+            "social_number",
             "bank",
             "account_number",
         ]
@@ -53,6 +54,7 @@ class StudentUserProfileUpdateSerializer(serializers.ModelSerializer):
     university = serializers.CharField(required=False)
     major = serializers.CharField(required=False)
     univ_certificate = serializers.FileField(required=False)
+    social_number = serializers.CharField(required=False)
     bank = serializers.CharField(required=False)
     account_number = serializers.CharField(required=False)
 
@@ -67,6 +69,7 @@ class StudentUserProfileUpdateSerializer(serializers.ModelSerializer):
             "university",
             "major",
             "univ_certificate",
+            "social_number",
             "bank",
             "account_number",
         ]

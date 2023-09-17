@@ -6,6 +6,7 @@ from .views import (
     StudentUserPortfolioDetailView,
     StudentUserPortfolioListView,
     CheckStudentUserProfileView,
+    StudentBankAccountCheckView,
     CompanyUserInfoView,
     CompanyUserInfoAuthView,
     CompanyUserInfoChangePhoneSendView,
@@ -79,6 +80,12 @@ urlpatterns = [
         "student/profile/exists/",
         CheckStudentUserProfileView.as_view(),
         name="student-profile-check",
+    ),
+    # 프로필/수정페이지/계좌인증
+    path(
+        "student/profile/bank/check/",
+        StudentBankAccountCheckView.as_view(),
+        name="student-bank-check",
     ),
     # 내 정보/기업회원
     path(

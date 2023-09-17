@@ -122,6 +122,7 @@ class BoardDurationExtendView(generics.UpdateAPIView):
         else:
             board.duration = timezone.now() - board.created_at + timedelta(days=7)
 
+        board.is_closed = False
         board.duration_extended += 1
         board.save()
 
@@ -175,6 +176,24 @@ class CompanyActivityFormListView(generics.RetrieveAPIView):
     def get_queryset(self):
         user = self.request.user.company_user
         return Activity.objects.filter(board__company_user=user)
+
+
+# 지원관리/대외활동1/지원마감 : 지원마감 버튼
+class CompanyActivityCloseView(generics.UpdateAPIView):
+    queryset = Activity.objects.all()
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def update(self, request, *args, **kwargs):
+        user = request.user.company_user
+        activity = self.get_object()
+        if activity.board.company_user != user:
+            return Response(
+                {"detail": "해당 대외활동을 모집한 회사 유저만 지원마감이 가능합니다."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        activity.is_closed = True
+        activity.save()
+        return Response(status=status.HTTP_200_OK)
 
 
 # 지원관리/대외활동1/지원자1 : 지원자 한명의 지원서
@@ -327,6 +346,18 @@ class FormCreateView(generics.CreateAPIView):
         user = self.request.user.student_user
         activity_id = self.request.data.get("activity")
         exist_form = Form.objects.filter(student_user=user, activity__pk=activity_id)
+        try:
+            activity = Activity.objects.get(pk=activity_id)
+        except Activity.DoesNotExist:
+            return Response(
+                {"detail": "해당 대외활동이 존재하지 않습니다."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if activity.is_closed:
+            return Response(
+                {"detail": "해당 대외활동이 마감되었습니다."}, status=status.HTTP_400_BAD_REQUEST
+            )
+
         if exist_form:
             return Response(
                 {"detail": "해당 대외활동에 이미 지원하였습니다."}, status=status.HTTP_400_BAD_REQUEST

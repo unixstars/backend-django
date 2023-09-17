@@ -383,65 +383,51 @@ class GoogleLoginView(views.APIView):
     throttle_classes = [LoginRateThrottle]
 
     def post(self, request):
-        id_token_str = request.data.get("idToken", None)
-        client_type = request.data.get("clientType", None)  # 예: 'android', 'ios'
+        access_token_str = request.data.get("accessToken", None)
 
-        if id_token_str is None or client_type is None:
+        if access_token_str is None:
             return Response(
-                {"error": "idToken과 clientType이 필요합니다."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-            # client_type에 따른 Google client ID 선택
-        if client_type == "android":
-            google_client_id = os.getenv("GOOGLE_CLIENT_ID_ANDROID")
-        elif client_type == "ios":
-            google_client_id = os.getenv("GOOGLE_CLIENT_ID_IOS")
-        else:
-            return Response(
-                {"error": "알 수 없는 clientType입니다."},
+                {"error": "accessToken이 필요합니다."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        # Google의 공개 키로 idToken을 검증
+        # Google의 OAuth2 엔드포인트를 사용하여 유저 정보를 가져옵니다
         try:
-            # YOUR_GOOGLE_CLIENT_ID는 당신의 Google OAuth 2.0 클라이언트 ID를 사용해야 합니다.
-            payload = id_token.verify_oauth2_token(
-                id_token_str, google_requests.Request(), google_client_id
+            response = requests.get(
+                "https://www.googleapis.com/oauth2/v3/tokeninfo",
+                params={"access_token": access_token_str},
+            )
+            payload = response.json()
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+        if "email" not in payload:
+            return Response(
+                {"error": "유효하지 않은 accessToken 입니다."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
-            # 토큰이 Google 계정으로부터 발급된 것인지 확인합니다.
-            if "https://accounts.google.com" in payload["iss"]:
-                email = payload["email"]
+        email = payload["email"]
 
-                try:
-                    user = User.objects.get(email=email)
-                    if not user.is_active:
-                        return Response(
-                            {"error": "회원탈퇴한 유저입니다."},
-                            status=status.HTTP_400_BAD_REQUEST,
-                        )
-                except User.DoesNotExist:
-                    user = User.objects.create(email=email)
-                    student_user = StudentUser.objects.create(user=user)
-                    student_user.save()
-
-                refresh = RefreshToken.for_user(user)
-                token_data = {
-                    "access": str(refresh.access_token),
-                    "refresh": str(refresh),
-                }
-
-                return Response(token_data)
-
-            else:
+        try:
+            user = User.objects.get(email=email)
+            if not user.is_active:
                 return Response(
-                    {"error": "유효하지 않은 idToken 입니다."},
+                    {"error": "회원탈퇴한 유저입니다."},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
+        except User.DoesNotExist:
+            user = User.objects.create(email=email)
+            student_user = StudentUser.objects.create(user=user)
+            student_user.save()
 
-        except ValueError as e:
-            # idToken이 유효하지 않은 경우
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        refresh = RefreshToken.for_user(user)
+        token_data = {
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+        }
+
+        return Response(token_data)
 
 
 # 애플 로그인/회원가입

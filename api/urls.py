@@ -1,6 +1,5 @@
 from django.urls import path, include
 
-
 urlpatterns = [
     path("", include("activity.urls")),
     path("", include("user.urls")),
