@@ -14,14 +14,23 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+import os
+from dotenv import load_dotenv
 from django.contrib import admin
 from django.urls import path, include
 from . import views
 from api.views import AppConfigurationView
 
+# .env 파일 로드
+load_dotenv()
+
+ENV_ROLE = os.getenv("ENV_ROLE")
+
 urlpatterns = [
     path("", views.health_check),
-    path("admin/", admin.site.urls),
     path("app-config/", AppConfigurationView.as_view()),
     path("api/v1/", include("api.urls")),
 ]
+
+if ENV_ROLE == "development":
+    urlpatterns.insert(1, path("admin/", admin.site.urls))
