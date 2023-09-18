@@ -41,3 +41,9 @@ info/
 # 로컬 미디어 파일
 media/
 static/
+
+# 마이그레이션 파일
+migrations/
+!migrations/__init__.py
+
+
