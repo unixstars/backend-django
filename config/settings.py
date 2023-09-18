@@ -21,6 +21,10 @@ load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# 환경에 따른 분리
+ENV_ROLE = os.getenv("ENV_ROLE")
+dev = "development"
+prod = "production"
 
 # 프로덕트 전 체크리스트
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -28,14 +32,23 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: 프로덕트 환경에서는 반드시 False로!
-DEBUG = True
+if ENV_ROLE == dev:
+    DEBUG = True
+elif ENV_ROLE == prod:
+    DEBUG = False
 
-ALLOWED_HOSTS = [
-    ".ap-northeast-2.compute.amazonaws.com",
-    "unistar-backend-dev.com",
-    "172.31.41.0",
-    "127.0.0.1",
-]
+if ENV_ROLE == dev:
+    ALLOWED_HOSTS = [
+        ".ap-northeast-2.compute.amazonaws.com",
+        "unistar-backend-dev.com",
+        "172.31.41.0",
+        "127.0.0.1",
+    ]
+elif ENV_ROLE == prod:
+    ALLOWED_HOSTS = [
+        ".ap-northeast-2.compute.amazonaws.com",
+        "unistar-backend.com",
+    ]
 
 
 # Application 정의
@@ -96,9 +109,13 @@ MIDDLEWARE = [
 ]
 
 # CORS 설정
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-]
+if ENV_ROLE == dev:
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+    ]
+elif ENV_ROLE == prod:
+    CORS_ALLOWED_ORIGINS = []
+
 
 # REST_FRAMEWORK 설정
 REST_FRAMEWORK = {
@@ -215,31 +232,34 @@ DATABASES = {
 }
 """
 
-
-DATABASES = {
-    # "default": {
-    #    "ENGINE": "django.db.backends.mysql",
-    #    "NAME": os.getenv("DB_NAME"),
-    #    "USER": os.getenv("DB_USER"),
-    #    "PASSWORD": os.getenv("DB_PASSWORD"),
-    #   "HOST": os.getenv("DB_HOST"),
-    #    "PORT": "3306",
-    #   "OPTIONS": {
-    #       "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
-    #    },
-    # },
-    "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": os.getenv("DB_NAME_DEV"),
-        "USER": os.getenv("DB_USER_DEV"),
-        "PASSWORD": os.getenv("DB_PASSWORD_DEV"),
-        "HOST": os.getenv("DB_HOST_DEV"),
-        "PORT": "3306",
-        "OPTIONS": {
-            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+if ENV_ROLE == dev:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.getenv("DB_NAME_DEV"),
+            "USER": os.getenv("DB_USER_DEV"),
+            "PASSWORD": os.getenv("DB_PASSWORD_DEV"),
+            "HOST": os.getenv("DB_HOST_DEV"),
+            "PORT": "3306",
+            "OPTIONS": {
+                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
         },
-    },
-}
+    }
+elif ENV_ROLE == prod:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.mysql",
+            "NAME": os.getenv("DB_NAME"),
+            "USER": os.getenv("DB_USER"),
+            "PASSWORD": os.getenv("DB_PASSWORD"),
+            "HOST": os.getenv("DB_HOST"),
+            "PORT": "3306",
+            "OPTIONS": {
+                "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+            },
+        },
+    }
 
 
 # 비밀번호 validation
@@ -287,11 +307,19 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # AWS Access 설정
-AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
-AWS_REGION = os.getenv("AWS_REGION")
-AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME_DEV")
-AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+if ENV_ROLE == dev:
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_REGION = os.getenv("AWS_REGION")
+    AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME_DEV")
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+elif ENV_ROLE == prod:
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_REGION = os.getenv("AWS_REGION")
+    AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+
 
 # Static 파일 설정
 STATIC_URL = "/static/"
