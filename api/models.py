@@ -14,9 +14,6 @@ class AppConfiguration(models.Model):
     ip_blacklist = models.JSONField(blank=True, null=True)
     environment = models.CharField(max_length=5, choices=ENV_CHOICES)
 
-    class Meta:
-        abstract = True
-
 
 class SingletonModel(AppConfiguration):
     class Meta:
