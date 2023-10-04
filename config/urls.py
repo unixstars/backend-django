@@ -32,5 +32,5 @@ urlpatterns = [
     path("api/v1/", include("api.urls")),
 ]
 
-if ENV_ROLE == "development":
+if ENV_ROLE == "development" or ENV_ROLE == "production":
     urlpatterns.insert(1, path("admin/", admin.site.urls))

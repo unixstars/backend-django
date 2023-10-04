@@ -4,11 +4,11 @@ from rest_framework.response import Response
 
 from .models import SingletonModel
 from .serializers import AppConfigurationSerializer
-from .permissions import IsStaff
+from .permissions import IsStaffOrReadOnly
 
 
 class AppConfigurationView(APIView):
-    permission_classes = [IsStaff]
+    permission_classes = [IsStaffOrReadOnly]
 
     def get(self, request):
         app_config = SingletonModel.load()

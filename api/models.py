@@ -7,8 +7,11 @@ class AppConfiguration(models.Model):
         ("prod", "Production"),
     ]
 
-    app_version_name = models.CharField(max_length=50)
-    app_version_code = models.IntegerField()
+    minimum_app_version_name = models.CharField(max_length=50)
+    minimum_app_version_code = models.IntegerField()
+    maximum_app_version_name = models.CharField(max_length=50)
+    maximum_app_version_code = models.IntegerField()
+    ip_blacklist = models.JSONField(blank=True, null=True)
     environment = models.CharField(max_length=5, choices=ENV_CHOICES)
 
     class Meta:

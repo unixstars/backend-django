@@ -71,6 +71,8 @@ class IsSubmitOwnerStudent(permissions.BasePermission):
         return obj.assignment.accepted_applicant.form.student_user.user == request.user
 
 
-class IsStaff(permissions.BasePermission):
+class IsStaffOrReadOnly(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.is_staff
+        if request.method == "GET" and request.user.is_authenticated:
+            return True
+        return request.user.is_staff

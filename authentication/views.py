@@ -503,7 +503,6 @@ class AppleLoginView(views.APIView):
         return Response(token_data)
 
 
-"""
 # 카카오 로그인/회원가입 => 프론트 작업 후 수정 예정
 class KakaoLoginView(views.APIView):
     def post(self, request):
@@ -599,7 +598,6 @@ class NaverLoginView(views.APIView):
         )
         response.set_cookie(key="refresh", value=str(refresh), httponly=True)
         return response
-"""
 
 
 # 회원탈퇴
