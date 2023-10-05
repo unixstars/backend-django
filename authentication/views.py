@@ -539,9 +539,9 @@ class KakaoLoginView(views.APIView):
             )
 
         try:
-            user = User.objects.get(email=email, username=str(client_id))
+            user = User.objects.get(email=email)
         except User.DoesNotExist:
-            user = User.objects.create(email=email, username=str(client_id))
+            user = User.objects.create(email=email)
             student_user = StudentUser.objects.create(user=user)
             student_user.save()
 
@@ -589,9 +589,9 @@ class NaverLoginView(views.APIView):
             )
 
         try:
-            user = User.objects.get(email=email, username=str(client_id))
+            user = User.objects.get(email=email)
         except User.DoesNotExist:
-            user = User.objects.create(email=email, username=str(client_id))
+            user = User.objects.create(email=email)
             student_user = StudentUser.objects.create(user=user)
             student_user.save()
 
