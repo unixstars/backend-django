@@ -548,11 +548,8 @@ class KakaoLoginView(views.APIView):
         refresh = RefreshToken.for_user(user)
 
         response = Response(
-            {
-                "access": str(refresh.access_token),
-            }
+            {"access": str(refresh.access_token), "refresh": str(refresh)}
         )
-        response.set_cookie(key="refresh", value=str(refresh), httponly=True)
         return response
 
 
@@ -598,11 +595,8 @@ class NaverLoginView(views.APIView):
         refresh = RefreshToken.for_user(user)
 
         response = Response(
-            {
-                "access": str(refresh.access_token),
-            }
+            {"access": str(refresh.access_token), "refresh": str(refresh)}
         )
-        response.set_cookie(key="refresh", value=str(refresh), httponly=True)
         return response
 
 
