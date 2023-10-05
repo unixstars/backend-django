@@ -505,8 +505,11 @@ class AppleLoginView(views.APIView):
 
 # 카카오 로그인/회원가입 => 프론트 작업 후 수정 예정
 class KakaoLoginView(views.APIView):
+    permission_classes = [AllowAny]
+    throttle_classes = [LoginRateThrottle]
+
     def post(self, request):
-        access_token = request.data.get("access_token", None)
+        access_token = request.data.get("accessToken", None)
         if access_token is None:
             return Response(
                 {"error": "Access token is required"},
@@ -555,8 +558,11 @@ class KakaoLoginView(views.APIView):
 
 # 네이버 로그인/회원가입 => 프론트 작업 후 수정 예정
 class NaverLoginView(views.APIView):
+    permission_classes = [AllowAny]
+    throttle_classes = [LoginRateThrottle]
+
     def post(self, request):
-        access_token = request.data.get("access_token", None)
+        access_token = request.data.get("accessToken", None)
         if access_token is None:
             return Response(
                 {"error": "Access token is required"},
