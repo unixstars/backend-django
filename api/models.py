@@ -14,16 +14,11 @@ class AppConfiguration(models.Model):
     ip_blacklist = models.JSONField(blank=True, null=True)
     environment = models.CharField(max_length=5, choices=ENV_CHOICES)
 
-
-class SingletonModel(AppConfiguration):
-    class Meta:
-        abstract = True
-
     def save(self, *args, **kwargs):
         self.pk = 1
-        super(SingletonModel, self).save(*args, **kwargs)
+        super(AppConfiguration, self).save(*args, **kwargs)
 
     @classmethod
-    def load(cls):
+    def get_instance(cls):
         obj, created = cls.objects.get_or_create(pk=1)
         return obj
