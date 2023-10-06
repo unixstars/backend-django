@@ -7,12 +7,12 @@ class AppConfiguration(models.Model):
         ("prod", "Production"),
     ]
 
-    minimum_app_version_name = models.CharField(max_length=50)
-    minimum_app_version_code = models.IntegerField()
-    maximum_app_version_name = models.CharField(max_length=50)
-    maximum_app_version_code = models.IntegerField()
+    minimum_app_version_name = models.CharField(max_length=50, default="0.0.0")
+    minimum_app_version_code = models.IntegerField(default=0)
+    maximum_app_version_name = models.CharField(max_length=50, default="0.0.0")
+    maximum_app_version_code = models.IntegerField(default=0)
     ip_blacklist = models.JSONField(blank=True, null=True)
-    environment = models.CharField(max_length=5, choices=ENV_CHOICES)
+    environment = models.CharField(max_length=5, choices=ENV_CHOICES, default="dev")
 
     def save(self, *args, **kwargs):
         self.pk = 1
