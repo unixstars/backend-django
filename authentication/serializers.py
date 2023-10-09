@@ -4,6 +4,7 @@ from user.models import CompanyUser, StudentUser, User
 from django.core.cache import cache
 from api.utils import hash_function
 from allauth.utils import email_address_exists
+from django.utils import timezone
 
 
 class CompanyVerificationSerializer(serializers.Serializer):
@@ -77,6 +78,59 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
             ceo_name=self.validated_data.get("ceo_name", ""),
             start_date=self.validated_data.get("start_date", ""),
             corporate_number=self.validated_data.get("corporate_number", ""),
+            manager_email=self.validated_data.get("manager_email", ""),
+            manager_phone=self.validated_data.get("manager_phone", ""),
+        )
+        return user
+
+
+class TestCompanyUserRegistrationSerializer(RegisterSerializer):
+    DEFAULT_BNUM = "1234567890"
+    DEFAULT_CNUM = "1234567890123"
+
+    email = serializers.EmailField(required=False)
+    manager_phone = serializers.CharField(max_length=20)
+    manager_email = serializers.EmailField()
+    business_number = serializers.CharField(max_length=10, default=DEFAULT_BNUM)
+    ceo_name = serializers.CharField(max_length=10)
+    start_date = serializers.DateField(required=False)
+    corporate_number = serializers.CharField(max_length=13, default=DEFAULT_CNUM)
+
+    def validate(self, attrs):
+        super().validate(attrs)
+        manager_email = attrs.get("manager_email", "")
+
+        # 회원탈퇴한 유저인지 확인
+        try:
+            user = User.objects.get(email=manager_email)
+            if not user.is_active:
+                raise serializers.ValidationError(
+                    {"non_field_errors": ["회원탈퇴한 유저입니다."]}
+                )
+        except User.DoesNotExist:
+            pass
+
+        if email_address_exists(manager_email):
+            raise serializers.ValidationError("해당 이메일로 가입된 유저가 이미 존재합니다.")
+
+        return attrs
+
+    def save(self, request):
+        self.validated_data["email"] = self.validated_data.get("manager_email", "")
+        user = super().save(request)
+        user.is_company_user = True
+        user.save()
+
+        CompanyUser.objects.create(
+            user=user,
+            business_number=self.validated_data.get(
+                "business_number", TestCompanyUserRegistrationSerializer.DEFAULT_BNUM
+            ),
+            ceo_name=self.validated_data.get("ceo_name", ""),
+            start_date=self.validated_data.get("start_date", timezone.now().date()),
+            corporate_number=self.validated_data.get(
+                "corporate_number", TestCompanyUserRegistrationSerializer.DEFAULT_CNUM
+            ),
             manager_email=self.validated_data.get("manager_email", ""),
             manager_phone=self.validated_data.get("manager_phone", ""),
         )
