@@ -11,6 +11,7 @@ from .views import (
     CompanyUserInfoFindVerificationView,
     CompanyUserInfoPasswordChangeView,
     TestStudentRegisterView,
+    TestCompanyUserRegisterView,
     GoogleLoginView,
     AppleLoginView,
     UserDeactivateView,
@@ -66,6 +67,11 @@ urlpatterns = [
         "student/test/register/",
         TestStudentRegisterView.as_view(),
         name="student-test-register",
+    ),
+    path(
+        "company/test/register/",
+        TestCompanyUserRegisterView.as_view(),
+        name="company-test-register",
     ),
     path(
         # v 찾기/휴대전화인증/인증코드 전송: 휴대전화 인증코드 전송 버튼

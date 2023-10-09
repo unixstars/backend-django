@@ -11,6 +11,7 @@ from .serializers import (
     CompanyManagerPhoneVerificationSerializer,
     CompanyUserRegistrationSerializer,
     TestStudentRegisterSerializer,
+    TestCompanyUserRegistrationSerializer,
     CompanyUserInfoFindVerificationSerializer,
     UserDeactivateSerializer,
 )
@@ -23,8 +24,7 @@ from dj_rest_auth.views import LoginView, PasswordChangeView
 
 from rest_framework_simplejwt.tokens import RefreshToken
 from user.models import User, StudentUser, CompanyUser
-from google.oauth2 import id_token
-from google.auth.transport import requests as google_requests
+from api.permissions import IsStaffOrReadOnly
 
 
 # 기업회원 회원가입/법인 기업 인증 : 법인 인증
@@ -253,7 +253,12 @@ class UserLoginView(LoginView):
 # 테스트 학생 유저 가입
 class TestStudentRegisterView(RegisterView):
     serializer_class = TestStudentRegisterSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsStaffOrReadOnly]
+
+
+class TestCompanyUserRegisterView(RegisterView):
+    serializer_class = TestCompanyUserRegistrationSerializer
+    permission_classes = [IsStaffOrReadOnly]
 
 
 # 찾기/휴대전화인증/인증코드 전송: 휴대전화 인증코드 전송 버튼
@@ -503,7 +508,7 @@ class AppleLoginView(views.APIView):
         return Response(token_data)
 
 
-# 카카오 로그인/회원가입 => 프론트 작업 후 수정 예정
+# 카카오 로그인/회원가입
 class KakaoLoginView(views.APIView):
     permission_classes = [AllowAny]
     throttle_classes = [LoginRateThrottle]
@@ -553,7 +558,7 @@ class KakaoLoginView(views.APIView):
         return response
 
 
-# 네이버 로그인/회원가입 => 프론트 작업 후 수정 예정
+# 네이버 로그인/회원가입
 class NaverLoginView(views.APIView):
     permission_classes = [AllowAny]
     throttle_classes = [LoginRateThrottle]
