@@ -34,5 +34,5 @@ class StudentUserPortfolioAdmin(admin.ModelAdmin):
 
 @admin.register(CompanyUser)
 class CompanyUserAdmin(admin.ModelAdmin):
-    list_display = ["business_number", "ceo_name"]
-    search_fields = ["business_number", "ceo_name"]
+    list_display = ["user", "business_number", "ceo_name"]
+    search_fields = ["user", "business_number", "ceo_name"]
