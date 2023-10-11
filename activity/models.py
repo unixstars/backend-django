@@ -111,6 +111,7 @@ class Board(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     duration_extended = models.IntegerField(default=0)
     is_closed = models.BooleanField(default=False)
+    is_admitted = models.BooleanField(default=False)
 
     def __str__(self):
         company = self.company_name
