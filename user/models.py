@@ -78,7 +78,7 @@ class CompanyUser(models.Model):
     manager_email = models.EmailField(unique=True)
 
     def __str__(self):
-        return self.business_number
+        return self.user.email
 
     class Meta:
         verbose_name = "CompanyUser"
@@ -88,6 +88,9 @@ class StudentUser(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, primary_key=True, related_name="student_user"
     )
+
+    def __str__(self):
+        return self.user.email
 
     class Meta:
         verbose_name = "StudentUser"
