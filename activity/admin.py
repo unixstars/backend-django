@@ -6,6 +6,7 @@ from .models import Board, Activity, Scrap, Form
 class BoardAdmin(admin.ModelAdmin):
     list_display = ["company_user", "title", "company_name", "views", "created_at"]
     search_fields = ["company_user", "company_name"]
+    list_filter = ["is_admitted"]
 
 
 @admin.register(Activity)

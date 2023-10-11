@@ -53,7 +53,6 @@ get_object(): 특정 쿼리셋 하나 반환
 
 # 홈/로그인 전 : 게시글 목록(전부)
 class BoardListView(generics.ListAPIView):
-    queryset = Board.objects.order_by("-views", "-created_at").all()
     serializer_class = BoardListSerializer
     permission_classes = [AllowAny]
     pagination_class = BoardListPagination
@@ -65,6 +64,9 @@ class BoardListView(generics.ListAPIView):
         "activity__kind",
         "activity__way",
     ]
+
+    def get_queryset(self):
+        return Board.objects.order_by("-views", "-created_at").filter(is_admitted=True)
 
 
 # 대외활동 게시글/로그인 전 : 게시글 하나(전부)
