@@ -274,6 +274,7 @@ class FormBoardDetailSerializer(FormSerializer):
     pride = serializers.SerializerMethodField()
     address = serializers.SerializerMethodField()
     d_day = serializers.SerializerMethodField()
+    is_closed = serializers.SerializerMethodField()
 
     class Meta:
         model = Form
@@ -324,6 +325,10 @@ class FormBoardDetailSerializer(FormSerializer):
         deadline = board.created_at + board.duration
         difference = deadline - timezone.now()
         return max(difference.days, -1)
+
+    def get_is_closed(self, obj):
+        board = obj.activity.board
+        return board.is_closed
 
 
 class ActivityListSerializer(serializers.ModelSerializer):
