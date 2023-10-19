@@ -41,12 +41,14 @@ if ENV_ROLE == dev:
     ALLOWED_HOSTS = [
         ".ap-northeast-2.compute.amazonaws.com",
         "unistar-backend-dev.com",
+        "company.getunivxstartnow.com",
         "172.31.41.0",
         "127.0.0.1",
     ]
 elif ENV_ROLE == prod:
     ALLOWED_HOSTS = [
         ".ap-northeast-2.compute.amazonaws.com",
+        "company.getunivxstartnow.com",
         "unistar-backend.com",
     ]
 
