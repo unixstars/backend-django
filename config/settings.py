@@ -41,7 +41,6 @@ if ENV_ROLE == dev:
     ALLOWED_HOSTS = [
         ".ap-northeast-2.compute.amazonaws.com",
         "unistar-backend-dev.com",
-        "company.getunivxstartnow.com",
         "172.31.41.0",
         "127.0.0.1",
     ]
@@ -116,7 +115,9 @@ if ENV_ROLE == dev:
         "http://localhost:3000",
     ]
 elif ENV_ROLE == prod:
-    CORS_ALLOWED_ORIGINS = []
+    CORS_ALLOWED_ORIGINS = [
+        "company.getunivxstartnow.com",
+    ]
 
 
 # REST_FRAMEWORK 설정
