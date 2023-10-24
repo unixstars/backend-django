@@ -116,7 +116,7 @@ if ENV_ROLE == dev:
     ]
 elif ENV_ROLE == prod:
     CORS_ALLOWED_ORIGINS = [
-        "company.getunivxstartnow.com",
+        "https://company.getunivxstartnow.com",
     ]
 
 
