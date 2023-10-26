@@ -119,6 +119,8 @@ elif ENV_ROLE == prod:
         "https://company.getunivxstartnow.com",
     ]
 
+CORS_ALLOW_CREDENTIALS = True
+
 
 # REST_FRAMEWORK 설정
 REST_FRAMEWORK = {
