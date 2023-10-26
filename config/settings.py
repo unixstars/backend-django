@@ -14,6 +14,7 @@ from pathlib import Path
 import os
 from dotenv import load_dotenv
 from datetime import timedelta
+from corsheaders.defaults import default_headers
 
 # .env 파일 로드
 load_dotenv()
@@ -121,6 +122,10 @@ elif ENV_ROLE == prod:
 
 CORS_ALLOW_CREDENTIALS = True
 
+CORS_ALLOW_HEADERS = [
+    *default_headers,
+    "access-control-allow-credentials",
+]
 
 # REST_FRAMEWORK 설정
 REST_FRAMEWORK = {
