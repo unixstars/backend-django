@@ -125,6 +125,7 @@ CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
     *default_headers,
     "access-control-allow-credentials",
+    "access-control-allow-methods",
 ]
 
 # REST_FRAMEWORK 설정
