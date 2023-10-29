@@ -85,16 +85,13 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
 
 
 class TestCompanyUserRegistrationSerializer(RegisterSerializer):
-    DEFAULT_BNUM = "1234567890"
-    DEFAULT_CNUM = "1234567890123"
-
     email = serializers.EmailField(required=False)
     manager_phone = serializers.CharField(max_length=20)
     manager_email = serializers.EmailField()
-    business_number = serializers.CharField(max_length=10, default=DEFAULT_BNUM)
+    business_number = serializers.CharField(max_length=10)
     ceo_name = serializers.CharField(max_length=10)
     start_date = serializers.DateField(required=False)
-    corporate_number = serializers.CharField(max_length=13, default=DEFAULT_CNUM)
+    corporate_number = serializers.CharField(max_length=13)
 
     def validate(self, attrs):
         super().validate(attrs)
@@ -123,14 +120,10 @@ class TestCompanyUserRegistrationSerializer(RegisterSerializer):
 
         CompanyUser.objects.create(
             user=user,
-            business_number=self.validated_data.get(
-                "business_number", TestCompanyUserRegistrationSerializer.DEFAULT_BNUM
-            ),
+            business_number=self.validated_data.get("business_number", ""),
             ceo_name=self.validated_data.get("ceo_name", ""),
             start_date=self.validated_data.get("start_date", timezone.now().date()),
-            corporate_number=self.validated_data.get(
-                "corporate_number", TestCompanyUserRegistrationSerializer.DEFAULT_CNUM
-            ),
+            corporate_number=self.validated_data.get("corporate_number", ""),
             manager_email=self.validated_data.get("manager_email", ""),
             manager_phone=self.validated_data.get("manager_phone", ""),
         )
