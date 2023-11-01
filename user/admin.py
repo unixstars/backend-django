@@ -10,8 +10,8 @@ from .models import (
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ["email", "username", "is_staff"]
-    search_fields = ["email", "username"]
+    list_display = ["email", "is_staff", "created_at"]
+    search_fields = ["email"]
 
 
 @admin.register(StudentUser)
