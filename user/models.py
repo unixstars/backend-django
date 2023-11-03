@@ -143,6 +143,9 @@ class StudentUserPortfolio(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self) -> str:
+        return f"{self.student_user}의 {self.title}"
+
 
 class PortfolioFile(models.Model):
     def get_upload_path(instance, filename):
