@@ -1,5 +1,6 @@
 from django.db import models
 from activity.models import Form
+from django.utils import timezone
 
 
 class AcceptedApplicant(models.Model):
@@ -13,7 +14,7 @@ class AcceptedApplicant(models.Model):
     form = models.OneToOneField(
         Form, on_delete=models.CASCADE, related_name="accepted_applicant"
     )
-    start_date = models.DateField(auto_now_add=True)
+    start_date = models.DateField(default=timezone.now)
     week = models.IntegerField(default=0)
     activity_status = models.CharField(
         max_length=10,
