@@ -22,3 +22,6 @@ class AppConfiguration(models.Model):
     def get_instance(cls):
         obj, created = cls.objects.get_or_create(pk=1)
         return obj
+
+    def __str__(self) -> str:
+        return "AppConfig"
