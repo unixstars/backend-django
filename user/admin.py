@@ -29,7 +29,7 @@ class StudentUserProfileAdmin(admin.ModelAdmin):
 
 @admin.register(StudentUserPortfolio)
 class StudentUserPortfolioAdmin(admin.ModelAdmin):
-    list_display = ["title", "content"]
+    list_display = ["title", "student_user"]
     search_fields = ["title"]
 
 
