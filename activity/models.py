@@ -200,6 +200,9 @@ class Form(models.Model):
             "activity",
         ]
 
+    def __str__(self) -> str:
+        return f"{self.student_user}의 {self.activity} 지원서"
+
 
 class Suggestion(models.Model):
     company_user = models.ForeignKey(
