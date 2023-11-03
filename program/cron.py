@@ -14,13 +14,13 @@ def update_accepted_applicants():
         if applicant.form.activity.period.total_seconds() % (60 * 60 * 24 * 7) > 0:
             activity_duration_in_weeks += 1
 
-        days_passed = (now - applicant.start_date).days
+        days_passed = (now.date() - applicant.start_date).days
         weeks_passed = days_passed // 7
 
-        if weeks_passed > activity_duration_in_weeks:
+        if weeks_passed > applicant.week:
+            applicant.week = weeks_passed
+
+        if weeks_passed >= activity_duration_in_weeks:
             applicant.activity_status = AcceptedApplicant.COMPLETED
-        else:
-            applicant.week += weeks_passed
-            applicant.start_date += timedelta(days=weeks_passed * 7)
 
         applicant.save()
