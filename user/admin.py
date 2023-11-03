@@ -5,6 +5,7 @@ from .models import (
     StudentUserProfile,
     StudentUserPortfolio,
     CompanyUser,
+    PortfolioFile,
 )
 
 
@@ -30,6 +31,11 @@ class StudentUserProfileAdmin(admin.ModelAdmin):
 class StudentUserPortfolioAdmin(admin.ModelAdmin):
     list_display = ["title", "content"]
     search_fields = ["title"]
+
+
+@admin.register(PortfolioFile)
+class StudentUserPortfolioFileAdmin(admin.ModelAdmin):
+    list_display = ["student_user_portfolio"]
 
 
 @admin.register(CompanyUser)
