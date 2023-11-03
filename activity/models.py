@@ -136,6 +136,9 @@ class Activity(models.Model):
     )
     is_closed = models.BooleanField(default=False)
 
+    def __str__(self):
+        return self.title
+
 
 class Scrap(models.Model):
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="scrap")
