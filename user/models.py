@@ -128,6 +128,9 @@ class StudentUserProfile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self) -> str:
+        return f"{self.student_user}/{self.name}의 프로필"
+
 
 class StudentUserPortfolio(models.Model):
     student_user = models.ForeignKey(
@@ -160,3 +163,6 @@ class PortfolioFile(models.Model):
     )
 
     file = models.FileField(upload_to=get_upload_path)
+
+    def __str__(self) -> str:
+        return f"{self.student_user_portfolio}의 {self.file}"

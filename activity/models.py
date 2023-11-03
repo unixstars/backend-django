@@ -152,6 +152,9 @@ class Scrap(models.Model):
             "student_user",
         ]
 
+    def __str__(self) -> str:
+        return f"{self.student_user}의 {self.board} 스크랩"
+
 
 class Form(models.Model):
     student_user = models.ForeignKey(
@@ -212,3 +215,6 @@ class Suggestion(models.Model):
         StudentUser, on_delete=models.CASCADE, related_name="suggestion"
     )
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"{self.company_user}의 {self.student_user} 지원제안"

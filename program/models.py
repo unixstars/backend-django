@@ -21,12 +21,18 @@ class AcceptedApplicant(models.Model):
         default=ONGOING,
     )
 
+    def __str__(self):
+        return f"{self.form} 합격자"
+
 
 class ApplicantWarning(models.Model):
     accepted_applicant = models.ForeignKey(
         AcceptedApplicant, on_delete=models.CASCADE, related_name="applicant_warning"
     )
     content = models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return f"{self.accepted_applicant} 경고"
 
 
 class Notice(models.Model):
@@ -38,6 +44,9 @@ class Notice(models.Model):
     content = models.TextField()
     is_checked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"{self.accepted_applicant} 공지:{self.title}"
 
 
 class NoticeComment(models.Model):
@@ -55,6 +64,9 @@ class NoticeComment(models.Model):
     user_type = models.CharField(
         max_length=10, choices=USER_TYPE_CHOICES, default=STUDENT
     )
+
+    def __str__(self) -> str:
+        return f"{self.notice} 댓글"
 
 
 class Assignment(models.Model):
@@ -87,6 +99,9 @@ class Assignment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def __str__(self) -> str:
+        return f"{self.accepted_applicant} 과제:{self.title}"
+
 
 class AssignmentComment(models.Model):
     assignment = models.ForeignKey(
@@ -104,6 +119,9 @@ class AssignmentComment(models.Model):
         max_length=10, choices=USER_TYPE_CHOICES, default=STUDENT
     )
 
+    def __str__(self) -> str:
+        return f"{self.assignment} 댓글"
+
 
 class Submit(models.Model):
     assignment = models.OneToOneField(
@@ -113,6 +131,9 @@ class Submit(models.Model):
     content = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"{self.assignment} 제출물"
 
 
 class SubmitFile(models.Model):
@@ -129,3 +150,6 @@ class SubmitFile(models.Model):
 
     file = models.FileField(upload_to=get_upload_path_file)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"{self.submit} 파일:{self.file}"
