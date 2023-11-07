@@ -162,7 +162,7 @@ CRONJOBS = [
         "> /var/log/uwsgi/cron/delete_expired_tokens.log",
     ),
     (
-        "*/60 * * * *",
+        "0 * * * *",
         "activity.cron.close_expired_boards",
         "> /var/log/uwsgi/cron/close_update.log",
     ),
