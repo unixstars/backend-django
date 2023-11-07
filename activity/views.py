@@ -41,6 +41,7 @@ from rest_framework.response import Response
 from django.utils import timezone
 from datetime import timedelta
 from django.shortcuts import get_object_or_404
+from django.db.models import Case, When, Value, IntegerField, QuerySet
 
 
 """
@@ -66,7 +67,18 @@ class BoardListView(generics.ListAPIView):
     ]
 
     def get_queryset(self):
-        return Board.objects.order_by("-views", "-created_at").filter(is_admitted=True)
+        # `is_closed`가 True일 경우, 정렬 순위를 낮추기 위한 로직
+        return (
+            Board.objects.annotate(
+                closed_order=Case(
+                    When(is_closed=True, then=Value(1)),  # is_closed가 True이면 1을 부여
+                    default=Value(0),  # 그 외의 경우 0을 부여
+                    output_field=IntegerField(),
+                )
+            )
+            .order_by("closed_order", "-views", "-created_at")
+            .filter(is_admitted=True)
+        )
 
 
 # 대외활동 게시글/로그인 전 : 게시글 하나(전부)
