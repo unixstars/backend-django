@@ -158,18 +158,18 @@ REST_FRAMEWORK = {
 CRONJOBS = [
     (
         "0 0 * * *",
+        "program.cron.update_accepted_applicants",
+        "> /var/log/uwsgi/cron/update_accepted_applicants.log",
+    ),
+    (
+        "1 0 * * *",
         "authentication.cron.delete_expired_tokens",
         "> /var/log/uwsgi/cron/delete_expired_tokens.log",
     ),
     (
-        "0 0 * * *",
+        "2 0 * * *",
         "activity.cron.close_expired_boards",
         "> /var/log/uwsgi/cron/close_update.log",
-    ),
-    (
-        "0 0 * * *",
-        "program.cron.update_accepted_applicants",
-        "> /var/log/uwsgi/cron/update_accepted_applicants.log",
     ),
 ]
 
