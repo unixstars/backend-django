@@ -290,6 +290,7 @@ class FormBoardDetailSerializer(FormSerializer):
             "pride",
             "address",
             "d_day",
+            "is_closed",
         ]
 
     def get_logo(self, obj):
