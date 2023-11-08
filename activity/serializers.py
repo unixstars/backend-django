@@ -296,11 +296,15 @@ class FormBoardDetailSerializer(FormSerializer):
         logo = obj.activity.board.logo
         if logo:
             return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(logo))
+        else:
+            return None
 
     def get_banner(self, obj):
         banner = obj.activity.board.banner
         if banner:
             return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(banner))
+        else:
+            return None
 
     def get_title(self, obj):
         return obj.activity.board.title
