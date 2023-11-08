@@ -50,8 +50,8 @@ class ProgramListSerializer(serializers.ModelSerializer):
         return company_name
 
     def get_total_week(self, obj):
-        duration = obj.form.activity.board.duration
-        weeks, remaining_days = divmod(duration.days, 7)
+        period = obj.form.activity.period
+        weeks, remaining_days = divmod(period.days, 7)
         if remaining_days > 0:
             weeks += 1
         return weeks
