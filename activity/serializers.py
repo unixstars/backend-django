@@ -222,13 +222,9 @@ class BoardCreateSerializer(BoardSerializer):
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if instance.logo:
-            ret["logo"] = generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(instance.logo)
-            )
+            ret["logo"] = f"{settings.MEDIA_URL}{instance.logo}"
         if instance.banner:
-            ret["banner"] = generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(instance.banner)
-            )
+            ret["banner"] = f"{settings.MEDIA_URL}{instance.banner}"
         return ret
 
 
@@ -251,7 +247,7 @@ class FormBoardListSerializer(FormSerializer):
     def get_logo(self, obj):
         logo = obj.activity.board.logo
         if logo:
-            return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(logo))
+            return f"{settings.MEDIA_URL}{logo}"
 
     def get_title(self, obj):
         return obj.activity.board.title
@@ -292,16 +288,12 @@ class FormBoardDetailSerializer(FormSerializer):
     def get_logo(self, obj):
         logo = obj.activity.board.logo
         if logo:
-            return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(logo))
-        else:
-            return None
+            return f"{settings.MEDIA_URL}{logo}"
 
     def get_banner(self, obj):
         banner = obj.activity.board.banner
         if banner:
-            return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(banner))
-        else:
-            return None
+            return f"{settings.MEDIA_URL}{banner}"
 
     def get_title(self, obj):
         return obj.activity.board.title
@@ -550,9 +542,7 @@ class CompanyStudentProfileDetailSerializer(serializers.ModelSerializer):
 
     def get_profile_image(self, obj):
         if obj.profile_image:
-            return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(obj.profile_image)
-            )
+            return f"{settings.MEDIA_URL}{obj.profile_image}"
 
 
 class CompanyStudentPortfolioDetailSerializer(serializers.ModelSerializer):

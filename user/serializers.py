@@ -99,26 +99,18 @@ class StudentUserProfileShowSerializer(serializers.ModelSerializer):
 
     def get_profile_image(self, obj):
         if obj.profile_image:
-            return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(obj.profile_image)
-            )
+            return f"{settings.MEDIA_URL}{obj.profile_image}"
 
     def get_univ_certificate(self, obj):
         if obj.univ_certificate:
-            return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(obj.univ_certificate)
-            )
+            return f"{settings.MEDIA_URL}{obj.univ_certificate}"
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if instance.profile_image:
-            ret["profile_image"] = generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(instance.profile_image)
-            )
+            ret["profile_image"] = f"{settings.MEDIA_URL}{instance.profile_image}"
         if instance.univ_certificate:
-            ret["univ_certificate"] = generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(instance.univ_certificate)
-            )
+            ret["univ_certificate"] = f"{settings.MEDIA_URL}{instance.univ_certificate}"
         return ret
 
 
@@ -134,16 +126,12 @@ class PortfolioFileSerializer(serializers.ModelSerializer):
 
     def get_file(self, obj):
         if obj.file:
-            return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(obj.file)
-            )
+            return f"{settings.MEDIA_URL}{obj.file}"
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if instance.file:
-            ret["file"] = generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(instance.file)
-            )
+            ret["file"] = f"{settings.MEDIA_URL}{instance.file}"
         return ret
 
 

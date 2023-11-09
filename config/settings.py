@@ -173,6 +173,32 @@ CRONJOBS = [
     ),
 ]
 
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {message}",
+            "style": "{",
+        },
+    },
+    "handlers": {
+        "file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "filename": "/var/log/uwsgi/cron/cron_info.log",
+            "formatter": "verbose",
+        },
+    },
+    "loggers": {
+        "cron_info": {
+            "handlers": ["file"],
+            "level": "INFO",
+            "propagate": True,
+        },
+    },
+}
+
 
 # Email 로그인 관련(dj-rest-auth 설정)
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
@@ -334,7 +360,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # Media 파일 설정
 MEDIA_LOCATION = "media"
 DEFAULT_FILE_STORAGE = "mystorages.MediaStorage"
-MEDIA_URL = f"https://d38hmicnsm5ncj.cloudfront.net/{MEDIA_LOCATION}/"
+CLOUDFRONT_URL = os.getenv("CLOUDFRONT_URL")
+MEDIA_URL = f"{CLOUDFRONT_URL}/{MEDIA_LOCATION}/"
 
 # 파일 업로드 크기 제한(한 번의 요청)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 54 * 1024 * 1024  # 54 MB

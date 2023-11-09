@@ -40,10 +40,7 @@ class ProgramListSerializer(serializers.ModelSerializer):
     def get_logo(self, obj):
         logo = obj.form.activity.board.logo
         if logo:
-            return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME,
-                str(logo),
-            )
+            return f"{settings.MEDIA_URL}{logo}"
 
     def get_company_name(self, obj):
         company_name = obj.form.activity.board.company_name
@@ -109,10 +106,7 @@ class ProgramDetailSerializer(serializers.ModelSerializer):
     def get_logo(self, obj):
         logo = obj.form.activity.board.logo
         if logo:
-            return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME,
-                str(logo),
-            )
+            return f"{settings.MEDIA_URL}{logo}"
 
     def get_company_name(self, obj):
         company_name = obj.form.activity.board.company_name
@@ -168,7 +162,7 @@ class NoticeCommentSerializer(serializers.ModelSerializer):
             )
         else:
             image = obj.notice.accepted_applicant.form.activity.board.logo
-        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+        return f"{settings.MEDIA_URL}{image}"
 
 
 class NoticeCommentCreateSerializer(serializers.ModelSerializer):
@@ -191,7 +185,7 @@ class NoticeCommentCreateSerializer(serializers.ModelSerializer):
             )
         else:
             image = obj.notice.accepted_applicant.form.activity.board.logo
-        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+        return f"{settings.MEDIA_URL}{image}"
 
 
 class SubmitFileSerializer(serializers.ModelSerializer):
@@ -206,17 +200,12 @@ class SubmitFileSerializer(serializers.ModelSerializer):
 
     def get_file(self, obj):
         if obj.file:
-            return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(obj.file)
-            )
+            return f"{settings.MEDIA_URL}{obj.file}"
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if instance.file:
-            ret["file"] = generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(instance.file)
-            )
-
+            ret["file"] = f"{settings.MEDIA_URL}{instance.file}"
         return ret
 
 
@@ -274,7 +263,7 @@ class AssignmentCommentSerializer(serializers.ModelSerializer):
             )
         else:
             image = obj.assignment.accepted_applicant.form.activity.board.logo
-        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+        return f"{settings.MEDIA_URL}{image}"
 
 
 class AssignmentCommentCreateSerializer(serializers.ModelSerializer):
@@ -297,7 +286,7 @@ class AssignmentCommentCreateSerializer(serializers.ModelSerializer):
             )
         else:
             image = obj.assignment.accepted_applicant.form.activity.board.logo
-        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+        return f"{settings.MEDIA_URL}{image}"
 
 
 class SubmitCreateSerializer(serializers.ModelSerializer):
@@ -375,10 +364,7 @@ class CompanyProgramListSerializer(serializers.ModelSerializer):
     def get_logo(self, obj):
         logo = obj.board.logo
         if logo:
-            return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME,
-                str(logo),
-            )
+            return f"{settings.MEDIA_URL}{logo}"
 
     def get_company_name(self, obj):
         company_name = obj.board.company_name
@@ -580,7 +566,7 @@ class CompanyProgramNoticeCommentCreateSerializer(serializers.ModelSerializer):
             )
         else:
             image = obj.notice.accepted_applicant.form.activity.board.logo
-        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+        return f"{settings.MEDIA_URL}{image}"
 
 
 class CompanyProgramAssignmentDetailSerializer(serializers.ModelSerializer):
@@ -638,4 +624,4 @@ class CompanyProgramAssignmentCommentCreateSerializer(serializers.ModelSerialize
             )
         else:
             image = obj.assignment.accepted_applicant.form.activity.board.logo
-        return generate_presigned_url(settings.AWS_STORAGE_BUCKET_NAME, str(image))
+        return f"{settings.MEDIA_URL}{image}"

@@ -1,10 +1,14 @@
 from datetime import timedelta
 from django.utils import timezone
 from .models import AcceptedApplicant
+import logging
+
+logger = logging.getLogger("cron_info")
 
 
 def update_accepted_applicants():
     now = timezone.now()
+    logger.info("Update accepted applicants cron job started at %s", now)
     for applicant in AcceptedApplicant.objects.filter(
         activity_status=AcceptedApplicant.ONGOING
     ):
@@ -24,3 +28,5 @@ def update_accepted_applicants():
             applicant.activity_status = AcceptedApplicant.COMPLETED
 
         applicant.save()
+        logger.info("Update applicant week %s at %s", applicant, now)
+    logger.info("CLOSE UPDATE APPLICANT WEEK %s", now)
