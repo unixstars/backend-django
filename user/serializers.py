@@ -74,6 +74,7 @@ class StudentUserProfileUpdateSerializer(serializers.ModelSerializer):
         if obj.univ_certificate:
             return f"{settings.MEDIA_URL}{obj.univ_certificate}"
 
+    """
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         if instance.profile_image:
@@ -81,6 +82,7 @@ class StudentUserProfileUpdateSerializer(serializers.ModelSerializer):
         if instance.univ_certificate:
             ret["univ_certificate"] = f"{settings.MEDIA_URL}{instance.univ_certificate}"
         return ret
+    """
 
 
 class StudentUserProfileShowSerializer(serializers.ModelSerializer):
