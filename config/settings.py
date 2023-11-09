@@ -43,6 +43,7 @@ if ENV_ROLE == dev:
         "unistar-backend-dev.com",
         "172.31.41.0",
         "127.0.0.1",
+        "3.37.193.243",
     ]
 elif ENV_ROLE == prod:
     ALLOWED_HOSTS = [
