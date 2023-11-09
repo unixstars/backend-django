@@ -40,15 +40,11 @@ class BoardSerializer(serializers.ModelSerializer):
 
     def get_logo(self, obj):
         if obj.logo:
-            return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(obj.logo)
-            )
+            return f"{settings.MEDIA_URL}{obj.logo}"
 
     def get_banner(self, obj):
         if obj.banner:
-            return generate_presigned_url(
-                settings.AWS_STORAGE_BUCKET_NAME, str(obj.banner)
-            )
+            return f"{settings.MEDIA_URL}{obj.banner}"
 
     def get_scrap_count(self, obj):
         return Scrap.objects.filter(board=obj).count()

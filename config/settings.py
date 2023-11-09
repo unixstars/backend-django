@@ -334,7 +334,7 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static")
 # Media 파일 설정
 MEDIA_LOCATION = "media"
 DEFAULT_FILE_STORAGE = "mystorages.MediaStorage"
-MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/{MEDIA_LOCATION}/"
+MEDIA_URL = f"https://d38hmicnsm5ncj.cloudfront.net/{MEDIA_LOCATION}/"
 
 # 파일 업로드 크기 제한(한 번의 요청)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 54 * 1024 * 1024  # 54 MB
