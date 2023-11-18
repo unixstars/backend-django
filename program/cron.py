@@ -23,10 +23,10 @@ def update_accepted_applicants():
 
         if weeks_passed > applicant.week:
             applicant.week = weeks_passed
-
+        logger.info("Update applicant week %s at %s", applicant, now)
         if weeks_passed >= activity_duration_in_weeks:
             applicant.activity_status = AcceptedApplicant.COMPLETED
-
+        logger.info("Update applicant COMPLETE %s at %s", applicant, now)
         applicant.save()
-        logger.info("Update applicant week %s at %s", applicant, now)
+
     logger.info("CLOSE UPDATE APPLICANT WEEK %s", now)
