@@ -19,9 +19,7 @@ def update_accepted_applicants():
             activity_duration_in_weeks += 1
 
         days_passed = (now.date() - applicant.start_date).days
-        logger.info("Date: %s", days_passed)
-        weeks_passed = days_passed // 7
-        logger.info("Week: %s", weeks_passed)
+        weeks_passed = days_passed // 7 + 1
 
         if weeks_passed > applicant.week:
             applicant.week = weeks_passed
