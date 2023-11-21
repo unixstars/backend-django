@@ -43,9 +43,9 @@ class AssignmentCommentAdmin(admin.ModelAdmin):
 
 @admin.register(Submit)
 class SubmitAdmin(admin.ModelAdmin):
-    list_display = ["assignment"]
+    list_display = ["assignment", "created_at", "updated_at"]
 
 
 @admin.register(SubmitFile)
 class SubmitFileAdmin(admin.ModelAdmin):
-    list_display = ["submit"]
+    list_display = ["submit", "created_at"]
