@@ -50,6 +50,7 @@ class StudentUserProfileUpdateSerializer(serializers.ModelSerializer):
     social_number = serializers.CharField(required=False)
     bank = serializers.CharField(required=False)
     account_number = serializers.CharField(required=False)
+    address = serializers.CharField(required=False)
 
     class Meta:
         model = StudentUserProfile
