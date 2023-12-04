@@ -33,7 +33,7 @@ class NoticeCommentAdmin(admin.ModelAdmin):
 
 @admin.register(Assignment)
 class AssignmentAdmin(admin.ModelAdmin):
-    list_display = ["accepted_applicant", "title"]
+    list_display = ["accepted_applicant", "title", "created_at", "updated_at"]
 
 
 @admin.register(AssignmentComment)

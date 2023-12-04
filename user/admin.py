@@ -23,7 +23,14 @@ class StudentUserAdmin(admin.ModelAdmin):
 
 @admin.register(StudentUserProfile)
 class StudentUserProfileAdmin(admin.ModelAdmin):
-    list_display = ["name", "student_user", "university", "major"]
+    list_display = [
+        "name",
+        "student_user",
+        "bank",
+        "account_number",
+        "social_number",
+        "address",
+    ]
     search_fields = ["name", "university", "major"]
 
 

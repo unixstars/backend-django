@@ -125,6 +125,7 @@ class StudentUserProfile(models.Model):
     bank = models.CharField(max_length=20)
     account_number = models.CharField(max_length=100)
     social_number = models.CharField(max_length=13, default="")
+    address = models.TextField(default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

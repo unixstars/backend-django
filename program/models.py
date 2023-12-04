@@ -15,7 +15,7 @@ class AcceptedApplicant(models.Model):
         Form, on_delete=models.CASCADE, related_name="accepted_applicant"
     )
     start_date = models.DateField(default=timezone.now)
-    week = models.IntegerField(default=0)
+    week = models.IntegerField(default=1)
     activity_status = models.CharField(
         max_length=10,
         choices=ACTIVITY_STATUS_CHOICES,

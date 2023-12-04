@@ -145,7 +145,7 @@ class Form(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f"{self.student_user}의 {self.activity} 지원서"
+        return f"{self.student_user.student_user_profile.name}의 {self.activity.board}/{self.activity} 지원서"
 
 
 class Suggestion(models.Model):
