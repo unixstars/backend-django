@@ -17,7 +17,7 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(StudentUser)
 class StudentUserAdmin(admin.ModelAdmin):
-    list_display = ["user", "student_user_profile.name"]
+    list_display = ["user"]
     search_fields = ["user"]
 
 
