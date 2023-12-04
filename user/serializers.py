@@ -16,9 +16,10 @@ class StudentUserProfileSerializer(serializers.ModelSerializer):
             "university",
             "major",
             "univ_certificate",
-            "social_number",
             "bank",
             "account_number",
+            "social_number",
+            "address",
         ]
 
     def get_profile_image(self, obj):
@@ -61,9 +62,10 @@ class StudentUserProfileUpdateSerializer(serializers.ModelSerializer):
             "university",
             "major",
             "univ_certificate",
-            "social_number",
             "bank",
             "account_number",
+            "social_number",
+            "address",
         ]
 
     def get_profile_image(self, obj):

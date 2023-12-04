@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Board, Activity, Scrap, Form
+from .models import Board, Activity, Scrap, Form, Suggestion
 
 
 @admin.register(Board)
@@ -24,3 +24,8 @@ class ScrapAdmin(admin.ModelAdmin):
 class FormAdmin(admin.ModelAdmin):
     list_display = ["activity", "student_user", "accept_status"]
     search_fields = ["activity", "student_user", "accept_status"]
+
+
+@admin.register(Suggestion)
+class SuggestionAdmin(admin.ModelAdmin):
+    list_display = ["company_user", "student_user", "created_at"]
