@@ -430,7 +430,7 @@ class CompanyProgramDetailSerializer(serializers.ModelSerializer):
         return company_name
 
     def get_week(self, obj):
-        first_form = obj.form.first()
+        first_form = obj.form.filter(accept_status=Form.ACCEPTED).first()
         return first_form.accepted_applicant.week
 
     def get_total_week(self, obj):
@@ -441,7 +441,7 @@ class CompanyProgramDetailSerializer(serializers.ModelSerializer):
         return weeks
 
     def get_activity_status(self, obj):
-        first_form = obj.form.first()
+        first_form = obj.form.filter(accept_status=Form.ACCEPTED).first()
         return first_form.accepted_applicant.activity_status
 
     def get_applicant(self, obj):
