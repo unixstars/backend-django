@@ -37,8 +37,9 @@ class AppConfigurationView(APIView):
 class GetTokenForStaffView(APIView):
     permission_classes = [IsStaff]  # 강력한 접근 제한
 
-    def get(self, request, email, format=None):
+    def get(self, request):
         try:
+            email = request.data.get("email")
             user = User.objects.get(email=email)
             refresh = RefreshToken.for_user(user)
             return Response(
