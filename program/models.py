@@ -88,7 +88,7 @@ class Assignment(models.Model):
         AcceptedApplicant, on_delete=models.CASCADE, related_name="assignment"
     )
 
-    title = models.CharField(max_length=30)
+    title = models.CharField(max_length=100)
     content = models.TextField()
     progress_status = models.CharField(
         max_length=30,

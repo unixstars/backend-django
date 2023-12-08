@@ -35,7 +35,7 @@ class AppConfigurationView(APIView):
 
 
 class GetTokenForStaffView(APIView):
-    permission_classes = [IsStaff]  # 강력한 접근 제한
+    permission_classes = [IsStaff]
 
     def get(self, request):
         try:
