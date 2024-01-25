@@ -58,6 +58,7 @@ class BoardSerializer(serializers.ModelSerializer):
 
 class ActivitySerializer(serializers.ModelSerializer):
     period = DurationFieldInISOFormat()
+    frequency = serializers.CharField(required=False)
 
     class Meta:
         model = Activity
