@@ -67,7 +67,7 @@ class Activity(models.Model):
     kind = models.CharField(max_length=20)
     people_number = models.IntegerField()
     talent = models.TextField()
-    frequency = models.TextField()
+    frequency = models.TextField(default="")
     way = models.TextField()
     period = models.DurationField()
     recruit = models.BooleanField(default=False)
