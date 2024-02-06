@@ -274,6 +274,7 @@ if ENV_ROLE == dev:
             "PORT": "3306",
             "OPTIONS": {
                 "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+                "charset": "utf8mb4",
             },
         },
     }
@@ -288,6 +289,7 @@ elif ENV_ROLE == prod:
             "PORT": "3306",
             "OPTIONS": {
                 "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
+                "charset": "utf8mb4",
             },
         },
     }
