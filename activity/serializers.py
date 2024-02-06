@@ -441,8 +441,6 @@ class CompanyActivityListSerializer(serializers.ModelSerializer):
     def get_deadline(self, obj):
         board = obj.board
         deadline = board.created_at + board.duration
-        if timezone.now() > deadline:
-            return 0
         return deadline.date()
 
     def get_form_count(self, obj):
