@@ -156,21 +156,10 @@ REST_FRAMEWORK = {
 
 # 반복작업
 CRONJOBS = [
-    (
-        "0 0 * * *",
-        "program.cron.update_accepted_applicants",
-        "> /var/log/uwsgi/cron/update_accepted_applicants.log",
-    ),
-    (
-        "1 0 * * *",
-        "authentication.cron.delete_expired_tokens",
-        "> /var/log/uwsgi/cron/delete_expired_tokens.log",
-    ),
-    (
-        "2 0 * * *",
-        "activity.cron.close_expired_boards",
-        "> /var/log/uwsgi/cron/close_update.log",
-    ),
+    ("0 0 * * 0", "config.cron.clean_logs"),
+    ("1 0 * * *", "program.cron.update_accepted_applicants"),
+    ("2 0 * * *", "authentication.cron.delete_expired_tokens"),
+    ("3 0 * * *", "activity.cron.close_expired_boards"),
 ]
 
 LOGGING = {
@@ -180,13 +169,26 @@ LOGGING = {
         "verbose": {
             "format": "{levelname} {asctime} {module} {message}",
             "style": "{",
+            "datefmt": "%Y-%m-%d %H:%M:%S",  # 날짜와 시간 형식
         },
     },
     "handlers": {
         "file": {
             "level": "INFO",
             "class": "logging.FileHandler",
-            "filename": "/var/log/uwsgi/cron/cron_info.log",
+            "filename": "/srv/backend-django/logs/cron_info.log",
+            "formatter": "verbose",
+        },
+        "client_errors": {  # 클라이언트 에러 로그 핸들러
+            "level": "WARNING",
+            "class": "logging.FileHandler",
+            "filename": "/srv/backend-django/logs/client_errors.log",
+            "formatter": "verbose",
+        },
+        "server_errors": {  # 서버 에러 로그 핸들러
+            "level": "ERROR",
+            "class": "logging.FileHandler",
+            "filename": "/srv/backend-django/logs/server_errors.log",
             "formatter": "verbose",
         },
     },
@@ -195,6 +197,11 @@ LOGGING = {
             "handlers": ["file"],
             "level": "INFO",
             "propagate": True,
+        },
+        "django.request": {  # 장고 요청 로거 수정
+            "handlers": ["client_errors", "server_errors"],
+            "level": "WARNING",  # WARNING 이상을 캡처하여 클라이언트 에러도 기록
+            "propagate": False,
         },
     },
 }
