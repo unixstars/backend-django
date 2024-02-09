@@ -149,7 +149,10 @@ class SubmitFile(models.Model):
         Submit, on_delete=models.CASCADE, related_name="submit_file"
     )
 
-    file = models.FileField(upload_to=get_upload_path_file)
+    file = models.FileField(
+        upload_to=get_upload_path_file,
+        max_length=200,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:

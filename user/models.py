@@ -115,13 +115,19 @@ class StudentUserProfile(models.Model):
 
     name = models.CharField(max_length=10)
     profile_image = models.ImageField(
-        upload_to=get_upload_path_profile_image, null=True, default=None
+        upload_to=get_upload_path_profile_image,
+        null=True,
+        default=None,
+        max_length=200,
     )
     birth = models.DateField()
     phone_number = models.CharField(max_length=20)
     university = models.CharField(max_length=20)
     major = models.CharField(max_length=30)
-    univ_certificate = models.FileField(upload_to=get_upload_path_certificate)
+    univ_certificate = models.FileField(
+        upload_to=get_upload_path_certificate,
+        max_length=200,
+    )
     bank = models.CharField(max_length=20)
     account_number = models.CharField(max_length=100)
     social_number = models.CharField(max_length=13, default="")
@@ -163,7 +169,10 @@ class PortfolioFile(models.Model):
         StudentUserPortfolio, on_delete=models.CASCADE, related_name="portfolio_file"
     )
 
-    file = models.FileField(upload_to=get_upload_path)
+    file = models.FileField(
+        upload_to=get_upload_path,
+        max_length=200,
+    )
 
     def __str__(self) -> str:
         return f"{self.student_user_portfolio}의 {self.file}"

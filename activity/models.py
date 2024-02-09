@@ -26,11 +26,13 @@ class Board(models.Model):
         upload_to=get_upload_path_logo,
         null=True,
         blank=True,
+        max_length=200,
     )
     banner = models.ImageField(
         upload_to=get_upload_path_banner,
         null=True,
         blank=True,
+        max_length=200,
     )
     title = models.CharField(
         max_length=30,
