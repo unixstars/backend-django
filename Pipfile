@@ -21,6 +21,8 @@ django-allauth = "*"
 django-crontab = "*"
 google-auth = "*"
 google-auth-oauthlib = "*"
+pandas = "*"
+openpyxl = "*"
 
 [dev-packages]
 black = "*"
