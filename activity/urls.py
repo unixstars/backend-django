@@ -28,6 +28,7 @@ from .views import (
     CompanyStudentPortfolioDetailView,
     CompanyStudentSuggestionCreateView,
     SuggestionListView,
+    FormExcelExportView,
 )
 
 urlpatterns = [
@@ -79,6 +80,12 @@ urlpatterns = [
         "company/activity/<int:pk>/form/",
         CompanyActivityFormListView.as_view(),
         name="company-activity-form-list",
+    ),
+    # 지원관리/대외활동1/엑셀 다운로드: 지원자들 정보 엑셀 다운로드
+    path(
+        "company/activity/<int:activity_id>/excel/",
+        FormExcelExportView.as_view(),
+        name="form-excel-export",
     ),
     # 지원관리/대외활동1/지원마감 : 지원마감 버튼
     path(

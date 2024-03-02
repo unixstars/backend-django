@@ -1,4 +1,4 @@
-from rest_framework import generics, status, parsers, filters
+from rest_framework import views, generics, status, parsers, filters
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, APIException
 from .models import Board, Scrap, Form, Activity, Suggestion
@@ -41,8 +41,10 @@ from rest_framework.response import Response
 from django.utils import timezone
 from datetime import timedelta
 from django.shortcuts import get_object_or_404
-from django.db.models import Case, When, Value, IntegerField, QuerySet
-
+from django.db.models import Case, When, Value, IntegerField
+from django.http import HttpResponse
+import pandas as pd
+from io import BytesIO
 
 """
 queryset : 모든 요청에 대해 일정한 데이터 셋일경우(정적)
@@ -71,7 +73,9 @@ class BoardListView(generics.ListAPIView):
         return (
             Board.objects.annotate(
                 closed_order=Case(
-                    When(is_closed=True, then=Value(1)),  # is_closed가 True이면 1을 부여
+                    When(
+                        is_closed=True, then=Value(1)
+                    ),  # is_closed가 True이면 1을 부여
                     default=Value(0),  # 그 외의 경우 0을 부여
                     output_field=IntegerField(),
                 )
@@ -256,7 +260,9 @@ class CompanyActivityFormRejectView(generics.UpdateAPIView):
         form = self.get_object()
         if form.activity.board.company_user != user:
             return Response(
-                {"detail": "해당 대외활동을 모집한 회사 유저만 불합격처리가 가능합니다."},
+                {
+                    "detail": "해당 대외활동을 모집한 회사 유저만 불합격처리가 가능합니다."
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         if form.accept_status != Form.PENDING:
@@ -305,7 +311,9 @@ class ScrapCreateView(generics.CreateAPIView):
             board=serializer.validated_data["board"],
             student_user=self.request.user.student_user,
         ).exists():
-            raise APIException("이미 스크랩이 존재합니다.", code=status.HTTP_400_BAD_REQUEST)
+            raise APIException(
+                "이미 스크랩이 존재합니다.", code=status.HTTP_400_BAD_REQUEST
+            )
         serializer.save(student_user=self.request.user.student_user)
 
 
@@ -364,17 +372,20 @@ class FormCreateView(generics.CreateAPIView):
             activity = Activity.objects.get(pk=activity_id)
         except Activity.DoesNotExist:
             return Response(
-                {"detail": "해당 대외활동이 존재하지 않습니다."}, status=status.HTTP_400_BAD_REQUEST
+                {"detail": "해당 대외활동이 존재하지 않습니다."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         if activity.is_closed:
             return Response(
-                {"detail": "해당 대외활동이 마감되었습니다."}, status=status.HTTP_400_BAD_REQUEST
+                {"detail": "해당 대외활동이 마감되었습니다."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         if exist_form:
             return Response(
-                {"detail": "해당 대외활동에 이미 지원하였습니다."}, status=status.HTTP_400_BAD_REQUEST
+                {"detail": "해당 대외활동에 이미 지원하였습니다."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
         return super().create(request, *args, **kwargs)
 
@@ -503,7 +514,9 @@ class CompanyStudentSuggestionCreateView(generics.CreateAPIView):
 
         if not company_user.board:
             return Response(
-                {"detail": "적어도 하나의 대외활동 게시글을 작성해야 지원제안을 보낼 수 있습니다."},
+                {
+                    "detail": "적어도 하나의 대외활동 게시글을 작성해야 지원제안을 보낼 수 있습니다."
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         return super().create(request, *args, **kwargs)
@@ -527,3 +540,98 @@ class SuggestionListView(generics.ListAPIView):
             student_user=user
         )
         return suggestions
+
+
+# 기업: 지원자 정보 엑셀 다운로드
+class FormExcelExportView(views.APIView):
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+    parser_classes = [
+        parsers.FormParser,
+        parsers.MultiPartParser,
+    ]
+
+    def get(self, request, *args, **kwargs):
+        activity_id = self.kwargs.get("activity_id")
+        try:
+            activity = Activity.objects.select_related("board__company_user").get(
+                id=activity_id
+            )
+        except Activity.DoesNotExist:
+            return Response(
+                {"message": "대외활동이 존재하지 않습니다."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        if activity.board.company_user != request.user.company_user:
+            return Response(
+                {"message": "해당 대외활동에 접근할 권한이 없습니다."},
+                status=status.HTTP_403_FORBIDDEN,
+            )
+
+        # 시트 1: 학생 프로필 및 지원서
+        forms = (
+            Form.objects.filter(activity=activity)
+            .select_related("student_user__student_user_profile")
+            .prefetch_related("student_user_portfolio__portfolio_file")
+            .distinct()
+        )
+        user_forms_info = [
+            {
+                "이름": form.student_user.student_user_profile.name,
+                "자기소개": form.introduce,
+                "지원이유": form.reason,
+                "나만의 강점": form.merit,
+                "대학": form.student_user.student_user_profile.university,
+                "학과": form.student_user.student_user_profile.major,
+                "재학증명서": (
+                    form.student_user.student_user_profile.univ_certificate.url
+                    if form.student_user.student_user_profile.univ_certificate
+                    else "없음"
+                ),
+                "프로필 사진": (
+                    form.student_user.student_user_profile.profile_image.url
+                    if form.student_user.student_user_profile.profile_image
+                    else "없음"
+                ),
+                "생년월일": form.student_user.student_user_profile.birth,
+                "휴대폰번호": form.student_user.student_user_profile.phone_number,
+                "포트폴리오 제목": (
+                    form.student_user_portfolio.title
+                    if form.student_user_portfolio
+                    else "포트폴리오 없음"
+                ),
+                "포트폴리오 설명": (
+                    form.student_user_portfolio.description
+                    if form.student_user_portfolio
+                    else "포트폴리오 없음"
+                ),
+                "포트폴리오 파일": (
+                    "\n".join(
+                        pf.file.url
+                        for pf in form.student_user_portfolio.portfolio_file.all()
+                    )
+                    if (
+                        form.student_user_portfolio
+                        and form.student_user_portfolio.portfolio_file.exists()
+                    )
+                    else "없음"
+                ),
+            }
+            for form in forms
+        ]
+        df_user_forms_info = pd.DataFrame(user_forms_info)
+
+        # 엑셀 파일을 메모리에 생성
+        with BytesIO() as b_io:
+            with pd.ExcelWriter(b_io, engine="openpyxl") as writer:
+                df_user_forms_info.to_excel(writer, sheet_name="지원자_정보")
+            # 메모리에서 데이터를 읽어 응답으로 반환
+            data = b_io.getvalue()
+
+        response = HttpResponse(
+            data,
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = 'attachment; filename="지원자_정보.xlsx"'
+
+        return response
