@@ -585,12 +585,12 @@ class FormExcelExportView(views.APIView):
                 "대학": form.student_user.student_user_profile.university,
                 "학과": form.student_user.student_user_profile.major,
                 "재학증명서": (
-                    f'=HYPERLINK("{self.request.build_absolute_uri(form.student_user.student_user_profile.univ_certificate.url)}", "다운로드")'
+                    f'=HYPERLINK("{settings.MEDIA_URL}{form.student_user.student_user_profile.univ_certificate.url}", "다운로드")'
                     if form.student_user.student_user_profile.univ_certificate
                     else "없음"
                 ),
                 "프로필 사진": (
-                    f'=HYPERLINK("{self.request.build_absolute_uri(form.student_user.student_user_profile.profile_image.url)}", "다운로드")'
+                    f'=HYPERLINK("{settings.MEDIA_URL}{form.student_user.student_user_profile.profile_image.url}", "다운로드")'
                     if form.student_user.student_user_profile.profile_image
                     else "없음"
                 ),
@@ -608,7 +608,7 @@ class FormExcelExportView(views.APIView):
                 ),
                 "포트폴리오 파일": (
                     "\n".join(
-                        f'=HYPERLINK("{self.request.build_absolute_uri(pf.file.url)}", "파일 {idx+1}")'
+                        f'=HYPERLINK("{settings.MEDIA_URL}{pf.file.url}", "파일 {idx+1}")'
                         for idx, pf in enumerate(
                             form.student_user_portfolio.portfolio_file.all()
                         )
