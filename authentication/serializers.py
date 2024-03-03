@@ -3,7 +3,7 @@ from dj_rest_auth.registration.serializers import RegisterSerializer
 from user.models import CompanyUser, StudentUser, User
 from django.core.cache import cache
 from api.utils import hash_function
-from allauth.utils import email_address_exists
+from allauth.account.utils import assess_unique_email
 from django.utils import timezone
 
 
@@ -49,7 +49,7 @@ class CompanyUserRegistrationSerializer(RegisterSerializer):
         except User.DoesNotExist:
             pass
 
-        if email_address_exists(manager_email):
+        if assess_unique_email(manager_email):
             raise serializers.ValidationError(
                 ("해당 이메일로 가입된 유저가 이미 존재합니다."),
             )
@@ -107,8 +107,10 @@ class TestCompanyUserRegistrationSerializer(RegisterSerializer):
         except User.DoesNotExist:
             pass
 
-        if email_address_exists(manager_email):
-            raise serializers.ValidationError("해당 이메일로 가입된 유저가 이미 존재합니다.")
+        if assess_unique_email(manager_email):
+            raise serializers.ValidationError(
+                "해당 이메일로 가입된 유저가 이미 존재합니다."
+            )
 
         return attrs
 
