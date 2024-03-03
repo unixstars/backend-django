@@ -576,8 +576,11 @@ class FormExcelExportView(views.APIView):
             .prefetch_related("student_user_portfolio__portfolio_file")
             .distinct()
         )
-        user_forms_info = [
-            {
+
+        data_rows = []
+        for form in forms:
+            # 기본 지원자 정보
+            base_info = {
                 "이름": form.student_user.student_user_profile.name,
                 "자기소개": form.introduce,
                 "지원이유": form.reason,
@@ -606,25 +609,37 @@ class FormExcelExportView(views.APIView):
                     if form.student_user_portfolio
                     else "포트폴리오 없음"
                 ),
-                "포트폴리오 파일": (
-                    "\n".join(
-                        f'=HYPERLINK("{settings.MEDIA_URL}{pf.file.name}", "파일 {idx+1}")'
-                        for idx, pf in enumerate(
-                            form.student_user_portfolio.portfolio_file.all()
-                        )
-                    )
-                    if (
-                        form.student_user_portfolio
-                        and form.student_user_portfolio.portfolio_file.exists()
-                    )
-                    else "없음"
-                ),
             }
-            for form in forms
-        ]
-        df_user_forms_info = pd.DataFrame(user_forms_info)
 
-        # 엑셀 파일을 메모리에 생성
+            # 포트폴리오 파일이 여러 개 있는 경우
+            if (
+                form.student_user_portfolio
+                and form.student_user_portfolio.portfolio_file.exists()
+            ):
+                first_file = True
+                for idx, pf in enumerate(
+                    form.student_user_portfolio.portfolio_file.all()
+                ):
+                    file_info = {
+                        "포트폴리오 파일": f'=HYPERLINK("{settings.MEDIA_URL}{pf.file.name}", "파일 {idx+1}")'
+                    }
+                    if first_file:
+                        # 첫 번째 파일의 경우 기본 정보와 함께 추가
+                        data_rows.append({**base_info, **file_info})
+                        first_file = False
+                    else:
+                        # 추가 파일의 경우 파일 정보만 추가
+                        data_rows.append(file_info)
+            else:
+                # 포트폴리오 파일이 없는 경우
+                base_info["포트폴리오 파일"] = "없음"
+                data_rows.append(base_info)
+
+        # 데이터 프레임 생성
+        df_user_forms_info = pd.DataFrame(data_rows)
+
+        # 엑셀 파일 생성 로직
+        # 예를 들어, df_user_forms_info를 엑셀 파일로 저장
         with BytesIO() as b_io:
             with pd.ExcelWriter(b_io, engine="openpyxl") as writer:
                 df_user_forms_info.to_excel(writer, sheet_name="지원자_정보")
