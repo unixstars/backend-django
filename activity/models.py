@@ -131,9 +131,9 @@ class Form(models.Model):
         (ACCEPTED, "합격"),
     ]
 
-    introduce = models.TextField()
-    reason = models.TextField()
-    merit = models.TextField()
+    introduce = models.TextField(default="")
+    reason = models.TextField(default="")
+    merit = models.TextField(default="")
     accept_status = models.CharField(
         max_length=10,
         choices=ACCEPT_STATUS_CHOICES,

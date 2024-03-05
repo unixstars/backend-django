@@ -1,6 +1,9 @@
 import os
 import glob
 from django.utils import timezone
+import logging
+
+logger = logging.getLogger("cron_info")
 
 
 def clean_logs():
