@@ -108,6 +108,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "allauth.account.middleware.AccountMiddleware",
+    "api.middleware.LogHeaderMiddleware",
 ]
 
 # CORS 설정
@@ -192,6 +193,12 @@ LOGGING = {
             "filename": "/srv/backend-django/logs/server_errors.log",
             "formatter": "verbose",
         },
+        "rate_exceed": {  # 미들웨어 로그를 위한 핸들러
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": "/srv/backend-django/logs/rate_exceed.log",
+            "formatter": "verbose",
+        },
     },
     "loggers": {
         "cron_info": {
@@ -202,6 +209,11 @@ LOGGING = {
         "django.request": {  # 장고 요청 로거 수정
             "handlers": ["client_errors", "server_errors"],
             "level": "WARNING",  # WARNING 이상을 캡처하여 클라이언트 에러도 기록
+            "propagate": False,
+        },
+        "api.middleware": {
+            "handlers": ["rate_exceed"],
+            "level": "DEBUG",
             "propagate": False,
         },
     },
