@@ -91,7 +91,12 @@ class Assignment(models.Model):
 
     # activity 관계 추가
     activity = models.ForeignKey(
-        Activity, on_delete=models.CASCADE, related_name="assignment"
+        Activity,
+        on_delete=models.CASCADE,
+        related_name="assignment",
+        null=True,
+        blank=True,
+        default=None,
     )
 
     title = models.CharField(max_length=100)  # 프론트(실제) 글자제한 30
@@ -149,6 +154,9 @@ class Submit(models.Model):
         AcceptedApplicant,
         on_delete=models.CASCADE,
         related_name="submit",
+        null=True,
+        blank=True,
+        default=None,
     )
 
     content = models.TextField(null=True, blank=True)
