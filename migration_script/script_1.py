@@ -34,7 +34,7 @@ class Migration(migrations.Migration):
 
     # dev,prod에 따라 다른 마이그레이션 파일 이름 적용
     dependencies = [
-        ("program", "0007_assignment_activity_and_more.py"),
+        ("program", "0007_assignment_activity_and_more"),
     ]
 
     operations = [
