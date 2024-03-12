@@ -50,7 +50,24 @@ class Notice(models.Model):
         return f"{self.accepted_applicant} 공지:{self.title}"
 
 
-# NoticeComment 삭제
+class NoticeComment(models.Model):
+    notice = models.ForeignKey(
+        Notice, on_delete=models.CASCADE, related_name="notice_comment"
+    )
+
+    STUDENT, COMPANY = "student", "company"
+    USER_TYPE_CHOICES = (
+        (STUDENT, "학생유저"),
+        (COMPANY, "기업유저"),
+    )
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    user_type = models.CharField(
+        max_length=10, choices=USER_TYPE_CHOICES, default=STUDENT
+    )
+
+    def __str__(self) -> str:
+        return f"{self.notice} 댓글"
 
 
 class Assignment(models.Model):
