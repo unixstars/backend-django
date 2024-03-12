@@ -162,3 +162,41 @@ class Suggestion(models.Model):
 
     def __str__(self) -> str:
         return f"{self.company_user}의 {self.student_user} 지원제안"
+
+
+class Communication(models.Model):
+
+    activity = models.OneToOneField(
+        Activity, on_delete=models.CASCADE, related_name="communication"
+    )
+
+    STUDENT, COMPANY = "student", "company"
+    USER_TYPE_CHOICES = (
+        (STUDENT, "학생유저"),
+        (COMPANY, "기업유저"),
+    )
+    content = models.TextField()
+    user_type = models.CharField(
+        max_length=10, choices=USER_TYPE_CHOICES, default=COMPANY
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class CommunicationComment(models.Model):
+
+    communication = models.ForeignKey(
+        Communication, on_delete=models.CASCADE, related_name="communication_comment"
+    )
+    form = models.ForeignKey(
+        Form,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="communication_comment",
+    )
+
+    title = models.CharField(max_length=30)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)

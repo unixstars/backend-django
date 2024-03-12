@@ -1,5 +1,5 @@
 from django.db import models
-from activity.models import Form
+from activity.models import Activity, Form
 from django.utils import timezone
 
 
@@ -50,24 +50,7 @@ class Notice(models.Model):
         return f"{self.accepted_applicant} 공지:{self.title}"
 
 
-class NoticeComment(models.Model):
-    notice = models.ForeignKey(
-        Notice, on_delete=models.CASCADE, related_name="notice_comment"
-    )
-
-    STUDENT, COMPANY = "student", "company"
-    USER_TYPE_CHOICES = (
-        (STUDENT, "학생유저"),
-        (COMPANY, "기업유저"),
-    )
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    user_type = models.CharField(
-        max_length=10, choices=USER_TYPE_CHOICES, default=STUDENT
-    )
-
-    def __str__(self) -> str:
-        return f"{self.notice} 댓글"
+# NoticeComment 삭제
 
 
 class Assignment(models.Model):
@@ -84,8 +67,14 @@ class Assignment(models.Model):
         (FINAL_APPROVAL, "최종승인"),
     )
 
+    # accepted_applicant 관계 제거 예정
     accepted_applicant = models.ForeignKey(
         AcceptedApplicant, on_delete=models.CASCADE, related_name="assignment"
+    )
+
+    # activity 관계 추가
+    activity = models.ForeignKey(
+        Activity, on_delete=models.CASCADE, related_name="assignment"
     )
 
     title = models.CharField(max_length=100)  # 프론트(실제) 글자제한 30
@@ -109,6 +98,15 @@ class AssignmentComment(models.Model):
         Assignment, on_delete=models.CASCADE, related_name="assignment_comment"
     )
 
+    # accepted_applicant 관계 추가
+    accepted_applicant = models.ForeignKey(
+        AcceptedApplicant,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assignment_comment",
+    )
+
     STUDENT, COMPANY = "student", "company"
     USER_TYPE_CHOICES = (
         (STUDENT, "학생유저"),
@@ -117,7 +115,7 @@ class AssignmentComment(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     user_type = models.CharField(
-        max_length=10, choices=USER_TYPE_CHOICES, default=STUDENT
+        max_length=10, choices=USER_TYPE_CHOICES, default=COMPANY
     )
 
     def __str__(self) -> str:
@@ -127,6 +125,13 @@ class AssignmentComment(models.Model):
 class Submit(models.Model):
     assignment = models.OneToOneField(
         Assignment, on_delete=models.CASCADE, related_name="submit"
+    )
+
+    # accepted_applicant 관계 추가
+    accepted_applicant = models.ForeignKey(
+        AcceptedApplicant,
+        on_delete=models.CASCADE,
+        related_name="submit",
     )
 
     content = models.TextField(null=True, blank=True)
