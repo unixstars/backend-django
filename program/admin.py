@@ -33,7 +33,7 @@ class NoticeCommentAdmin(admin.ModelAdmin):
 
 @admin.register(Assignment)
 class AssignmentAdmin(admin.ModelAdmin):
-    list_display = ["accepted_applicant", "title", "created_at", "updated_at"]
+    list_display = ["activity", "title", "created_at", "updated_at"]
 
 
 @admin.register(AssignmentComment)
@@ -43,7 +43,7 @@ class AssignmentCommentAdmin(admin.ModelAdmin):
 
 @admin.register(Submit)
 class SubmitAdmin(admin.ModelAdmin):
-    list_display = ["assignment", "created_at", "updated_at"]
+    list_display = ["accepted_applicant", "assignment", "created_at", "updated_at"]
 
 
 @admin.register(SubmitFile)
