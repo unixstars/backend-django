@@ -84,19 +84,10 @@ class Assignment(models.Model):
         (FINAL_APPROVAL, "최종승인"),
     )
 
-    # accepted_applicant 관계 제거 예정
-    accepted_applicant = models.ForeignKey(
-        AcceptedApplicant, on_delete=models.CASCADE, related_name="assignment"
-    )
-
-    # activity 관계 추가
     activity = models.ForeignKey(
         Activity,
         on_delete=models.CASCADE,
         related_name="assignment",
-        null=True,
-        blank=True,
-        default=None,
     )
 
     title = models.CharField(max_length=100)  # 프론트(실제) 글자제한 30
@@ -120,7 +111,6 @@ class AssignmentComment(models.Model):
         Assignment, on_delete=models.CASCADE, related_name="assignment_comment"
     )
 
-    # accepted_applicant 관계 추가
     accepted_applicant = models.ForeignKey(
         AcceptedApplicant,
         on_delete=models.SET_NULL,
@@ -149,14 +139,10 @@ class Submit(models.Model):
         Assignment, on_delete=models.CASCADE, related_name="submit"
     )
 
-    # accepted_applicant 관계 추가
     accepted_applicant = models.ForeignKey(
         AcceptedApplicant,
         on_delete=models.CASCADE,
         related_name="submit",
-        null=True,
-        blank=True,
-        default=None,
     )
 
     content = models.TextField(null=True, blank=True)
