@@ -37,8 +37,19 @@ class ApplicantWarning(models.Model):
 
 
 class Notice(models.Model):
+
+    # 제거 예정
     accepted_applicant = models.ForeignKey(
         AcceptedApplicant, on_delete=models.CASCADE, related_name="notice"
+    )
+
+    # 추가
+    activity = models.ForeignKey(
+        Activity,
+        on_delete=models.CASCADE,
+        related_name="notice",
+        null=True,
+        blank=True,
     )
 
     title = models.CharField(max_length=30)
@@ -53,6 +64,15 @@ class Notice(models.Model):
 class NoticeComment(models.Model):
     notice = models.ForeignKey(
         Notice, on_delete=models.CASCADE, related_name="notice_comment"
+    )
+
+    # 추가
+    accepted_applicant = models.ForeignKey(
+        AcceptedApplicant,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="notice_comment",
     )
 
     STUDENT, COMPANY = "student", "company"
