@@ -23,7 +23,7 @@ class ApplicantWarningAdmin(admin.ModelAdmin):
 
 @admin.register(Notice)
 class NoticeAdmin(admin.ModelAdmin):
-    list_display = ["accepted_applicant", "title"]
+    list_display = ["activity", "title"]
 
 
 @admin.register(NoticeComment)
