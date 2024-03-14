@@ -38,18 +38,10 @@ class ApplicantWarning(models.Model):
 
 class Notice(models.Model):
 
-    # 제거 예정
-    accepted_applicant = models.ForeignKey(
-        AcceptedApplicant, on_delete=models.CASCADE, related_name="notice"
-    )
-
-    # 추가
     activity = models.ForeignKey(
         Activity,
         on_delete=models.CASCADE,
         related_name="notice",
-        null=True,
-        blank=True,
     )
 
     title = models.CharField(max_length=30)
@@ -66,7 +58,6 @@ class NoticeComment(models.Model):
         Notice, on_delete=models.CASCADE, related_name="notice_comment"
     )
 
-    # 추가
     accepted_applicant = models.ForeignKey(
         AcceptedApplicant,
         on_delete=models.SET_NULL,
@@ -83,7 +74,7 @@ class NoticeComment(models.Model):
     content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     user_type = models.CharField(
-        max_length=10, choices=USER_TYPE_CHOICES, default=STUDENT
+        max_length=10, choices=USER_TYPE_CHOICES, default=COMPANY
     )
 
     def __str__(self) -> str:
