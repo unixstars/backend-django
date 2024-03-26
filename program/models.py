@@ -36,6 +36,35 @@ class ApplicantWarning(models.Model):
         return f"{self.accepted_applicant} 경고"
 
 
+class ApplicantComment(models.Model):
+    activity = models.ForeignKey(
+        Activity,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="applicant_comment",
+    )
+
+    accepted_applicant = models.ForeignKey(
+        AcceptedApplicant,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="applicant_comment",
+    )
+
+    STUDENT, COMPANY = "student", "company"
+    USER_TYPE_CHOICES = (
+        (STUDENT, "학생유저"),
+        (COMPANY, "기업유저"),
+    )
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    user_type = models.CharField(
+        max_length=10, choices=USER_TYPE_CHOICES, default=COMPANY
+    )
+
+
 class Notice(models.Model):
 
     activity = models.ForeignKey(
