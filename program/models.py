@@ -30,7 +30,7 @@ class ApplicantWarning(models.Model):
     accepted_applicant = models.ForeignKey(
         AcceptedApplicant, on_delete=models.CASCADE, related_name="applicant_warning"
     )
-    content = models.CharField(max_length=50)
+    content = models.CharField(max_length=50, default="")
 
     def __str__(self) -> str:
         return f"{self.accepted_applicant} 경고"
