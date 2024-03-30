@@ -26,26 +26,6 @@ class NoticeAdmin(admin.ModelAdmin):
     list_display = ["activity", "title"]
 
 
-@admin.register(NoticeComment)
-class NoticeCommentAdmin(admin.ModelAdmin):
-    list_display = ["notice"]
-
-
 @admin.register(Assignment)
 class AssignmentAdmin(admin.ModelAdmin):
     list_display = ["activity", "title", "created_at", "updated_at"]
-
-
-@admin.register(AssignmentComment)
-class AssignmentCommentAdmin(admin.ModelAdmin):
-    list_display = ["assignment"]
-
-
-@admin.register(Submit)
-class SubmitAdmin(admin.ModelAdmin):
-    list_display = ["accepted_applicant", "assignment", "created_at", "updated_at"]
-
-
-@admin.register(SubmitFile)
-class SubmitFileAdmin(admin.ModelAdmin):
-    list_display = ["submit", "created_at"]
