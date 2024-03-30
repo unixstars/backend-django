@@ -122,9 +122,10 @@ class ApplicantCommentCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, IsStudentUser]
 
     def perform_create(self, serializer):
+        user = self.request.user.student_user
         program_id = self.kwargs.get("program_id")
         activity = Activity.objects.get(form__accepted_applicant__pk=program_id)
-        applicant = AcceptedApplicant.objects.get(pk=program_id)
+        applicant = AcceptedApplicant.objects.get(form__student_user=user)
         return serializer.save(
             activity=activity,
             accepted_applicant=applicant,
