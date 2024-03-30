@@ -176,17 +176,23 @@ class ApplicantCommentListSerializer(serializers.ModelSerializer):
 
     def get_is_myself(self, obj):
         request = self.context.get("request")
-        user_type = obj.user_type
-        if user_type == ApplicantComment.STUDENT:
-            if request.user.student_user == obj.accepted_applicant.form.student_user:
-                return True
-            else:
-                return False
-        else:
-            if request.user.company_user == obj.activity.board.company_user:
-                return True
-            else:
-                return False
+
+        # 학생 사용자가 댓글의 작성자인지 확인
+        if hasattr(request.user, "student_user"):
+            return (
+                obj.user_type == ApplicantComment.STUDENT
+                and request.user.student_user
+                == obj.accepted_applicant.form.student_user
+            )
+
+        # 기업 사용자가 댓글의 작성자인지 확인
+        elif hasattr(request.user, "company_user"):
+            return (
+                obj.user_type == ApplicantComment.COMPANY
+                and request.user.company_user == obj.activity.board.company_user
+            )
+
+        return False
 
 
 class ApplicantCommentCreateSerializer(serializers.ModelSerializer):

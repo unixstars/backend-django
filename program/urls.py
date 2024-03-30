@@ -45,13 +45,13 @@ urlpatterns = [
         ProgramDetailView.as_view(),
         name="student-program-detail",
     ),
-    # N: 나의활동/활동1/소통댓글창 : 대외활동 기업 및 참여자 댓글 반환
+    # 나의활동/활동1/소통댓글창 : 대외활동 기업 및 참여자 댓글 반환
     path(
         "student/program/<int:program_id>/comment/",
         ApplicantCommentListView.as_view(),
         name="student-program-comment",
     ),
-    # N: 나의활동/활동1/소통댓글창/등록 : 학생 댓글 등록
+    # 나의활동/활동1/소통댓글창/등록 : 학생 댓글 등록
     path(
         "student/program/<int:program_id>/comment/create/",
         ApplicantCommentCreateView.as_view(),
