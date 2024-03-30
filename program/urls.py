@@ -3,6 +3,8 @@ from .views import (
     ProgramListView,
     ProgramDetailView,
     ProgramWarningView,
+    ApplicantCommentListView,
+    ApplicantCommentCreateView,
     NoticeDetailView,
     NoticeCommentListView,
     NoticeCommentCreateView,
@@ -43,14 +45,18 @@ urlpatterns = [
         ProgramDetailView.as_view(),
         name="student-program-detail",
     ),
-    # 나의활동/활동1/경고: 받은 경고 리스트
+    # N: 나의활동/활동1/소통댓글창 : 대외활동 기업 및 참여자 댓글 반환
     path(
-        "student/program/<int:program_id>/warning/",
-        ProgramWarningView.as_view(),
-        name="student-program-warning",
+        "student/program/<int:program_id>/comment/",
+        ApplicantCommentListView.as_view(),
+        name="student-program-comment",
     ),
-    # N: 나의활동/활동1/소통댓글창 : 대외활동 기업 및 참여자 댓글 반환(이름도 있어야 하며, 자신의 댓글만 반대 방향)
     # N: 나의활동/활동1/소통댓글창/등록 : 학생 댓글 등록
+    path(
+        "student/program/<int:program_id>/comment/create/",
+        ApplicantCommentCreateView.as_view(),
+        name="student-program-comment-create",
+    ),
     # R: 나의활동/활동1/공지: 공지 => db구조에 따른 로직 변경, 공지 체크, 댓글 없어짐
     path(
         "student/program/<int:program_id>/notice/<int:pk>/",

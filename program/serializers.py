@@ -4,6 +4,7 @@ from api.utils import generate_presigned_url
 from .models import (
     AcceptedApplicant,
     ApplicantWarning,
+    ApplicantComment,
     Notice,
     NoticeComment,
     Assignment,
@@ -60,7 +61,6 @@ class NoticeListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
-            "is_checked",
             "created_at",
         ]
 
@@ -136,6 +136,68 @@ class ProgramWarningSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApplicantWarning
         fields = ["id", "content"]
+
+
+class ApplicantCommentListSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    image = serializers.SerializerMethodField()
+    is_myself = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ApplicantComment
+        fields = [
+            "name",
+            "image",
+            "content",
+            "user_type",
+            "is_myself",
+        ]
+
+        def get_name(self, obj):
+            user_type = obj.user_type
+            if user_type == ApplicantComment.STUDENT:
+                name = (
+                    obj.accepted_applicant.form.student_user.student_user_profile.name
+                )
+                return name
+            else:
+                return obj.activity.board.company_name
+
+        def get_image(self, obj):
+            user_type = obj.user_type
+            if user_type == ApplicantComment.STUDENT:
+                image = (
+                    obj.accepted_applicant.form.student_user.student_user_profile.profile_image
+                )
+                if image:
+                    return f"{settings.MEDIA_URL}{image}"
+            else:
+                image = obj.activity.board.logo
+                if image:
+                    return f"{settings.MEDIA_URL}{image}"
+
+        def get_is_myself(self, obj):
+            request = self.context.get("request")
+            user_type = obj.user_type
+            if user_type == ApplicantComment.STUDENT:
+                if (
+                    request.user.student_user
+                    == obj.accepted_applicant.form.student_user
+                ):
+                    return True
+                else:
+                    return False
+            else:
+                if request.user.company_user == obj.activity.board.company_user:
+                    return True
+                else:
+                    return False
+
+
+class ApplicantCommentCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ApplicantComment
+        fields = ["content"]
 
 
 class NoticeDetailSerializer(serializers.ModelSerializer):

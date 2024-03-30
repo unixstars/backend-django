@@ -39,9 +39,7 @@ class ApplicantWarning(models.Model):
 class ApplicantComment(models.Model):
     activity = models.ForeignKey(
         Activity,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
+        on_delete=models.CASCADE,
         related_name="applicant_comment",
     )
 
@@ -59,10 +57,10 @@ class ApplicantComment(models.Model):
         (COMPANY, "기업유저"),
     )
     content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
     user_type = models.CharField(
         max_length=10, choices=USER_TYPE_CHOICES, default=COMPANY
     )
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class Notice(models.Model):

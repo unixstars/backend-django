@@ -17,6 +17,7 @@ from api.permissions import (
 from .models import (
     AcceptedApplicant,
     ApplicantWarning,
+    ApplicantComment,
     Notice,
     NoticeComment,
     Assignment,
@@ -27,7 +28,8 @@ from activity.models import Activity
 from .serializers import (
     ProgramListSerializer,
     ProgramDetailSerializer,
-    ProgramWarningSerializer,
+    ApplicantCommentListSerializer,
+    ApplicantCommentCreateSerializer,
     NoticeDetailSerializer,
     NoticeCommentSerializer,
     NoticeCommentCreateSerializer,
@@ -73,7 +75,7 @@ class ProgramDetailView(generics.RetrieveAPIView):
         return (
             AcceptedApplicant.objects.filter(form__student_user=user)
             .exclude(activity_status="canceled")
-            .select_related("form__activity", "form__activity__board")
+            .select_related("form__activity__board")
             .prefetch_related(
                 "form__activity__notice",
                 "form__activity__assignment",
@@ -81,6 +83,7 @@ class ProgramDetailView(generics.RetrieveAPIView):
         )
 
 
+"""
 # 나의활동/활동1/경고: 받은 경고 리스트
 class ProgramWarningView(generics.ListAPIView):
     serializer_class = ProgramWarningSerializer
@@ -92,6 +95,41 @@ class ProgramWarningView(generics.ListAPIView):
         return ApplicantWarning.objects.filter(
             accepted_applicant__pk=program_id,
             accepted_applicant__form__student_user=user,
+        )
+"""
+
+
+# 나의활동/활동1/소통댓글창
+class ApplicantCommentListView(generics.ListAPIView):
+    serializer_class = ApplicantCommentListSerializer
+    permission_classes = [IsAuthenticated, IsStudentUser]
+
+    def get_queryset(self):
+        program_id = self.kwargs.get("program_id")
+        activity = Activity.objects.get(form__accepted_applicant__pk=program_id)
+        return (
+            ApplicantComment.objects.filter(activity=activity)
+            .select_related(
+                "accepted_applicant__form__student_user__student_user_profile",
+                "activity__board__company_user",
+            )
+            .order_by("created_at")
+        )
+
+
+# 나의활동/활동1/소통댓글창/등록 : 학생 댓글 등록
+class ApplicantCommentCreateView(generics.CreateAPIView):
+    serializer_class = ApplicantCommentCreateSerializer
+    permission_classes = [IsAuthenticated, IsStudentUser]
+
+    def perform_create(self, serializer):
+        program_id = self.kwargs.get("program_id")
+        activity = Activity.objects.get(form__accepted_applicant__pk=program_id)
+        applicant = AcceptedApplicant.objects.get(pk=program_id)
+        return serializer.save(
+            activity=activity,
+            accepted_applicant=applicant,
+            user_type=ApplicantComment.STUDENT,
         )
 
 
