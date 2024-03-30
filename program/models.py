@@ -79,7 +79,7 @@ class Notice(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return f"{self.accepted_applicant} 공지:{self.title}"
+        return f"{self.activity} 공지:{self.title}"
 
 
 class NoticeComment(models.Model):
@@ -143,7 +143,7 @@ class Assignment(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self) -> str:
-        return f"{self.accepted_applicant} 과제:{self.title}"
+        return f"{self.activity} 과제:{self.title}"
 
 
 class AssignmentComment(models.Model):
