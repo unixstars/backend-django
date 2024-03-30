@@ -70,8 +70,14 @@ class ProgramDetailView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         user = self.request.user.student_user
-        return AcceptedApplicant.objects.filter(form__student_user=user).exclude(
-            activity_status="canceled"
+        return (
+            AcceptedApplicant.objects.filter(form__student_user=user)
+            .exclude(activity_status="canceled")
+            .select_related("form__activity", "form__activity__board")
+            .prefetch_related(
+                "form__activity__notice",
+                "form__activity__assignment",
+            )
         )
 
 
@@ -206,7 +212,9 @@ class SubmitCreateView(generics.CreateAPIView):
 
         if assignment.progress_status != Assignment.IN_PROGRESS:
             return Response(
-                {"detail": "과제 제출은 처음만 가능합니다. 이후엔 수정 제출 해야 합니다."},
+                {
+                    "detail": "과제 제출은 처음만 가능합니다. 이후엔 수정 제출 해야 합니다."
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
         return super().create(request, *args, **kwargs)
@@ -440,7 +448,9 @@ class CompanyProgramAssignmentRevisionView(generics.UpdateAPIView):
             assignment.save()
         else:
             return Response(
-                {"detail": "수정 요청은 과제 상태가 진행중 또는 1차 수정일때만 가능합니다."},
+                {
+                    "detail": "수정 요청은 과제 상태가 진행중 또는 1차 수정일때만 가능합니다."
+                },
                 status=status.HTTP_400_BAD_REQUEST,
             )
 

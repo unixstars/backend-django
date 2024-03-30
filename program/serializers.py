@@ -81,8 +81,8 @@ class ProgramDetailSerializer(serializers.ModelSerializer):
     company_name = serializers.SerializerMethodField()
     total_week = serializers.SerializerMethodField()
     warning_count = serializers.SerializerMethodField()
-    notice = NoticeListSerializer(many=True)
-    assignment = AssignmentListSerializer(many=True)
+    notice = serializers.SerializerMethodField()
+    assignment = serializers.SerializerMethodField()
 
     class Meta:
         model = AcceptedApplicant
@@ -122,6 +122,14 @@ class ProgramDetailSerializer(serializers.ModelSerializer):
     def get_warning_count(self, obj) -> int:
         warnings = ApplicantWarning.objects.filter(accepted_applicant=obj)
         return warnings.count()
+
+    def get_notice(self, obj):
+        notices = obj.form.activity.notice.all()
+        return NoticeListSerializer(notices, many=True).data
+
+    def get_assignment(self, obj):
+        assignments = obj.form.activity.assignment.all()
+        return AssignmentListSerializer(assignments, many=True).data
 
 
 class ProgramWarningSerializer(serializers.ModelSerializer):
