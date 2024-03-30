@@ -30,6 +30,7 @@ from .serializers import (
     ProgramDetailSerializer,
     ApplicantCommentListSerializer,
     ApplicantCommentCreateSerializer,
+    ProgramWarningSerializer,
     NoticeDetailSerializer,
     NoticeCommentSerializer,
     NoticeCommentCreateSerializer,
@@ -83,7 +84,6 @@ class ProgramDetailView(generics.RetrieveAPIView):
         )
 
 
-"""
 # 나의활동/활동1/경고: 받은 경고 리스트
 class ProgramWarningView(generics.ListAPIView):
     serializer_class = ProgramWarningSerializer
@@ -96,7 +96,6 @@ class ProgramWarningView(generics.ListAPIView):
             accepted_applicant__pk=program_id,
             accepted_applicant__form__student_user=user,
         )
-"""
 
 
 # 나의활동/활동1/소통댓글창
