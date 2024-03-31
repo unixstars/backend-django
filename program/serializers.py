@@ -72,6 +72,8 @@ class AssignmentListSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "progress_status",
+            "created_at",
+            "updated_at",
         ]
 
 
@@ -151,6 +153,7 @@ class ApplicantCommentListSerializer(serializers.ModelSerializer):
             "content",
             "user_type",
             "is_myself",
+            "created_at",
         ]
 
     def get_name(self, obj):
@@ -208,7 +211,6 @@ class NoticeDetailSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "content",
-            "is_checked",
             "created_at",
         ]
 
@@ -288,13 +290,14 @@ class SubmitSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "content",
+            "progress_status",
             "submit_file",
         ]
 
 
 class AssignmentDetailSerializer(serializers.ModelSerializer):
     deadline = serializers.SerializerMethodField()
-    submit = SubmitSerializer()
+    submit = serializers.SerializerMethodField()
 
     class Meta:
         model = Assignment
@@ -302,7 +305,6 @@ class AssignmentDetailSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "content",
-            "progress_status",
             "deadline",
             "created_at",
             "submit",
@@ -312,6 +314,14 @@ class AssignmentDetailSerializer(serializers.ModelSerializer):
         deadline_datetime = obj.created_at + obj.duration
         deadline_date = deadline_datetime.date()
         return deadline_date
+
+    def get_submit(self, obj):
+        assignment_id = self.context.get("assignment_id")
+        program_id = self.context.get("program_id")
+        submit = Submit.objects.get(
+            accepted_applicant__pk=program_id, assignment__pk=assignment_id
+        )
+        return SubmitSerializer(submit).data
 
 
 class AssignmentCommentSerializer(serializers.ModelSerializer):
@@ -366,7 +376,6 @@ class SubmitCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submit
         fields = [
-            "id",
             "content",
             "submit_file",
         ]
@@ -386,7 +395,6 @@ class SubmitUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Submit
         fields = [
-            "id",
             "content",
             "submit_file",
         ]

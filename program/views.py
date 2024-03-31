@@ -139,11 +139,9 @@ class NoticeDetailView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated, IsStudentUser]
 
     def get_queryset(self):
-        user = self.request.user.student_user
         program_id = self.kwargs.get("program_id")
         return Notice.objects.filter(
-            accepted_applicant__pk=program_id,
-            accepted_applicant__form__student_user=user,
+            activity__form__accepted_applicant__pk=program_id,
         )
 
 
@@ -195,12 +193,16 @@ class AssignmentDetailView(generics.RetrieveAPIView):
     permission_classes = [IsAuthenticated, IsStudentUser]
 
     def get_queryset(self):
-        user = self.request.user.student_user
         program_id = self.kwargs.get("program_id")
         return Assignment.objects.filter(
-            accepted_applicant__pk=program_id,
-            accepted_applicant__form__student_user=user,
+            activity__form__accepted_applicant__pk=program_id,
         )
+
+    def get_serializer_context(self):
+        context = super(AssignmentDetailView, self).get_serializer_context()
+        context["program_id"] = self.kwargs.get("program_id")
+        context["assignment_id"] = self.kwargs.get("pk")
+        return context
 
 
 # (학생,기업) 과제 댓글 리스트
@@ -236,7 +238,6 @@ class SubmitCreateView(generics.CreateAPIView):
     permission_classes = [
         IsAuthenticated,
         IsStudentUser,
-        IsSubmitOwnerStudent,
     ]
     parser_classes = [
         parsers.MultiPartParser,
@@ -245,10 +246,14 @@ class SubmitCreateView(generics.CreateAPIView):
     ]
 
     def create(self, request, *args, **kwargs):
+        program_id = self.kwargs.get("program_id")
         assignment_id = self.kwargs.get("assignment_id")
-        assignment = Assignment.objects.get(pk=assignment_id)
 
-        if assignment.progress_status != Assignment.IN_PROGRESS:
+        if Submit.objects.filter(
+            accepted_applicant__pk=program_id,
+            assignment__pk=assignment_id,
+            progress_status=Submit.IN_PROGRESS,
+        ).exists():
             return Response(
                 {
                     "detail": "과제 제출은 처음만 가능합니다. 이후엔 수정 제출 해야 합니다."
@@ -258,9 +263,11 @@ class SubmitCreateView(generics.CreateAPIView):
         return super().create(request, *args, **kwargs)
 
     def perform_create(self, serializer):
+        program_id = self.kwargs.get("program_id")
+        program = AcceptedApplicant.objects.get(pk=program_id)
         assignment_id = self.kwargs.get("assignment_id")
         assignment = Assignment.objects.get(pk=assignment_id)
-        serializer.save(assignment=assignment)
+        serializer.save(assignment=assignment, accepted_applicant=program)
 
 
 # 나의활동/활동1/과제/수정: 과제 수정
@@ -269,19 +276,19 @@ class SubmitUpdateView(generics.UpdateAPIView):
     permission_classes = [
         IsAuthenticated,
         IsStudentUser,
-        IsSubmitOwnerStudent,
     ]
 
     def get_object(self):
+        program_id = self.kwargs.get("program_id")
         assignment_id = self.kwargs.get("assignment_id")
         # __in을 사용하여 특정 progress_status를 가진 인스턴스만 필터링
         try:
             submit = Submit.objects.filter(
-                assignment__progress_status__in=[
-                    Assignment.FIRST_REVISION,
-                    Assignment.SECOND_REVISION,
+                progress_status__in=[
+                    Submit.FIRST_REVISION,
+                    Submit.SECOND_REVISION,
                 ]
-            ).get(assignment__pk=assignment_id)
+            ).get(accepted_applicant__pk=program_id, assignment__pk=assignment_id)
             return submit
         except Submit.DoesNotExist:
             raise NotFound(detail="수정할 수 있는 과제 제출물이 존재하지 않습니다.")

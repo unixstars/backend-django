@@ -109,18 +109,6 @@ class NoticeComment(models.Model):
 
 
 class Assignment(models.Model):
-    IN_PROGRESS, FIRST_REVISION, SECOND_REVISION, FINAL_APPROVAL = (
-        "in_progress",
-        "first_revision",
-        "second_revision",
-        "final_approval",
-    )
-    PROGRESS_STATUS_CHOICES = (
-        (IN_PROGRESS, "진행중"),
-        (FIRST_REVISION, "1차수정"),
-        (SECOND_REVISION, "2차수정"),
-        (FINAL_APPROVAL, "최종승인"),
-    )
 
     activity = models.ForeignKey(
         Activity,
@@ -130,11 +118,6 @@ class Assignment(models.Model):
 
     title = models.CharField(max_length=100)  # 프론트(실제) 글자제한 30
     content = models.TextField()
-    progress_status = models.CharField(
-        max_length=30,
-        choices=PROGRESS_STATUS_CHOICES,
-        default=IN_PROGRESS,
-    )
     duration = models.DurationField()
     duration_extended = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -163,6 +146,7 @@ class AssignmentComment(models.Model):
         (COMPANY, "기업유저"),
     )
     content = models.TextField()
+
     created_at = models.DateTimeField(auto_now_add=True)
     user_type = models.CharField(
         max_length=10, choices=USER_TYPE_CHOICES, default=COMPANY
@@ -173,7 +157,7 @@ class AssignmentComment(models.Model):
 
 
 class Submit(models.Model):
-    assignment = models.OneToOneField(
+    assignment = models.ForeignKey(
         Assignment, on_delete=models.CASCADE, related_name="submit"
     )
 
@@ -183,9 +167,33 @@ class Submit(models.Model):
         related_name="submit",
     )
 
+    IN_PROGRESS, FIRST_REVISION, SECOND_REVISION, FINAL_APPROVAL = (
+        "in_progress",
+        "first_revision",
+        "second_revision",
+        "final_approval",
+    )
+    PROGRESS_STATUS_CHOICES = (
+        (IN_PROGRESS, "진행중"),
+        (FIRST_REVISION, "1차수정"),
+        (SECOND_REVISION, "2차수정"),
+        (FINAL_APPROVAL, "최종승인"),
+    )
+
     content = models.TextField(null=True, blank=True)
+    progress_status = models.CharField(
+        max_length=30,
+        choices=PROGRESS_STATUS_CHOICES,
+        default=IN_PROGRESS,
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = [
+            "assignment",
+            "accepted_applicant",
+        ]
 
     def __str__(self) -> str:
         return f"{self.assignment} 제출물"

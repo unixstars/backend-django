@@ -39,75 +39,45 @@ urlpatterns = [
         ProgramListView.as_view(),
         name="student-program-list",
     ),
-    # 나의활동/활동1: 공지,과제 리스트
+    # v 나의활동/활동1: 공지,과제 리스트
     path(
         "student/program/<int:pk>/",
         ProgramDetailView.as_view(),
         name="student-program-detail",
     ),
-    # 나의활동/활동1/소통댓글창 : 대외활동 기업 및 참여자 댓글 반환
+    # v 나의활동/활동1/소통댓글창 : 대외활동 기업 및 참여자 댓글 반환
     path(
         "student/program/<int:program_id>/comment/",
         ApplicantCommentListView.as_view(),
         name="student-program-comment",
     ),
-    # 나의활동/활동1/소통댓글창/등록 : 학생 댓글 등록
+    # v 나의활동/활동1/소통댓글창/등록 : 학생 댓글 등록
     path(
         "student/program/<int:program_id>/comment/create/",
         ApplicantCommentCreateView.as_view(),
         name="student-program-comment-create",
     ),
-    # R: 나의활동/활동1/공지: 공지 => db구조에 따른 로직 변경, 공지 체크, 댓글 없어짐
+    # R: 나의활동/활동1/공지: 공지 => db구조에 따른 로직 변경, 공지 체크, 댓글 없어짐 --
     path(
         "student/program/<int:program_id>/notice/<int:pk>/",
         NoticeDetailView.as_view(),
         name="student-program-notice",
     ),
-    # D: (학생,기업) 공지 댓글 리스트
-    path(
-        "notice/<int:notice_id>/comment/",
-        NoticeCommentListView.as_view(),
-        name="notice-comment-list",
-    ),
-    # D: 나의활동/활동1/공지/댓글 작성: 공지 댓글 작성
-    path(
-        "student/notice/<int:notice_id>/comment/create/",
-        NoticeCommentCreateView.as_view(),
-        name="notice-comment-create",
-    ),
-    # D: 나의활동/활동1/공지/공지 확인: 공지 확인 버튼
-    path(
-        "student/notice/<int:pk>/check/",
-        NoticeCheckUpdateView.as_view(),
-        name="notice-check",
-    ),
-    # R: 나의활동/활동1/과제: 과제 => db구조에 따른 로직 변경, 공지 체크, 댓글 없어짐
+    # R: 나의활동/활동1/과제: 과제 => db구조에 따른 로직 변경, 공지 체크, 댓글 없어짐 --
     path(
         "student/program/<int:program_id>/assignment/<int:pk>/",
         AssignmentDetailView.as_view(),
         name="student-program-assignment",
     ),
-    # D: (학생,기업) 과제 댓글 리스트
+    # R: 나의활동/활동1/과제/과제제출: 과제 제출 버튼 => db구조에 따른 로직 변경 --
     path(
-        "assignment/<int:assignment_id>/comment/",
-        AssignmentCommentListView.as_view(),
-        name="assignment-comment-list",
-    ),
-    # D: 나의활동/활동1/과제/댓글 작성: 과제 댓글 작성
-    path(
-        "student/assignment/<int:assignment_id>/comment/create/",
-        AssignmentCommentCreateView.as_view(),
-        name="assignment-comment-create",
-    ),
-    # R: 나의활동/활동1/과제/과제제출: 과제 제출 버튼 => db구조에 따른 로직 변경
-    path(
-        "student/assignment/<int:assignment_id>/submit/",
+        "student/program/<int:program_id>/assignment/<int:assignment_id>/submit/",
         SubmitCreateView.as_view(),
         name="assignment-submit",
     ),
-    # R: 나의활동/활동1/과제/수정: 과제 수정 => db구조에 따른 로직 변경
+    # R: 나의활동/활동1/과제/수정: 과제 수정 => db구조에 따른 로직 변경 --
     path(
-        "student/assignment/<int:assignment_id>/submit/update/",
+        "student/program/<int:program_id>/assignment/<int:assignment_id>/submit/update/",
         SubmitUpdateView.as_view(),
         name="assignment-submit-update",
     ),
