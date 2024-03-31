@@ -35,3 +35,13 @@ class NoticeAdmin(admin.ModelAdmin):
 @admin.register(Assignment)
 class AssignmentAdmin(admin.ModelAdmin):
     list_display = ["activity", "title", "created_at", "updated_at"]
+
+
+@admin.register(Submit)
+class SubmitAdmin(admin.ModelAdmin):
+    list_display = ["assignment", "accepted_applicant", "progress_status"]
+
+
+@admin.register(SubmitFile)
+class SubmitFileAdmin(admin.ModelAdmin):
+    list_display = ["submit", "created_at"]
