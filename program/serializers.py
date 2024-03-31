@@ -71,7 +71,6 @@ class AssignmentListSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "title",
-            "progress_status",
             "created_at",
             "updated_at",
         ]
@@ -658,7 +657,6 @@ class CompanyProgramAssignmentDetailSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "content",
-            "progress_status",
             "deadline",
             "created_at",
             "submit",
