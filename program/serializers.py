@@ -317,10 +317,16 @@ class AssignmentDetailSerializer(serializers.ModelSerializer):
     def get_submit(self, obj):
         assignment_id = self.context.get("assignment_id")
         program_id = self.context.get("program_id")
-        submits = Submit.objects.filter(
+        submit_exists = Submit.objects.filter(
             accepted_applicant__pk=program_id, assignment__pk=assignment_id
-        )
-        return SubmitSerializer(submits, many=True).data
+        ).exists()
+        if submit_exists:
+            submit = Submit.objects.get(
+                accepted_applicant__pk=program_id, assignment__pk=assignment_id
+            )
+            return SubmitSerializer(submit).data
+        else:
+            return {}
 
 
 class AssignmentCommentSerializer(serializers.ModelSerializer):
