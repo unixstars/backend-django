@@ -69,13 +69,13 @@ urlpatterns = [
         AssignmentDetailView.as_view(),
         name="student-program-assignment",
     ),
-    # R: 나의활동/활동1/과제/과제제출: 과제 제출 버튼 => db구조에 따른 로직 변경 --
+    # R: 나의활동/활동1/과제/과제제출: 과제 제출 버튼 => db구조에 따른 로직 변경 -
     path(
         "student/program/<int:program_id>/assignment/<int:assignment_id>/submit/",
         SubmitCreateView.as_view(),
         name="assignment-submit",
     ),
-    # R: 나의활동/활동1/과제/수정: 과제 수정 => db구조에 따른 로직 변경 --
+    # R: 나의활동/활동1/과제/수정: 과제 수정 => db구조에 따른 로직 변경 -
     path(
         "student/program/<int:program_id>/assignment/<int:assignment_id>/submit/update/",
         SubmitUpdateView.as_view(),
