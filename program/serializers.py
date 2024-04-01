@@ -389,9 +389,8 @@ class SubmitCreateSerializer(serializers.ModelSerializer):
         if Submit.objects.filter(
             accepted_applicant__pk=program_id, assignment__pk=assignment_id
         ).exists():
-            raise serializers.ValidationError(
-                "이미 해당 과제에 대한 제출이 존재합니다."
-            )
+            # submit_file 데이터를 빈 배열로 설정, submit 제출 방어는 뷰에서 처리
+            attrs["submit_file"] = []
 
         return attrs
 
