@@ -386,16 +386,17 @@ class SubmitCreateSerializer(serializers.ModelSerializer):
         program_id = self.context["view"].kwargs.get("program_id")
         assignment_id = self.context["view"].kwargs.get("assignment_id")
 
-        # 제출이 이미 존재하는지 확인
+        # 시리얼라이저 레벨에서도 제출 존재 여부 확인
         if Submit.objects.filter(
             accepted_applicant__pk=program_id, assignment__pk=assignment_id
         ).exists():
-            raise ValidationError("이미 해당 과제에 대한 제출이 존재합니다.")
-        else:
-            submit_files_data = validated_data.pop("submit_file", [])
-            submit = Submit.objects.create(**validated_data)
-            for file_data in submit_files_data:
-                SubmitFile.objects.create(submit=submit, **file_data)
+            raise serializers.ValidationError(
+                "이미 해당 과제에 대한 제출이 존재합니다."
+            )
+        submit_files_data = validated_data.pop("submit_file", [])
+        submit = Submit.objects.create(**validated_data)
+        for file_data in submit_files_data:
+            SubmitFile.objects.create(submit=submit, **file_data)
 
         return submit
 

@@ -182,13 +182,13 @@ LOGGING = {
             "formatter": "verbose",
         },
         "client_errors": {  # 클라이언트 에러 로그 핸들러
-            "level": "DEBUG",
+            "level": "WARNING",
             "class": "logging.FileHandler",
             "filename": "/srv/backend-django/logs/client_errors.log",
             "formatter": "verbose",
         },
         "server_errors": {  # 서버 에러 로그 핸들러
-            "level": "DEBUG",
+            "level": "ERROR",
             "class": "logging.FileHandler",
             "filename": "/srv/backend-django/logs/server_errors.log",
             "formatter": "verbose",
