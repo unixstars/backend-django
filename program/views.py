@@ -246,7 +246,7 @@ class SubmitCreateView(generics.CreateAPIView):
     ]
 
     def get_serializer_context(self):
-        context = super(AssignmentDetailView, self).get_serializer_context()
+        context = super(SubmitCreateView, self).get_serializer_context()
         context["program_id"] = self.kwargs.get("program_id")
         context["assignment_id"] = self.kwargs.get("assignment_id")
         return context
