@@ -200,7 +200,7 @@ class Submit(models.Model):
 
 
 class SubmitFile(models.Model):
-    def get_upload_path_files(instance, filename):
+    def get_upload_path_file(instance, filename):
         return "activity/{}/student/{}/assginment/{}".format(
             instance.submit.assignment.activity.pk,
             instance.submit.accepted_applicant.form.student_user.pk,
@@ -212,7 +212,7 @@ class SubmitFile(models.Model):
     )
 
     file = models.FileField(
-        upload_to=get_upload_path_files,
+        upload_to=get_upload_path_file,
         max_length=200,
     )
     created_at = models.DateTimeField(auto_now_add=True)
