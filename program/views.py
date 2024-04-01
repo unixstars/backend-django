@@ -1,7 +1,7 @@
 from rest_framework import generics, status, parsers
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import NotFound, ValidationError
+from rest_framework.exceptions import NotFound
 from django.db.models import Exists, OuterRef
 from django.utils import timezone
 from datetime import timedelta
@@ -264,17 +264,7 @@ class SubmitCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         program_id = self.kwargs.get("program_id")
-
         assignment_id = self.kwargs.get("assignment_id")
-        if Submit.objects.filter(
-            accepted_applicant__pk=program_id,
-            assignment__pk=assignment_id,
-            progress_status=Submit.IN_PROGRESS,
-        ).exists():
-            # 조건을 만족하는 경우, 예외를 발생시켜 `serializer.save()` 호출을 방지
-            raise ValidationError(
-                "이미 진행 중인 과제 제출이 있습니다. 과제 제출은 처음만 가능합니다."
-            )
         program = AcceptedApplicant.objects.get(pk=program_id)
         assignment = Assignment.objects.get(pk=assignment_id)
         serializer.save(assignment=assignment, accepted_applicant=program)

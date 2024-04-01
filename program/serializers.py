@@ -1,6 +1,6 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 from django.conf import settings
-from api.utils import generate_presigned_url
 from .models import (
     AcceptedApplicant,
     ApplicantWarning,
@@ -383,6 +383,14 @@ class SubmitCreateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
+        program_id = self.context["view"].kwargs.get("program_id")
+        assignment_id = self.context["view"].kwargs.get("assignment_id")
+
+        # 제출이 이미 존재하는지 확인
+        if Submit.objects.filter(
+            accepted_applicant__pk=program_id, assignment__pk=assignment_id
+        ).exists():
+            raise ValidationError("이미 해당 과제에 대한 제출이 존재합니다.")
         submit_files_data = validated_data.pop("submit_file", [])
         submit = Submit.objects.create(**validated_data)
         for file_data in submit_files_data:
