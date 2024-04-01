@@ -391,10 +391,11 @@ class SubmitCreateSerializer(serializers.ModelSerializer):
             accepted_applicant__pk=program_id, assignment__pk=assignment_id
         ).exists():
             raise ValidationError("이미 해당 과제에 대한 제출이 존재합니다.")
-        submit_files_data = validated_data.pop("submit_file", [])
-        submit = Submit.objects.create(**validated_data)
-        for file_data in submit_files_data:
-            SubmitFile.objects.create(submit=submit, **file_data)
+        else:
+            submit_files_data = validated_data.pop("submit_file", [])
+            submit = Submit.objects.create(**validated_data)
+            for file_data in submit_files_data:
+                SubmitFile.objects.create(submit=submit, **file_data)
 
         return submit
 
