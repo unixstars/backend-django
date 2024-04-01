@@ -386,20 +386,18 @@ class SubmitCreateSerializer(serializers.ModelSerializer):
         program_id = self.context.get("program_id")
         assignment_id = self.context.get("assignment_id")
 
-        submit_files_data = validated_data.pop("submit_file", [])
-        submit = Submit.objects.create(**validated_data)
-        if (
-            Submit.objects.filter(
-                accepted_applicant__pk=program_id,
-                assignment__pk=assignment_id,
-                progress_status=Submit.IN_PROGRESS,
-            ).exists()
-            == False
-        ):
-            for file_data in submit_files_data:
-                SubmitFile.objects.create(submit=submit, **file_data)
+        if Submit.objects.filter(
+            accepted_applicant__pk=program_id,
+            assignment__pk=assignment_id,
+            progress_status=Submit.IN_PROGRESS,
+        ).exists():
+            submit_files_data = []
         else:
-            pass
+            submit_files_data = validated_data.pop("submit_file", [])
+
+        submit = Submit.objects.create(**validated_data)
+        for file_data in submit_files_data:
+            SubmitFile.objects.create(submit=submit, **file_data)
 
         return submit
 
