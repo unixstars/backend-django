@@ -382,23 +382,24 @@ class SubmitCreateSerializer(serializers.ModelSerializer):
             "submit_file",
         ]
 
-    def validate(self, attrs):
-        program_id = self.context["view"].kwargs.get("program_id")
-        assignment_id = self.context["view"].kwargs.get("assignment_id")
-
-        if Submit.objects.filter(
-            accepted_applicant__pk=program_id, assignment__pk=assignment_id
-        ).exists():
-            # submit_file 데이터를 빈 배열로 설정, submit 제출 방어는 뷰에서 처리
-            attrs["submit_file"] = []
-
-        return attrs
-
     def create(self, validated_data):
+        program_id = self.context.get("program_id")
+        assignment_id = self.context.get("assignment_id")
+
         submit_files_data = validated_data.pop("submit_file", [])
         submit = Submit.objects.create(**validated_data)
-        for file_data in submit_files_data:
-            SubmitFile.objects.create(submit=submit, **file_data)
+        if (
+            Submit.objects.filter(
+                accepted_applicant__pk=program_id,
+                assignment__pk=assignment_id,
+                progress_status=Submit.IN_PROGRESS,
+            ).exists()
+            == False
+        ):
+            for file_data in submit_files_data:
+                SubmitFile.objects.create(submit=submit, **file_data)
+        else:
+            pass
 
         return submit
 
