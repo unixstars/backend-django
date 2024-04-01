@@ -391,6 +391,7 @@ class SubmitCreateSerializer(serializers.ModelSerializer):
             assignment__pk=assignment_id,
             progress_status=Submit.IN_PROGRESS,
         ).exists():
+            validated_data.pop("submit_file", [])
             submit_files_data = []
         else:
             submit_files_data = validated_data.pop("submit_file", [])
