@@ -694,7 +694,6 @@ class CompanyProgramNoticeDetailSerializer(serializers.ModelSerializer):
             "id",
             "title",
             "content",
-            "is_checked",
             "created_at",
         ]
 
@@ -734,7 +733,6 @@ class CompanyProgramNoticeCommentCreateSerializer(serializers.ModelSerializer):
 
 class CompanyProgramAssignmentDetailSerializer(serializers.ModelSerializer):
     deadline = serializers.SerializerMethodField()
-    submit = SubmitSerializer()
 
     class Meta:
         model = Assignment
@@ -744,7 +742,7 @@ class CompanyProgramAssignmentDetailSerializer(serializers.ModelSerializer):
             "content",
             "deadline",
             "created_at",
-            "submit",
+            "updated_at",
         ]
 
     def get_deadline(self, obj):

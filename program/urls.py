@@ -128,42 +128,44 @@ urlpatterns = [
         CompanyProgramWarningCreateView.as_view(),
         name="company-program-applicant-warning-create",
     ),
-    # N: 활동관리/활동1/소통 댓글창: 해당 대외활동 참여자 및 기업 댓글 리스트 --
+    # v 활동관리/활동1/소통 댓글창: 해당 대외활동 참여자 및 기업 댓글 리스트
     path(
         "company/program/<int:activity_id>/comment/",
         CompanyApplicantCommentListView.as_view(),
         name="company-applicant-comment",
     ),
-    # N: 활동관리/활동1/소통 댓글창/등록: 기업 댓글 등록 --
+    # v 활동관리/활동1/소통 댓글창/등록: 기업 댓글 등록
     path(
         "company/program/<int:activity_id>/comment/create/",
         CompanyApplicantCommentCreateView.as_view(),
         name="company-applicant-comment-create",
     ),
-    # R: 활동관리/활동1/공지: 공지 => db구조에 따른 로직 변경
+    # R: 활동관리/활동1/공지: 공지 --
     path(
-        "company/program/applicant/<int:applicant_id>/notice/<int:pk>/",
+        "company/program/<int:activity_id>/notice/<int:pk>/",
         CompanyProgramNoticeDetailView.as_view(),
-        name="company-program-applicant-notice-detail",
+        name="company-program-notice-detail",
     ),
-    # R: 활동관리/활동1/공지/공지 작성: 공지 작성 => db구조에 따른 로직 변경
+    # R: 활동관리/활동1/공지/공지 작성: 공지 작성 --
     path(
-        "company/program/applicant/<int:applicant_id>/notice/create/",
+        "company/program/<int:activity_id>/notice/create/",
         CompanyProgramNoticeCreateView.as_view(),
-        name="company-program-applicant-notice-create",
+        name="company-program-notice-create",
     ),
-    # R: 활동관리/활동1/학생1/과제: 과제 => db구조에 따른 로직 변경
+    # R: 활동관리/활동1/과제: 과제 --
     path(
-        "company/program/applicant/<int:applicant_id>/assignment/<int:pk>/",
+        "company/program/<int:activity_id>/assignment/<int:pk>/",
         CompanyProgramAssignmentDetailView.as_view(),
         name="company-program-assignment-detail",
     ),
-    # R: 활동관리/활동1/학생1/과제/과제 작성: 과제 작성 => db구조에 따른 로직 변경
+    # R: 활동관리/활동1/과제/과제 작성: 과제 작성 --
     path(
-        "company/program/applicant/<int:applicant_id>/assignment/create/",
+        "company/program/<int:activity_id>/assignment/create/",
         CompanyProgramAssignmentCreateView.as_view(),
         name="company-program-assignment-create",
     ),
+    # N: 등록된 과제/과제 제출자
+    # N: 등록된 과제/과제 제출자/제출 내용
     # R: 활동관리/활동1/학생1/과제: 과제 마감기한 연장 => db구조에 따른 로직 변경
     path(
         "company/program/assignment/<int:pk>/extend/",

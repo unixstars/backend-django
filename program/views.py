@@ -465,14 +465,14 @@ class CompanyApplicantCommentCreateView(generics.CreateAPIView):
         )
 
 
-# 활동관리/활동1/학생1/공지: 공지
+# 활동관리/활동1/공지: 공지
 class CompanyProgramNoticeDetailView(generics.RetrieveAPIView):
     serializer_class = CompanyProgramNoticeDetailSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def get_queryset(self):
-        applicant_id = self.kwargs.get("applicant_id")
-        return Notice.objects.filter(accepted_applicant__pk=applicant_id)
+        activity_id = self.kwargs.get("activity_id")
+        return Notice.objects.filter(activity__pk=activity_id)
 
 
 # 활동관리/활동1/학생1/공지/공지 작성: 공지 작성
@@ -481,9 +481,9 @@ class CompanyProgramNoticeCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def perform_create(self, serializer):
-        applicant_id = self.kwargs.get("applicant_id")
-        applicant = AcceptedApplicant.objects.get(pk=applicant_id)
-        serializer.save(accepted_applicant=applicant)
+        activity_id = self.kwargs.get("activity_id")
+        activity = Activity.objects.get(pk=activity_id)
+        serializer.save(activity=activity)
 
 
 # 활동관리/활동1/학생1/공지/댓글 작성: 공지 댓글 작성
@@ -497,15 +497,14 @@ class CompanyProgramNoticeCommentCreateView(generics.CreateAPIView):
         serializer.save(notice=notice, user_type=NoticeComment.COMPANY)
 
 
-# 활동관리/활동1/학생1/과제: 과제
+# 활동관리/활동1/과제: 과제
 class CompanyProgramAssignmentDetailView(generics.RetrieveAPIView):
     serializer_class = CompanyProgramAssignmentDetailSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def get_queryset(self):
-        applicant_id = self.kwargs.get("applicant_id")
-        applicant = AcceptedApplicant.objects.get(pk=applicant_id)
-        return Assignment.objects.filter(accepted_applicant=applicant)
+        activity_id = self.kwargs.get("activity_id")
+        return Assignment.objects.filter(activity__pk=activity_id)
 
 
 # 활동관리/활동1/학생1/과제/과제 작성: 과제 작성
@@ -514,9 +513,9 @@ class CompanyProgramAssignmentCreateView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def perform_create(self, serializer):
-        applicant_id = self.kwargs.get("applicant_id")
-        applicant = AcceptedApplicant.objects.get(pk=applicant_id)
-        serializer.save(accepted_applicant=applicant)
+        activity_id = self.kwargs.get("activity_id")
+        activity = Activity.objects.get(pk=activity_id)
+        serializer.save(activity=activity)
 
 
 # 활동관리/활동1/학생1/과제/댓글 작성: 과제 댓글 작성
