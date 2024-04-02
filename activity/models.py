@@ -161,10 +161,18 @@ class Suggestion(models.Model):
         return f"{self.company_user}의 {self.student_user} 지원제안"
 
 
-class Communication(models.Model):
-
-    activity = models.OneToOneField(
-        Activity, on_delete=models.CASCADE, related_name="communication"
+class CommunicationComment(models.Model):
+    activity = models.ForeignKey(
+        Activity,
+        on_delete=models.CASCADE,
+        related_name="communication_comment",
+    )
+    form = models.ForeignKey(
+        Form,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="communication_comment",
     )
 
     STUDENT, COMPANY = "student", "company"
@@ -176,24 +184,5 @@ class Communication(models.Model):
     user_type = models.CharField(
         max_length=10, choices=USER_TYPE_CHOICES, default=COMPANY
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-
-class CommunicationComment(models.Model):
-
-    communication = models.ForeignKey(
-        Communication, on_delete=models.CASCADE, related_name="communication_comment"
-    )
-    form = models.ForeignKey(
-        Form,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="communication_comment",
-    )
-
-    title = models.CharField(max_length=30)
-    content = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
