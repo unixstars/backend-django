@@ -785,3 +785,83 @@ class CompanyProgramAssignmentCommentCreateSerializer(serializers.ModelSerialize
         else:
             image = obj.assignment.accepted_applicant.form.activity.board.logo
         return f"{settings.MEDIA_URL}{image}"
+
+
+class CompanyProgramAssignmentSubmitNameListSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Submit
+        fields = ["id", "name"]
+
+    def get_name(self, obj):
+        name = obj.accepted_applicant.form.student_user.student_user_profile.name
+        return name
+
+
+class CompanyProgramAssignmentSubmitListSerializer(serializers.ModelSerializer):
+    activity_title = serializers.SerializerMethodField()
+    company_name = serializers.SerializerMethodField()
+    week = serializers.SerializerMethodField()
+    total_week = serializers.SerializerMethodField()
+    submits = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Assignment
+        fields = [
+            "title",
+            "activity_title",
+            "company_name",
+            "week",
+            "total_week",
+            "submits",
+        ]
+
+    def get_activity_title(self, obj):
+        return obj.activity.title
+
+    def get_company_name(self, obj):
+        return obj.activity.board.company_name
+
+    def get_week(self, obj):
+        form = obj.activity.form.first()
+        week = form.accepted_applicant.week
+        return week
+
+    def get_total_week(self, obj):
+        period = obj.activity.period
+        weeks, remaining_days = divmod(period.days, 7)
+        if remaining_days > 0:
+            weeks += 1
+        return weeks
+
+    def get_submits(self, obj):
+        submits = Submit.objects.filter(assignment=obj).select_related(
+            "accepted_applicant__form__student_user__student_user_profile"
+        )
+        return CompanyProgramAssignmentSubmitNameListSerializer(submits, many=True).data
+
+
+class CompanyProgramAssignmentSubmitDetailSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+    submit_file = SubmitFileSerializer(many=True)
+
+    class Meta:
+        model = Submit
+        fields = [
+            "id",
+            "name",
+            "title",
+            "content",
+            "progress_status",
+            "submit_file",
+        ]
+
+    def get_name(self, obj):
+        name = obj.accepted_applicant.form.student_user.student_user_profile.name
+        return name
+
+    def get_title(self, obj):
+        title = obj.assignment.title
+        return title

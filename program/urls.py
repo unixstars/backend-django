@@ -29,6 +29,8 @@ from .views import (
     CompanyProgramAssignmentDetailView,
     CompanyProgramAssignmentCreateView,
     CompanyProgramAssignmentCommentCreateView,
+    CompanyProgramAssignmentSubmitListView,
+    CompanyProgramAssignmentSubmitDetailView,
     CompanyProgramAssignmentDurationExtendView,
     CompanyProgramAssignmentRevisionView,
     CompanyProgramAssignmentApprovalView,
@@ -140,32 +142,42 @@ urlpatterns = [
         CompanyApplicantCommentCreateView.as_view(),
         name="company-applicant-comment-create",
     ),
-    # R: 활동관리/활동1/공지: 공지 --
+    # v 활동관리/활동1/공지: 공지
     path(
         "company/program/<int:activity_id>/notice/<int:pk>/",
         CompanyProgramNoticeDetailView.as_view(),
         name="company-program-notice-detail",
     ),
-    # R: 활동관리/활동1/공지/공지 작성: 공지 작성 --
+    # v 활동관리/활동1/공지/공지 작성: 공지 작성
     path(
         "company/program/<int:activity_id>/notice/create/",
         CompanyProgramNoticeCreateView.as_view(),
         name="company-program-notice-create",
     ),
-    # R: 활동관리/활동1/과제: 과제 --
+    # v 활동관리/활동1/과제: 과제
     path(
         "company/program/<int:activity_id>/assignment/<int:pk>/",
         CompanyProgramAssignmentDetailView.as_view(),
         name="company-program-assignment-detail",
     ),
-    # R: 활동관리/활동1/과제/과제 작성: 과제 작성 --
+    # v 활동관리/활동1/과제/과제 작성: 과제 작성
     path(
         "company/program/<int:activity_id>/assignment/create/",
         CompanyProgramAssignmentCreateView.as_view(),
         name="company-program-assignment-create",
     ),
-    # N: 등록된 과제/과제 제출자
-    # N: 등록된 과제/과제 제출자/제출 내용
+    # N: 등록된 과제/과제 제출자 --
+    path(
+        "company/program/assignment/<int:assignment_id>/submit/",
+        CompanyProgramAssignmentSubmitListView.as_view(),
+        name="company-assignment-submit-list",
+    ),
+    # N: 등록된 과제/과제 제출자/제출 내용 --
+    path(
+        "company/program/assignment/<int:assignment_id>/submit/<int:pk>/",
+        CompanyProgramAssignmentSubmitDetailView.as_view(),
+        name="company-assignment-submit-detail",
+    ),
     # R: 활동관리/활동1/학생1/과제: 과제 마감기한 연장 => db구조에 따른 로직 변경
     path(
         "company/program/assignment/<int:pk>/extend/",

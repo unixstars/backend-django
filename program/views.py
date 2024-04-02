@@ -50,6 +50,8 @@ from .serializers import (
     CompanyProgramNoticeDetailSerializer,
     CompanyProgramNoticeCreateSerializer,
     CompanyProgramNoticeCommentCreateSerializer,
+    CompanyProgramAssignmentSubmitListSerializer,
+    CompanyProgramAssignmentSubmitDetailSerializer,
     CompanyProgramAssignmentDetailSerializer,
     CompanyProgramAssignmentCreateSerializer,
     CompanyProgramAssignmentCommentCreateSerializer,
@@ -507,7 +509,7 @@ class CompanyProgramAssignmentDetailView(generics.RetrieveAPIView):
         return Assignment.objects.filter(activity__pk=activity_id)
 
 
-# 활동관리/활동1/학생1/과제/과제 작성: 과제 작성
+# 활동관리/활동1/과제/과제 작성: 과제 작성
 class CompanyProgramAssignmentCreateView(generics.CreateAPIView):
     serializer_class = CompanyProgramAssignmentCreateSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
@@ -527,6 +529,32 @@ class CompanyProgramAssignmentCommentCreateView(generics.CreateAPIView):
         assignment_id = self.kwargs.get("assignment_id")
         assignment = Assignment.objects.get(pk=assignment_id)
         serializer.save(assignment=assignment, user_type=AssignmentComment.COMPANY)
+
+
+# N: 등록된 과제/과제 제출자
+class CompanyProgramAssignmentSubmitListView(generics.RetrieveAPIView):
+    serializer_class = CompanyProgramAssignmentSubmitListSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def get_object(self):
+        assignment_id = self.kwargs.get("assignment_id")
+        return (
+            Assignment.objects.select_related("activity__board")
+            .prefetch_related("activity__form__accepted_applicant")
+            .get(pk=assignment_id)
+        )
+
+
+# N: 등록된 과제/과제 제출자/제출 내용
+class CompanyProgramAssignmentSubmitDetailView(generics.RetrieveAPIView):
+    serializer_class = CompanyProgramAssignmentSubmitDetailSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def get_queryset(self):
+        assignment_id = self.kwargs.get("assignment_id")
+        return Submit.objects.filter(assignment__pk=assignment_id).select_related(
+            "accepted_applicant__form__student_user__student_user_profile", "assignment"
+        )
 
 
 # 활동관리/활동1/학생1/과제: 과제 마감기한 연장
