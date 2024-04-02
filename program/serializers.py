@@ -549,9 +549,10 @@ class CompanyProgramApplicantSerializer(serializers.ModelSerializer):
 
 
 class CompanyProgramDetailSerializer(serializers.ModelSerializer):
-    title = serializers.SerializerMethodField()
     company_name = serializers.SerializerMethodField()
+    week = serializers.SerializerMethodField()
     total_week = serializers.SerializerMethodField()
+    activity_status = serializers.SerializerMethodField()
     notice = NoticeListSerializer(many=True)
     assignment = AssignmentListSerializer(many=True)
 
