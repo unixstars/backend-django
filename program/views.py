@@ -307,8 +307,13 @@ class OtherSubmitListView(generics.ListAPIView):
     def get_queryset(self):
         program_id = self.kwargs.get("program_id")
         assignment_id = self.kwargs.get("assignment_id")
-        return Submit.objects.filter(assignment__pk=assignment_id).exclude(
-            accepted_applicant__pk=program_id
+        return (
+            Submit.objects.filter(assignment__pk=assignment_id)
+            .exclude(accepted_applicant__pk=program_id)
+            .select_related(
+                "accepted_applicant__form__student_user__student_user_profile",
+                "assignment",
+            )
         )
 
 
@@ -327,8 +332,15 @@ class OtherSubmitDetailView(generics.RetrieveAPIView):
         return (
             Submit.objects.filter(assignment__pk=assignment_id)
             .exclude(accepted_applicant__pk=program_id)
+            .select_related(
+                "accepted_applicant__form__student_user__student_user_profile",
+                "assignment",
+            )
             .get(pk=submit_id)
         )
+
+
+############################################################################################################################
 
 
 ##기업

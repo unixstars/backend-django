@@ -439,7 +439,7 @@ class OtherSubmitListSerializer(serializers.ModelSerializer):
         ]
 
     def get_name(self, obj):
-        name = obj.accepted_applicant.form.student_user.student_user.profile.name
+        name = obj.accepted_applicant.form.student_user.student_user_profile.name
         return name
 
     def get_title(self, obj):
@@ -465,7 +465,7 @@ class OtherSubmitDetailSerializer(serializers.ModelSerializer):
         ]
 
     def get_name(self, obj):
-        name = obj.accepted_applicant.form.student_user.student_user.profile.name
+        name = obj.accepted_applicant.form.student_user.student_user_profile.name
         return name
 
     def get_title(self, obj):
