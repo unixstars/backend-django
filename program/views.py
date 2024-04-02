@@ -43,8 +43,7 @@ from .serializers import (
     OtherSubmitDetailSerializer,
     CompanyProgramListSerializer,
     CompanyProgramDetailSerializer,
-    CompanyProgramApplicantDetailSerializer,
-    CompanyProgramApplicantWarningSerializer,
+    CompanyProgramWarningSerializer,
     CompanyProgramWarningCreateSerializer,
     CompanyProgramNoticeDetailSerializer,
     CompanyProgramNoticeCreateSerializer,
@@ -365,22 +364,6 @@ class CompanyProgramListView(generics.ListAPIView):
         )
 
 
-# 활동관리/활동1: 활동1 참여자 리스트
-class CompanyProgramDetailView(generics.RetrieveAPIView):
-    serializer_class = CompanyProgramDetailSerializer
-    permission_classes = [IsAuthenticated, IsCompanyUser]
-
-    def get_queryset(self):
-        user = self.request.user.company_user
-        has_accepted_applicant = AcceptedApplicant.objects.filter(
-            form__activity=OuterRef("pk")
-        ).values("pk")
-
-        return Activity.objects.filter(
-            Exists(has_accepted_applicant), board__company_user=user
-        )
-
-
 # 활동관리/활동1/활동 시작: 대외활동 시작
 class CompanyProgramStartView(generics.UpdateAPIView):
     queryset = Activity.objects.all()
@@ -398,39 +381,45 @@ class CompanyProgramStartView(generics.UpdateAPIView):
         return Response(status=status.HTTP_200_OK)
 
 
-# 활동관리/활동1/학생1: 공지,과제 리스트
-class CompanyProgramApplicantDetailView(generics.RetrieveAPIView):
-    serializer_class = CompanyProgramApplicantDetailSerializer
+# 활동관리/활동1: 공지,과제 리스트
+class CompanyProgramDetaillView(generics.RetrieveAPIView):
+    serializer_class = CompanyProgramDetailSerializer
+    permission_classes = [IsAuthenticated, IsCompanyUser]
+
+    def get_object(self):
+        activity_id = self.kwargs.get("activity_id")
+        return (
+            Activity.objects.select_related("board")
+            .prefetch_related("form__accepted_applicant", "assignment", "notice")
+            .get(pk=activity_id)
+        )
+
+
+# 활동관리/활동1/참여자 경고 부여 : 참여자 경고 부여 화면창
+class CompanyProgramWarningView(generics.ListAPIView):
+    serializer_class = CompanyProgramWarningSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def get_queryset(self):
         activity_id = self.kwargs.get("activity_id")
-        return AcceptedApplicant.objects.filter(form__activity__pk=activity_id).exclude(
-            activity_status="canceled"
+        return (
+            AcceptedApplicant.objects.filter(form__activity__pk=activity_id)
+            .exclude(activity_status=AcceptedApplicant.CANCELED)
+            .select_related("form__student_user__student_user_profile")
+            .prefetch_related("applicant_warning")
         )
 
 
-# 활동관리/활동1/학생1/경고: 부여한 경고 리스트
-class CompanyProgramApplicantWarningView(generics.RetrieveAPIView):
-    serializer_class = CompanyProgramApplicantWarningSerializer
-    permission_classes = [IsAuthenticated, IsCompanyUser]
-
-    def get_queryset(self):
-        activity_id = self.kwargs.get("activity_id")
-        return AcceptedApplicant.objects.filter(form__activity__pk=activity_id).exclude(
-            activity_status="canceled"
-        )
-
-
-# 활동관리/활동1/학생1/경고/경고하기: 경고 부여하기
+# 활동관리/활동1/경고 부여하기: 참여자 한명 경고 부여하기
 class CompanyProgramWarningCreateView(generics.CreateAPIView):
     serializer_class = CompanyProgramWarningCreateSerializer
     permission_classes = [IsAuthenticated, IsCompanyUser]
 
-    def perform_create(self, serializer):
-        applicant_id = self.kwargs.get("applicant_id")
-        applicant = AcceptedApplicant.objects.get(pk=applicant_id)
-        serializer.save(accepted_applicant=applicant)
+    def get_queryset(self):
+        activity_id = self.kwargs.get("activity_id")
+        return ApplicantWarning.objects.filter(
+            accepted_applicant__form__activity__pk=activity_id
+        )
 
 
 # 활동관리/활동1/학생1/공지: 공지

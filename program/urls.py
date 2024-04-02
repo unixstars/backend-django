@@ -17,10 +17,9 @@ from .views import (
     OtherSubmitListView,
     OtherSubmitDetailView,
     CompanyProgramListView,
-    CompanyProgramDetailView,
     CompanyProgramStartView,
-    CompanyProgramApplicantDetailView,
-    CompanyProgramApplicantWarningView,
+    CompanyProgramDetaillView,
+    CompanyProgramWarningView,
     CompanyProgramWarningCreateView,
     CompanyProgramNoticeDetailView,
     CompanyProgramNoticeCreateView,
@@ -83,13 +82,13 @@ urlpatterns = [
         SubmitUpdateView.as_view(),
         name="student-assignment-submit-update",
     ),
-    # N: 과제/다른사람 제출물 : 해당 과제 다른 참여자 제출 리스트 --
+    # v 과제/다른사람 제출물 : 해당 과제 다른 참여자 제출 리스트
     path(
         "student/program/<int:program_id>/assignment/<int:assignment_id>/others/",
         OtherSubmitListView.as_view(),
         name="student-submit-others",
     ),
-    # N: 과제/다른사람제출물/사람1 : 해당 과제 다른 참여자 제출물 --
+    # v 과제/다른사람제출물/사람1 : 해당 과제 다른 참여자 제출물
     path(
         "student/program/<int:program_id>/assignment/<int:assignment_id>/others/<int:submit_id>/",
         OtherSubmitDetailView.as_view(),
@@ -103,38 +102,32 @@ urlpatterns = [
         CompanyProgramListView.as_view(),
         name="company-program-list",
     ),
-    # D: 활동관리/활동1: 활동1 참여자 리스트
-    path(
-        "company/program/<int:pk>/",
-        CompanyProgramDetailView.as_view(),
-        name="company-program-detail",
-    ),
     # 활동관리/활동1/활동 시작: 대외활동 시작
     path(
         "company/program/<int:pk>/start/",
         CompanyProgramStartView.as_view(),
         name="company-program-start",
     ),
-    # N: 활동관리/활동1/소통 댓글창: 해당 대외활동 참여자 및 기업 댓글 리스트
-    # N: 활동관리/활동1/소통 댓글창/등록: 기업 댓글 등록
-    # R: 활동관리/활동1: 공지,과제 리스트 => db구조에 따른 로직 변경
+    # R: 활동관리/활동1: 공지,과제 리스트 --
     path(
-        "company/program/<int:activity_id>/applicant/<int:pk>/",
-        CompanyProgramApplicantDetailView.as_view(),
-        name="company-program-applicant-detail",
+        "company/program/<int:activity_id>/",
+        CompanyProgramDetaillView.as_view(),
+        name="company-program-detail",
     ),
-    # R: 활동관리/활동1/학생1/경고: 부여한 경고 리스트 => 활동관리/경고 부여로 내용 변경
+    # R: 활동관리/활동1/참여자 경고 부여 : 참여자 경고 부여 화면창 --
     path(
-        "company/program/<int:activity_id>/applicant/<int:pk>/warning/",
-        CompanyProgramApplicantWarningView.as_view(),
-        name="company-program-applicant-warning",
+        "company/program/<int:activity_id>/warning/",
+        CompanyProgramWarningView.as_view(),
+        name="company-program-warning",
     ),
-    # 활동관리/활동1/학생1/경고/경고하기: 경고 부여하기
+    # R: 활동관리/활동1/경고 부여하기: 참여자 한명 경고 부여하기 --
     path(
-        "company/program/applicant/<int:applicant_id>/warning/create/",
+        "company/program/<int:activity_id>/warning/create/",
         CompanyProgramWarningCreateView.as_view(),
         name="company-program-applicant-warning-create",
     ),
+    # N: 활동관리/활동1/소통 댓글창: 해당 대외활동 참여자 및 기업 댓글 리스트
+    # N: 활동관리/활동1/소통 댓글창/등록: 기업 댓글 등록
     # R: 활동관리/활동1/공지: 공지 => db구조에 따른 로직 변경
     path(
         "company/program/applicant/<int:applicant_id>/notice/<int:pk>/",
