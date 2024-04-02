@@ -1,14 +1,11 @@
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
 from django.conf import settings
 from .models import (
     AcceptedApplicant,
     ApplicantWarning,
     ApplicantComment,
     Notice,
-    NoticeComment,
     Assignment,
-    AssignmentComment,
     Submit,
     SubmitFile,
 )
@@ -141,12 +138,6 @@ class ProgramDetailSerializer(serializers.ModelSerializer):
         return AssignmentListSerializer(assignments, many=True).data
 
 
-class ProgramWarningSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ApplicantWarning
-        fields = ["id", "content"]
-
-
 class ApplicantCommentListSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
@@ -222,52 +213,6 @@ class NoticeDetailSerializer(serializers.ModelSerializer):
         ]
 
 
-class NoticeCommentSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-
-    class Meta:
-        model = NoticeComment
-        fields = [
-            "user_type",
-            "image",
-            "content",
-            "created_at",
-        ]
-
-    def get_image(self, obj):
-        user_type = obj.user_type
-        if user_type == NoticeComment.STUDENT:
-            image = (
-                obj.notice.accepted_applicant.form.student_user.student_user_profile.profile_image
-            )
-        else:
-            image = obj.notice.accepted_applicant.form.activity.board.logo
-        return f"{settings.MEDIA_URL}{image}"
-
-
-class NoticeCommentCreateSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-
-    class Meta:
-        model = NoticeComment
-        fields = [
-            "image",
-            "content",
-            "user_type",
-            "created_at",
-        ]
-
-    def get_image(self, obj):
-        user_type = obj.user_type
-        if user_type == NoticeComment.STUDENT:
-            image = (
-                obj.notice.accepted_applicant.form.student_user.student_user_profile.profile_image
-            )
-        else:
-            image = obj.notice.accepted_applicant.form.activity.board.logo
-        return f"{settings.MEDIA_URL}{image}"
-
-
 class SubmitFileSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
 
@@ -332,52 +277,6 @@ class AssignmentDetailSerializer(serializers.ModelSerializer):
             return SubmitSerializer(submits.first()).data
         else:
             return {}
-
-
-class AssignmentCommentSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-
-    class Meta:
-        model = AssignmentComment
-        fields = [
-            "user_type",
-            "image",
-            "content",
-            "created_at",
-        ]
-
-    def get_image(self, obj):
-        user_type = obj.user_type
-        if user_type == AssignmentComment.STUDENT:
-            image = (
-                obj.assignment.accepted_applicant.form.student_user.student_user_profile.profile_image
-            )
-        else:
-            image = obj.assignment.accepted_applicant.form.activity.board.logo
-        return f"{settings.MEDIA_URL}{image}"
-
-
-class AssignmentCommentCreateSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-
-    class Meta:
-        model = AssignmentComment
-        fields = [
-            "user_type",
-            "image",
-            "content",
-            "created_at",
-        ]
-
-    def get_image(self, obj):
-        user_type = obj.user_type
-        if user_type == AssignmentComment.STUDENT:
-            image = (
-                obj.assignment.accepted_applicant.form.student_user.student_user_profile.profile_image
-            )
-        else:
-            image = obj.assignment.accepted_applicant.form.activity.board.logo
-        return f"{settings.MEDIA_URL}{image}"
 
 
 class SubmitCreateSerializer(serializers.ModelSerializer):
@@ -708,29 +607,6 @@ class CompanyProgramNoticeCreateSerializer(serializers.ModelSerializer):
         ]
 
 
-class CompanyProgramNoticeCommentCreateSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-
-    class Meta:
-        model = NoticeComment
-        fields = [
-            "image",
-            "content",
-            "user_type",
-            "created_at",
-        ]
-
-    def get_image(self, obj):
-        user_type = obj.user_type
-        if user_type == NoticeComment.STUDENT:
-            image = (
-                obj.notice.accepted_applicant.form.student_user.student_user_profile.profile_image
-            )
-        else:
-            image = obj.notice.accepted_applicant.form.activity.board.logo
-        return f"{settings.MEDIA_URL}{image}"
-
-
 class CompanyProgramAssignmentDetailSerializer(serializers.ModelSerializer):
     deadline = serializers.SerializerMethodField()
 
@@ -762,29 +638,6 @@ class CompanyProgramAssignmentCreateSerializer(serializers.ModelSerializer):
             "content",
             "duration",
         ]
-
-
-class CompanyProgramAssignmentCommentCreateSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
-
-    class Meta:
-        model = AssignmentComment
-        fields = [
-            "image",
-            "content",
-            "user_type",
-            "created_at",
-        ]
-
-    def get_image(self, obj):
-        user_type = obj.user_type
-        if user_type == AssignmentComment.STUDENT:
-            image = (
-                obj.assignment.accepted_applicant.form.student_user.student_user_profile.profile_image
-            )
-        else:
-            image = obj.assignment.accepted_applicant.form.activity.board.logo
-        return f"{settings.MEDIA_URL}{image}"
 
 
 class CompanyProgramAssignmentSubmitNameListSerializer(serializers.ModelSerializer):

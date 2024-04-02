@@ -2,16 +2,10 @@ from django.urls import path
 from .views import (
     ProgramListView,
     ProgramDetailView,
-    ProgramWarningView,
     ApplicantCommentListView,
     ApplicantCommentCreateView,
     NoticeDetailView,
-    NoticeCommentListView,
-    NoticeCommentCreateView,
-    NoticeCheckUpdateView,
     AssignmentDetailView,
-    AssignmentCommentListView,
-    AssignmentCommentCreateView,
     SubmitCreateView,
     SubmitUpdateView,
     OtherSubmitListView,
@@ -25,10 +19,8 @@ from .views import (
     CompanyApplicantCommentCreateView,
     CompanyProgramNoticeDetailView,
     CompanyProgramNoticeCreateView,
-    CompanyProgramNoticeCommentCreateView,
     CompanyProgramAssignmentDetailView,
     CompanyProgramAssignmentCreateView,
-    CompanyProgramAssignmentCommentCreateView,
     CompanyProgramAssignmentSubmitListView,
     CompanyProgramAssignmentSubmitDetailView,
     CompanyProgramAssignmentDurationExtendView,
@@ -178,19 +170,19 @@ urlpatterns = [
         CompanyProgramAssignmentSubmitDetailView.as_view(),
         name="company-assignment-submit-detail",
     ),
-    # R: 활동관리/활동1/과제/마감기한 연장 --
+    # v 활동관리/활동1/과제/마감기한 연장
     path(
         "company/program/assignment/<int:pk>/extend/",
         CompanyProgramAssignmentDurationExtendView.as_view(),
         name="company-program-assignment-duration-extend",
     ),
-    # R: 등록된 과제/과제 제출자/수정요구: 제출 수정요구(1,2차) --
+    # v 등록된 과제/과제 제출자/수정요구: 제출 수정요구(1,2차)
     path(
         "company/program/submit/<int:pk>/revise/",
         CompanyProgramSubmitRevisionView.as_view(),
         name="company-program-submit-revise",
     ),
-    # R: 등록된 과제/과제 제출자/최종 승인: 제출 최종승인 --
+    # v 등록된 과제/과제 제출자/최종 승인: 제출 최종승인
     path(
         "company/program/submit/<int:pk>/approve/",
         CompanyProgramSubmitApprovalView.as_view(),

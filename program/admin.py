@@ -4,9 +4,7 @@ from .models import (
     ApplicantWarning,
     ApplicantComment,
     Notice,
-    NoticeComment,
     Assignment,
-    AssignmentComment,
     Submit,
     SubmitFile,
 )

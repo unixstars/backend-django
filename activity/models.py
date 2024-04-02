@@ -1,7 +1,4 @@
 from django.db import models
-from PIL import Image
-import io, os, sys
-from django.core.files.uploadedfile import InMemoryUploadedFile
 from user.models import CompanyUser, StudentUser, StudentUserPortfolio
 
 

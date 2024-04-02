@@ -8,20 +8,13 @@ from datetime import timedelta
 from api.permissions import (
     IsStudentUser,
     IsCompanyUser,
-    IsNoticeCommentStudent,
-    IsAssignmentCommentStudent,
-    IsNoticeCommentCompany,
-    IsAssignmentCommentCompany,
-    IsSubmitOwnerStudent,
 )
 from .models import (
     AcceptedApplicant,
     ApplicantWarning,
     ApplicantComment,
     Notice,
-    NoticeComment,
     Assignment,
-    AssignmentComment,
     Submit,
 )
 from activity.models import Activity
@@ -30,13 +23,8 @@ from .serializers import (
     ProgramDetailSerializer,
     ApplicantCommentListSerializer,
     ApplicantCommentCreateSerializer,
-    ProgramWarningSerializer,
     NoticeDetailSerializer,
-    NoticeCommentSerializer,
-    NoticeCommentCreateSerializer,
     AssignmentDetailSerializer,
-    AssignmentCommentSerializer,
-    AssignmentCommentCreateSerializer,
     SubmitCreateSerializer,
     SubmitUpdateSerializer,
     OtherSubmitListSerializer,
@@ -49,12 +37,10 @@ from .serializers import (
     CompanyApplicantCommentCreateSerializer,
     CompanyProgramNoticeDetailSerializer,
     CompanyProgramNoticeCreateSerializer,
-    CompanyProgramNoticeCommentCreateSerializer,
     CompanyProgramAssignmentSubmitListSerializer,
     CompanyProgramAssignmentSubmitDetailSerializer,
     CompanyProgramAssignmentDetailSerializer,
     CompanyProgramAssignmentCreateSerializer,
-    CompanyProgramAssignmentCommentCreateSerializer,
 )
 
 
@@ -86,20 +72,6 @@ class ProgramDetailView(generics.RetrieveAPIView):
                 "form__activity__notice",
                 "form__activity__assignment",
             )
-        )
-
-
-# 나의활동/활동1/경고: 받은 경고 리스트
-class ProgramWarningView(generics.ListAPIView):
-    serializer_class = ProgramWarningSerializer
-    permission_classes = [IsAuthenticated, IsStudentUser]
-
-    def get_queryset(self):
-        user = self.request.user.student_user
-        program_id = self.kwargs.get("program_id")
-        return ApplicantWarning.objects.filter(
-            accepted_applicant__pk=program_id,
-            accepted_applicant__form__student_user=user,
         )
 
 
@@ -150,48 +122,6 @@ class NoticeDetailView(generics.RetrieveAPIView):
         )
 
 
-# (학생,기업) 공지 댓글 리스트
-class NoticeCommentListView(generics.ListAPIView):
-    serializer_class = NoticeCommentSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        notice_id = self.kwargs.get("notice_id")
-        return NoticeComment.objects.filter(notice__pk=notice_id).order_by("created_at")
-
-
-# 나의활동/활동1/공지/댓글 작성: 공지 댓글 작성
-class NoticeCommentCreateView(generics.CreateAPIView):
-    serializer_class = NoticeCommentCreateSerializer
-    permission_classes = [
-        IsAuthenticated,
-        IsStudentUser,
-        IsNoticeCommentStudent,
-    ]
-
-    def perform_create(self, serializer):
-        notice_id = self.kwargs.get("notice_id")
-        notice = Notice.objects.get(pk=notice_id)
-        serializer.save(notice=notice)
-
-
-# 나의활동/활동1/공지/공지 확인: 공지 확인 버튼
-class NoticeCheckUpdateView(generics.UpdateAPIView):
-    queryset = Notice.objects.all()
-    permission_classes = [IsAuthenticated, IsStudentUser]
-
-    def update(self, request, *args, **kwargs):
-        notice = self.get_object()
-        if notice.accepted_applicant.form.student_user.user != request.user:
-            return Response(
-                {"detail": "해당 활동에 참여한 학생이 아닙니다."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        notice.is_checked = True
-        notice.save()
-        return Response(status=status.HTTP_200_OK)
-
-
 # 나의활동/활동1/과제: 과제
 class AssignmentDetailView(generics.RetrieveAPIView):
     serializer_class = AssignmentDetailSerializer
@@ -208,33 +138,6 @@ class AssignmentDetailView(generics.RetrieveAPIView):
         context["program_id"] = self.kwargs.get("program_id")
         context["assignment_id"] = self.kwargs.get("pk")
         return context
-
-
-# (학생,기업) 과제 댓글 리스트
-class AssignmentCommentListView(generics.ListAPIView):
-    serializer_class = AssignmentCommentSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        assignment_id = self.kwargs.get("assignment_id")
-        return AssignmentComment.objects.filter(assignment__pk=assignment_id).order_by(
-            "created_at"
-        )
-
-
-# 나의활동/활동1/과제/댓글 작성: 과제 댓글 작성
-class AssignmentCommentCreateView(generics.CreateAPIView):
-    serializer_class = AssignmentCommentCreateSerializer
-    permission_classes = [
-        IsAuthenticated,
-        IsStudentUser,
-        IsAssignmentCommentStudent,
-    ]
-
-    def perform_create(self, serializer):
-        assignment_id = self.kwargs.get("assignment_id")
-        assignment = Assignment.objects.get(pk=assignment_id)
-        serializer.save(assignment=assignment)
 
 
 # 나의활동/활동1/과제/과제제출: 과제 제출 버튼
@@ -488,17 +391,6 @@ class CompanyProgramNoticeCreateView(generics.CreateAPIView):
         serializer.save(activity=activity)
 
 
-# 활동관리/활동1/학생1/공지/댓글 작성: 공지 댓글 작성
-class CompanyProgramNoticeCommentCreateView(generics.CreateAPIView):
-    serializer_class = CompanyProgramNoticeCommentCreateSerializer
-    permission_classes = [IsAuthenticated, IsCompanyUser, IsNoticeCommentCompany]
-
-    def perform_create(self, serializer):
-        notice_id = self.kwargs.get("notice_id")
-        notice = Notice.objects.get(pk=notice_id)
-        serializer.save(notice=notice, user_type=NoticeComment.COMPANY)
-
-
 # 활동관리/활동1/과제: 과제
 class CompanyProgramAssignmentDetailView(generics.RetrieveAPIView):
     serializer_class = CompanyProgramAssignmentDetailSerializer
@@ -518,17 +410,6 @@ class CompanyProgramAssignmentCreateView(generics.CreateAPIView):
         activity_id = self.kwargs.get("activity_id")
         activity = Activity.objects.get(pk=activity_id)
         serializer.save(activity=activity)
-
-
-# 활동관리/활동1/학생1/과제/댓글 작성: 과제 댓글 작성
-class CompanyProgramAssignmentCommentCreateView(generics.CreateAPIView):
-    serializer_class = CompanyProgramAssignmentCommentCreateSerializer
-    permission_classes = [IsAuthenticated, IsCompanyUser, IsAssignmentCommentCompany]
-
-    def perform_create(self, serializer):
-        assignment_id = self.kwargs.get("assignment_id")
-        assignment = Assignment.objects.get(pk=assignment_id)
-        serializer.save(assignment=assignment, user_type=AssignmentComment.COMPANY)
 
 
 # N: 등록된 과제/과제 제출자

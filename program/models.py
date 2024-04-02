@@ -73,39 +73,10 @@ class Notice(models.Model):
 
     title = models.CharField(max_length=30)
     content = models.TextField()
-    is_checked = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
         return f"{self.activity} 공지:{self.title}"
-
-
-class NoticeComment(models.Model):
-    notice = models.ForeignKey(
-        Notice, on_delete=models.CASCADE, related_name="notice_comment"
-    )
-
-    accepted_applicant = models.ForeignKey(
-        AcceptedApplicant,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="notice_comment",
-    )
-
-    STUDENT, COMPANY = "student", "company"
-    USER_TYPE_CHOICES = (
-        (STUDENT, "학생유저"),
-        (COMPANY, "기업유저"),
-    )
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    user_type = models.CharField(
-        max_length=10, choices=USER_TYPE_CHOICES, default=COMPANY
-    )
-
-    def __str__(self) -> str:
-        return f"{self.notice} 댓글"
 
 
 class Assignment(models.Model):
@@ -125,35 +96,6 @@ class Assignment(models.Model):
 
     def __str__(self) -> str:
         return f"{self.activity} 과제:{self.title}"
-
-
-class AssignmentComment(models.Model):
-    assignment = models.ForeignKey(
-        Assignment, on_delete=models.CASCADE, related_name="assignment_comment"
-    )
-
-    accepted_applicant = models.ForeignKey(
-        AcceptedApplicant,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="assignment_comment",
-    )
-
-    STUDENT, COMPANY = "student", "company"
-    USER_TYPE_CHOICES = (
-        (STUDENT, "학생유저"),
-        (COMPANY, "기업유저"),
-    )
-    content = models.TextField()
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    user_type = models.CharField(
-        max_length=10, choices=USER_TYPE_CHOICES, default=COMPANY
-    )
-
-    def __str__(self) -> str:
-        return f"{self.assignment} 댓글"
 
 
 class Submit(models.Model):
