@@ -383,19 +383,7 @@ class SubmitCreateSerializer(serializers.ModelSerializer):
         ]
 
     def create(self, validated_data):
-        program_id = self.context.get("program_id")
-        assignment_id = self.context.get("assignment_id")
-
-        if Submit.objects.filter(
-            accepted_applicant__pk=program_id,
-            assignment__pk=assignment_id,
-            progress_status=Submit.IN_PROGRESS,
-        ).exists():
-            validated_data.pop("submit_file", [])
-            submit_files_data = []
-        else:
-            submit_files_data = validated_data.pop("submit_file", [])
-
+        submit_files_data = validated_data.pop("submit_file", [])
         submit = Submit.objects.create(**validated_data)
         for file_data in submit_files_data:
             SubmitFile.objects.create(submit=submit, **file_data)
@@ -433,6 +421,51 @@ class SubmitUpdateSerializer(serializers.ModelSerializer):
         instance.save()
 
         return instance
+
+
+class OtherSubmitListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Submit
+        fields = [
+            "id",
+            "name",
+            "title",
+            "progress_status",
+            "created_at",
+            "updated_at",
+        ]
+
+    def get_name(self, obj):
+        name = obj.accepted_applicant.form.student_user.student_user.profile.name
+        return name
+
+    def get_title(self, obj):
+        title = obj.assignment.title
+        return title
+
+
+class OtherSubmitDetailSerializer(serializers.ModelSerializer):
+    submit_file = SubmitFileSerializer(many=True)
+
+    class Meta:
+        model = Submit
+        fields = [
+            "name",
+            "title",
+            "content",
+            "progress_status",
+            "submit_file",
+            "created_at",
+            "updated_at",
+        ]
+
+    def get_name(self, obj):
+        name = obj.accepted_applicant.form.student_user.student_user.profile.name
+        return name
+
+    def get_title(self, obj):
+        title = obj.assignment.title
+        return title
 
 
 class CompanyProgramListSerializer(serializers.ModelSerializer):

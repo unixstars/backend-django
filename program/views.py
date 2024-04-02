@@ -39,6 +39,8 @@ from .serializers import (
     AssignmentCommentCreateSerializer,
     SubmitCreateSerializer,
     SubmitUpdateSerializer,
+    OtherSubmitListSerializer,
+    OtherSubmitDetailSerializer,
     CompanyProgramListSerializer,
     CompanyProgramDetailSerializer,
     CompanyProgramApplicantDetailSerializer,
@@ -245,12 +247,6 @@ class SubmitCreateView(generics.CreateAPIView):
         parsers.JSONParser,
     ]
 
-    def get_serializer_context(self):
-        context = super(SubmitCreateView, self).get_serializer_context()
-        context["program_id"] = self.kwargs.get("program_id")
-        context["assignment_id"] = self.kwargs.get("assignment_id")
-        return context
-
     def create(self, request, *args, **kwargs):
         program_id = self.kwargs.get("program_id")
         assignment_id = self.kwargs.get("assignment_id")
@@ -298,6 +294,41 @@ class SubmitUpdateView(generics.UpdateAPIView):
             return submit
         except Submit.DoesNotExist:
             raise NotFound(detail="수정할 수 있는 과제 제출물이 존재하지 않습니다.")
+
+
+# 과제/다른사람 제출물 : 해당 과제 다른 참여자 과제 제목 리스트
+class OtherSubmitListView(generics.ListAPIView):
+    serializer_class = OtherSubmitListSerializer
+    permission_classes = [
+        IsAuthenticated,
+        IsStudentUser,
+    ]
+
+    def get_queryset(self):
+        program_id = self.kwargs.get("program_id")
+        assignment_id = self.kwargs.get("assignment_id")
+        return Submit.objects.filter(assignment__pk=assignment_id).exclude(
+            accepted_applicant__pk=program_id
+        )
+
+
+# 과제/다른사람제출물/사람1 : 사람1 과제 내용
+class OtherSubmitDetailView(generics.RetrieveAPIView):
+    serializer_class = OtherSubmitDetailSerializer
+    permission_classes = [
+        IsAuthenticated,
+        IsStudentUser,
+    ]
+
+    def get_object(self):
+        program_id = self.kwargs.get("program_id")
+        assignment_id = self.kwargs.get("assignment_id")
+        submit_id = self.kwargs.get("submit_id")
+        return (
+            Submit.objects.filter(assignment__pk=assignment_id)
+            .exclude(accepted_applicant__pk=program_id)
+            .get(pk=submit_id)
+        )
 
 
 ##기업
