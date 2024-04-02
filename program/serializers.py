@@ -613,7 +613,7 @@ class CompanyProgramWarningSerializer(serializers.ModelSerializer):
 
 class CompanyProgramWarningCreateSerializer(serializers.ModelSerializer):
     applicant_id = serializers.PrimaryKeyRelatedField(
-        queryset=ApplicantWarning.objects.all(),
+        queryset=AcceptedApplicant.objects.all(),
         source="accepted_applicant",
         write_only=True,
     )

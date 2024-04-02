@@ -108,13 +108,13 @@ urlpatterns = [
         CompanyProgramStartView.as_view(),
         name="company-program-start",
     ),
-    # R: 활동관리/활동1: 공지,과제 리스트 --
+    # v 활동관리/활동1: 공지,과제 리스트
     path(
         "company/program/<int:activity_id>/",
         CompanyProgramDetaillView.as_view(),
         name="company-program-detail",
     ),
-    # R: 활동관리/활동1/참여자 경고 부여 : 참여자 경고 부여 화면창 --
+    # v 활동관리/활동1/참여자 경고 부여 : 참여자 경고 부여 화면창
     path(
         "company/program/<int:activity_id>/warning/",
         CompanyProgramWarningView.as_view(),
