@@ -557,7 +557,7 @@ class CompanyProgramAssignmentSubmitDetailView(generics.RetrieveAPIView):
         )
 
 
-# 활동관리/활동1/학생1/과제: 과제 마감기한 연장
+# 활동관리/활동1/과제/마감기한 연장
 class CompanyProgramAssignmentDurationExtendView(generics.UpdateAPIView):
     queryset = Assignment.objects.all()
     permission_classes = [IsAuthenticated, IsCompanyUser]
@@ -585,24 +585,24 @@ class CompanyProgramAssignmentDurationExtendView(generics.UpdateAPIView):
         return Response(status=status.HTTP_200_OK)
 
 
-# 활동관리/활동1/학생1/과제/수정요구: 과제 수정요구(1,2차)
-class CompanyProgramAssignmentRevisionView(generics.UpdateAPIView):
-    queryset = Assignment.objects.all()
+# 등록된 과제/과제 제출자/수정요구: 제출 수정요구(1,2차)
+class CompanyProgramSubmitRevisionView(generics.UpdateAPIView):
+    queryset = Submit.objects.all()
     permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def update(self, request, *args, **kwargs):
-        assignment = self.get_object()
+        submit = self.get_object()
 
-        if assignment.progress_status == Assignment.IN_PROGRESS:
-            assignment.progress_status = Assignment.FIRST_REVISION
-            assignment.save()
-        elif assignment.progress_status == Assignment.FIRST_REVISION:
-            assignment.progress_status = Assignment.SECOND_REVISION
-            assignment.save()
+        if submit.progress_status == Submit.IN_PROGRESS:
+            submit.progress_status = Submit.FIRST_REVISION
+            submit.save()
+        elif submit.progress_status == Submit.FIRST_REVISION:
+            submit.progress_status = Submit.SECOND_REVISION
+            submit.save()
         else:
             return Response(
                 {
-                    "detail": "수정 요청은 과제 상태가 진행중 또는 1차 수정일때만 가능합니다."
+                    "detail": "수정 요청은 제출 상태가 진행중 또는 1차 수정일때만 가능합니다."
                 },
                 status=status.HTTP_400_BAD_REQUEST,
             )
@@ -610,20 +610,20 @@ class CompanyProgramAssignmentRevisionView(generics.UpdateAPIView):
         return Response(status=status.HTTP_200_OK)
 
 
-# 활동관리/활동1/학생1/과제/최종 승인: 과제 최종승인
-class CompanyProgramAssignmentApprovalView(generics.UpdateAPIView):
-    queryset = Assignment.objects.all()
+# 등록된 과제/과제 제출자/최종 승인: 제출 최종승인
+class CompanyProgramSubmitApprovalView(generics.UpdateAPIView):
+    queryset = Submit.objects.all()
     permission_classes = [IsAuthenticated, IsCompanyUser]
 
     def update(self, request, *args, **kwargs):
-        assignment = self.get_object()
+        submit = self.get_object()
 
-        if assignment.progress_status == Assignment.FINAL_APPROVAL:
+        if submit.progress_status == Submit.FINAL_APPROVAL:
             return Response(
                 {"detail": "이미 최종 승인된 상태입니다."},
                 status=status.HTTP_400_BAD_REQUEST,
             )
-        assignment.progress_status = Assignment.FINAL_APPROVAL
-        assignment.save()
+        submit.progress_status = Submit.FINAL_APPROVAL
+        submit.save()
 
         return Response(status=status.HTTP_200_OK)

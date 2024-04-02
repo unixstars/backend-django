@@ -32,8 +32,8 @@ from .views import (
     CompanyProgramAssignmentSubmitListView,
     CompanyProgramAssignmentSubmitDetailView,
     CompanyProgramAssignmentDurationExtendView,
-    CompanyProgramAssignmentRevisionView,
-    CompanyProgramAssignmentApprovalView,
+    CompanyProgramSubmitRevisionView,
+    CompanyProgramSubmitApprovalView,
 )
 
 urlpatterns = [
@@ -166,34 +166,34 @@ urlpatterns = [
         CompanyProgramAssignmentCreateView.as_view(),
         name="company-program-assignment-create",
     ),
-    # N: 등록된 과제/과제 제출자 --
+    # v 등록된 과제/과제 제출자
     path(
         "company/program/assignment/<int:assignment_id>/submit/",
         CompanyProgramAssignmentSubmitListView.as_view(),
         name="company-assignment-submit-list",
     ),
-    # N: 등록된 과제/과제 제출자/제출 내용 --
+    # v 등록된 과제/과제 제출자/제출 내용
     path(
         "company/program/assignment/<int:assignment_id>/submit/<int:pk>/",
         CompanyProgramAssignmentSubmitDetailView.as_view(),
         name="company-assignment-submit-detail",
     ),
-    # R: 활동관리/활동1/학생1/과제: 과제 마감기한 연장 => db구조에 따른 로직 변경
+    # R: 활동관리/활동1/과제/마감기한 연장 --
     path(
         "company/program/assignment/<int:pk>/extend/",
         CompanyProgramAssignmentDurationExtendView.as_view(),
         name="company-program-assignment-duration-extend",
     ),
-    # R: 활동관리/활동1/학생1/과제/수정요구: 과제 수정요구(1,2차) => db구조에 따른 로직 변경
+    # R: 등록된 과제/과제 제출자/수정요구: 제출 수정요구(1,2차) --
     path(
-        "company/program/assignment/<int:pk>/revise/",
-        CompanyProgramAssignmentRevisionView.as_view(),
-        name="company-program-assignment-revise",
+        "company/program/submit/<int:pk>/revise/",
+        CompanyProgramSubmitRevisionView.as_view(),
+        name="company-program-submit-revise",
     ),
-    # R: 활동관리/활동1/학생1/과제/최종 승인: 과제 최종승인 => db구조에 따른 로직 변경
+    # R: 등록된 과제/과제 제출자/최종 승인: 제출 최종승인 --
     path(
-        "company/program/assignment/<int:pk>/approve/",
-        CompanyProgramAssignmentApprovalView.as_view(),
-        name="company-program-assignment-approve",
+        "company/program/submit/<int:pk>/approve/",
+        CompanyProgramSubmitApprovalView.as_view(),
+        name="company-program-approve",
     ),
 ]
