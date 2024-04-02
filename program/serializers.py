@@ -424,6 +424,9 @@ class SubmitUpdateSerializer(serializers.ModelSerializer):
 
 
 class OtherSubmitListSerializer(serializers.ModelSerializer):
+    name = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
+
     class Meta:
         model = Submit
         fields = [
@@ -446,6 +449,8 @@ class OtherSubmitListSerializer(serializers.ModelSerializer):
 
 class OtherSubmitDetailSerializer(serializers.ModelSerializer):
     submit_file = SubmitFileSerializer(many=True)
+    name = serializers.SerializerMethodField()
+    title = serializers.SerializerMethodField()
 
     class Meta:
         model = Submit
