@@ -1,22 +1,13 @@
-# UNIXSTAR 앱 프로덕트 백엔드
+# 대외활동 관리 플랫폼 '유니스타(unistar)' 백엔드
 
-## 6.3
+## ERD(Entity Relationship Diragram)
 
-- DB 설계 바탕으로 모델 설정
-- 서버 연결 완료(EC2,RDS,S3)
+![유니스타 ERD](/readme_images/UNISTAR_2.0.png)
 
-## 6.4
+## Infrastucture
 
-- 대외활동 게시물 리스트 GET API 구현
+- AWS EC2, AWS S3(Using CDN), AWS RDS(MySQL 8.0)
 
-## 7.4
+### settings/config.py
 
-- 기획 수정 완료
-
-## 7.5-7.6
-
-- 테스트 데이터 삽입 관련 코드 수정(admin, model, serializer, config.settings)
-
-## 7.9
-
-- ERD DB 전체 반영 완료
+## 주요 기능
