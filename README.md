@@ -2,11 +2,41 @@
 
 ## 소개 및 주요 기능
 
+### 소개
+
 <p align="right">
   <img src="/readme_images/unistar_intro.PNG" alt="유니스타 소개 1" style="width: 30%;margin-right:1%;">
   <img src="/readme_images/unistar_intro2.PNG" alt="유니스타 소개 2" style="width: 30%;margin-right:1%;">
   <img src="/readme_images/unistar_intro3.PNG" alt="유니스타 소개 3" style="width: 30%;margin-right:1%;">
 </p>
+
+- 대외활동 관리 플랫폼 유니스타 입니다!
+- 기존 대외활동 플랫폼에서 제기되는 문제인 부실한 관리를 공지 및 과제 기능으로 보완할 수 있습니다.
+- 대외활동을 잘 모르는 기업들도 체계적인 시스템 하에 대외활동 진행이 가능합니다.
+- 학생에겐 실무 경험을, 기업에겐 적은 가격에 홍보 테스트를.
+- 디자인 업데이트 및 기능 업데이트 예정(6월)
+
+### 기업 측 주요 기능(기존 버전, 사용자 피드백 후 업데이트 중)
+
+- 로그인/회원가입: 국세청 api 법인기업 인증
+- 대외활동 게시글 작성(모집): 대외활동 게시글을 작성 후 학생 모집
+- 지원자 관리: 받은 지원서를 합격/불합격 시키는 기능
+- 참여자 관리: 참여자에게 경고 부여, 공지/과제 부여
+- 과제 관리: 제출된 과제 파일 수정 요청 및 최종 승인
+- 공지,과제 댓글: 참여자와 소통
+
+### 학생 측 주요 기능(기존 버전, 사용자 피드백 후 업데이트 중)
+
+- 로그인/회원가입: 구글,네이버,카카오,애플 소셜 로그인
+- 프로필,포트폴리오 작성
+- 대외활동 지원: 지원서 작성
+- 과제 제출(파일 제출): 기업이 최대 3번까지 수정 요구 가능, 수정요구가 되면 제출 가능
+- 공지,과제 댓글: 기업과 소통
+
+## 문서
+
+- API 문서(업데이트 이전 버전): https://www.notion.so/API-1-ac5069b51c8a4433bdac9b1c820e04d1?pvs=4
+- 디자인 와이어프레임(업데이트 이전 버전, 경력 10년 디자이너 컨택 완료 및 작업 예정): https://www.figma.com/file/DEIMcmXQbXg4jADLmW3UZK/%EC%99%80%EC%9D%B4%EC%96%B4%ED%94%84%EB%A0%88%EC%9E%84?type=design&node-id=3670%3A5445&mode=design&t=xW4LLMbPGCY7aRqw-1
 
 ## ERD(Entity Relationship Diragram)
 
