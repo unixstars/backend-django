@@ -3,9 +3,9 @@
 ## 소개 및 주요 기능
 
 <p align="right">
-  <img src="/readme_images/unistar_intro.PNG" alt="유니스타 소개 1" style="width: 30%;margin-left:1%;">
-  <img src="/readme_images/unistar_intro2.PNG" alt="유니스타 소개 2" style="width: 30%;margin-left:1%;">
-  <img src="/readme_images/unistar_intro3.PNG" alt="유니스타 소개 3" style="width: 30%;margin-left:1%;">
+  <img src="/readme_images/unistar_intro.PNG" alt="유니스타 소개 1" style="width: 30%;margin-right:1%;">
+  <img src="/readme_images/unistar_intro2.jpg" alt="유니스타 소개 2" style="width: 30%;margin-right:1%;">
+  <img src="/readme_images/unistar_intro3.PNG" alt="유니스타 소개 3" style="width: 30%;margin-right:1%;">
 </p>
 
 ## ERD(Entity Relationship Diragram)
