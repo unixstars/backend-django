@@ -35,7 +35,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 if ENV_ROLE == dev:
     DEBUG = True
 elif ENV_ROLE == prod:
-    DEBUG = True
+    DEBUG = False
 
 if ENV_ROLE == dev:
     ALLOWED_HOSTS = [
