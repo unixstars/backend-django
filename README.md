@@ -23,20 +23,20 @@
 
 ### app
 
-activity: 학생이 대외활동에 지원하기 전, 로그인 전 게시글
-api: RemoteConfig, middleware, hash fuction 등 공통적으로 쓰이는 실행파일
-authentication; 학생(소셜 로그인), 기업(법인 인증), 관리자 인증
-program: 학생이 대외활동에 지원한 후, 공지/과제/경고 등
-user: 유저 모델, 학생 프로필, 포트폴리오 등
+- activity: 학생이 대외활동에 지원하기 전, 로그인 전 게시글
+- api: RemoteConfig, middleware, hash fuction 등 공통적으로 쓰이는 실행파일
+- authentication; 학생(소셜 로그인), 기업(법인 인증), 관리자 인증
+- program: 학생이 대외활동에 지원한 후, 공지/과제/경고 등
+- user: 유저 모델, 학생 프로필, 포트폴리오 등
 
 ### 기타
 
-migration_script: 1.0에서 2.0으로 데이터 구조를 바꾸는 업데이트 과정에서 작성된 마이그레이션 파일
-readme_images: README.md에 사용되는 이미지 파일
-data.json: 초기 db 설정 과정 중 테스트 데이터
-manage.py: 파이썬 실행 파일
-mystorages.py: aws s3 bucket 연결 과정에서 사용되는 boto3 클래스
-pipfile, pipfile.lock: 패키지 버전 관리
+- migration_script: 1.0에서 2.0으로 데이터 구조를 바꾸는 업데이트 과정에서 작성된 마이그레이션 파일
+- readme_images: README.md에 사용되는 이미지 파일
+- data.json: 초기 db 설정 과정 중 테스트 데이터
+- manage.py: 파이썬 실행 파일
+- mystorages.py: aws s3 bucket 연결 과정에서 사용되는 boto3 클래스
+- pipfile, pipfile.lock: 패키지 버전 관리
 
 ## ERD(Entity Relationship Diragram)
 
