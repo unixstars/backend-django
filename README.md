@@ -18,7 +18,7 @@
 
 ### 기업 측 주요 기능(기존 버전, 사용자 피드백 후 업데이트 중)
 
-- 로그인/회원가입: 국세청 api 법인기업 인증
+- 로그인/회원가입: 국세청 api 법인기업 인증, NaverCloud 이용 SMS/Email 인증
 - 대외활동 게시글 작성(모집): 대외활동 게시글을 작성 후 학생 모집
 - 지원자 관리: 받은 지원서를 합격/불합격 시키는 기능
 - 참여자 관리: 참여자에게 경고 부여, 공지/과제 부여
@@ -41,6 +41,8 @@
 ## ERD(Entity Relationship Diragram)
 
 ![유니스타 ERD](/readme_images/UNISTAR_2.0.png)
+
+- ERD Link: https://www.erdcloud.com/d/Tayzn6ouNuxd3kEJd
 
 #### prefetcted_related(다대일), select_related(일대다, 일대일)로 쿼리 최소화
 
