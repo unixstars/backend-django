@@ -2,7 +2,6 @@ from django.contrib import admin
 from .models import (
     AcceptedApplicant,
     ApplicantWarning,
-    ApplicantComment,
     Notice,
     Assignment,
     Submit,
@@ -13,11 +12,6 @@ from .models import (
 @admin.register(AcceptedApplicant)
 class AcceptedApplicantAdmin(admin.ModelAdmin):
     list_display = ["form", "week", "activity_status"]
-
-
-@admin.register(ApplicantComment)
-class ApplicantCommentAdmin(admin.ModelAdmin):
-    list_display = ["activity", "accepted_applicant", "user_type", "created_at"]
 
 
 @admin.register(ApplicantWarning)

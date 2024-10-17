@@ -3,7 +3,6 @@ from django.conf import settings
 from .models import (
     AcceptedApplicant,
     ApplicantWarning,
-    ApplicantComment,
     Notice,
     Assignment,
     Submit,
@@ -136,70 +135,6 @@ class ProgramDetailSerializer(serializers.ModelSerializer):
     def get_assignment(self, obj):
         assignments = obj.form.activity.assignment.all()
         return AssignmentListSerializer(assignments, many=True).data
-
-
-class ApplicantCommentListSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
-    image = serializers.SerializerMethodField()
-    is_myself = serializers.SerializerMethodField()
-
-    class Meta:
-        model = ApplicantComment
-        fields = [
-            "name",
-            "image",
-            "content",
-            "user_type",
-            "is_myself",
-            "created_at",
-        ]
-
-    def get_name(self, obj):
-        user_type = obj.user_type
-        if user_type == ApplicantComment.STUDENT:
-            name = obj.accepted_applicant.form.student_user.student_user_profile.name
-            return name
-        else:
-            return obj.activity.board.company_name
-
-    def get_image(self, obj):
-        user_type = obj.user_type
-        if user_type == ApplicantComment.STUDENT:
-            image = (
-                obj.accepted_applicant.form.student_user.student_user_profile.profile_image
-            )
-            if image:
-                return f"{settings.MEDIA_URL}{image}"
-        else:
-            image = obj.activity.board.logo
-            if image:
-                return f"{settings.MEDIA_URL}{image}"
-
-    def get_is_myself(self, obj):
-        request = self.context.get("request")
-
-        # 학생 사용자가 댓글의 작성자인지 확인
-        if hasattr(request.user, "student_user"):
-            return (
-                obj.user_type == ApplicantComment.STUDENT
-                and request.user.student_user
-                == obj.accepted_applicant.form.student_user
-            )
-
-        # 기업 사용자가 댓글의 작성자인지 확인
-        elif hasattr(request.user, "company_user"):
-            return (
-                obj.user_type == ApplicantComment.COMPANY
-                and request.user.company_user == obj.activity.board.company_user
-            )
-
-        return False
-
-
-class ApplicantCommentCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ApplicantComment
-        fields = ["content"]
 
 
 class NoticeDetailSerializer(serializers.ModelSerializer):
@@ -520,70 +455,6 @@ class CompanyProgramWarningCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = ApplicantWarning
         fields = ["applicant_id"]
-
-
-class CompanyApplicantCommentListSerializer(serializers.ModelSerializer):
-    name = serializers.SerializerMethodField()
-    image = serializers.SerializerMethodField()
-    is_myself = serializers.SerializerMethodField()
-
-    class Meta:
-        model = ApplicantComment
-        fields = [
-            "name",
-            "image",
-            "content",
-            "user_type",
-            "is_myself",
-            "created_at",
-        ]
-
-    def get_name(self, obj):
-        user_type = obj.user_type
-        if user_type == ApplicantComment.STUDENT:
-            name = obj.accepted_applicant.form.student_user.student_user_profile.name
-            return name
-        else:
-            return obj.activity.board.company_name
-
-    def get_image(self, obj):
-        user_type = obj.user_type
-        if user_type == ApplicantComment.STUDENT:
-            image = (
-                obj.accepted_applicant.form.student_user.student_user_profile.profile_image
-            )
-            if image:
-                return f"{settings.MEDIA_URL}{image}"
-        else:
-            image = obj.activity.board.logo
-            if image:
-                return f"{settings.MEDIA_URL}{image}"
-
-    def get_is_myself(self, obj):
-        request = self.context.get("request")
-
-        # 학생 사용자가 댓글의 작성자인지 확인
-        if hasattr(request.user, "student_user"):
-            return (
-                obj.user_type == ApplicantComment.STUDENT
-                and request.user.student_user
-                == obj.accepted_applicant.form.student_user
-            )
-
-        # 기업 사용자가 댓글의 작성자인지 확인
-        elif hasattr(request.user, "company_user"):
-            return (
-                obj.user_type == ApplicantComment.COMPANY
-                and request.user.company_user == obj.activity.board.company_user
-            )
-
-        return False
-
-
-class CompanyApplicantCommentCreateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ApplicantComment
-        fields = ["content"]
 
 
 class CompanyProgramNoticeDetailSerializer(serializers.ModelSerializer):

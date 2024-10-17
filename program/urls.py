@@ -2,8 +2,6 @@ from django.urls import path
 from .views import (
     ProgramListView,
     ProgramDetailView,
-    ApplicantCommentListView,
-    ApplicantCommentCreateView,
     NoticeDetailView,
     AssignmentDetailView,
     SubmitCreateView,
@@ -15,8 +13,6 @@ from .views import (
     CompanyProgramDetaillView,
     CompanyProgramWarningView,
     CompanyProgramWarningCreateView,
-    CompanyApplicantCommentListView,
-    CompanyApplicantCommentCreateView,
     CompanyProgramNoticeDetailView,
     CompanyProgramNoticeCreateView,
     CompanyProgramAssignmentDetailView,
@@ -41,18 +37,6 @@ urlpatterns = [
         "student/program/<int:pk>/",
         ProgramDetailView.as_view(),
         name="student-program-detail",
-    ),
-    # v 나의활동/활동1/소통댓글창 : 대외활동 기업 및 참여자 댓글 반환
-    path(
-        "student/program/<int:program_id>/comment/",
-        ApplicantCommentListView.as_view(),
-        name="student-program-comment",
-    ),
-    # v 나의활동/활동1/소통댓글창/등록 : 학생 댓글 등록
-    path(
-        "student/program/<int:program_id>/comment/create/",
-        ApplicantCommentCreateView.as_view(),
-        name="student-program-comment-create",
     ),
     # v 나의활동/활동1/공지: 공지
     path(
@@ -121,18 +105,6 @@ urlpatterns = [
         "company/program/<int:activity_id>/warning/create/",
         CompanyProgramWarningCreateView.as_view(),
         name="company-program-applicant-warning-create",
-    ),
-    # v 활동관리/활동1/소통 댓글창: 해당 대외활동 참여자 및 기업 댓글 리스트
-    path(
-        "company/program/<int:activity_id>/comment/",
-        CompanyApplicantCommentListView.as_view(),
-        name="company-applicant-comment",
-    ),
-    # v 활동관리/활동1/소통 댓글창/등록: 기업 댓글 등록
-    path(
-        "company/program/<int:activity_id>/comment/create/",
-        CompanyApplicantCommentCreateView.as_view(),
-        name="company-applicant-comment-create",
     ),
     # v 활동관리/활동1/공지: 공지
     path(

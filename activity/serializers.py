@@ -1,7 +1,6 @@
 from django.conf import settings
 from rest_framework import serializers
-from .models import Board, Activity, Scrap, Form, Suggestion
-from api.utils import generate_presigned_url
+from .models import Board, Activity, Scrap, Form, Suggestion, FormChatRoom, FormMessage
 from api.serializers import DurationFieldInISOFormat
 from django.utils import timezone
 from django.db import transaction
@@ -197,7 +196,9 @@ class BoardCreateSerializer(BoardSerializer):
 
     def validate_duration(self, value):
         if value < timedelta(days=7) or value > timedelta(days=60):
-            raise serializers.ValidationError("모집기간은 7일에서 60일 사이여야 합니다.")
+            raise serializers.ValidationError(
+                "모집기간은 7일에서 60일 사이여야 합니다."
+            )
         return value
 
     def validate_activity(self, activities_data):
@@ -579,3 +580,41 @@ class SuggestionListSerializer(serializers.ModelSerializer):
     def get_company_name(self, obj):
         board = obj.company_user.board.first()
         return board.company_name
+
+
+class FormMessageSerializer(serializers.ModelSerializer):
+    author_logo = serializers.SerializerMethodField()
+
+    class Meta:
+        model = FormMessage
+        fields = [
+            "id",
+            "author_id",
+            "author_name",
+            "author_logo",
+            "content",
+            "user_type",
+            "is_read",
+            "created_at",
+        ]
+
+    def get_author_logo(self, obj):
+        if obj.author_logo:
+            return f"{settings.MEDIA_URL}{obj.author_logo}"
+
+
+class FormChatRoomSerializer(serializers.ModelSerializer):
+    last_message = serializers.SerializerMethodField()
+
+    class Meta:
+        model = FormChatRoom
+        fields = [
+            "title",
+            "last_message",
+        ]
+
+    def get_last_message(self, obj):
+        last_message = obj.form_message.order_by("-created_at").first()
+        if last_message:
+            return FormMessageSerializer(last_message).data
+        return None

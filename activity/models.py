@@ -161,28 +161,35 @@ class Suggestion(models.Model):
         return f"{self.company_user}의 {self.student_user} 지원제안"
 
 
-class CommunicationComment(models.Model):
-    activity = models.ForeignKey(
-        Activity,
-        on_delete=models.CASCADE,
-        related_name="communication_comment",
-    )
+class FormChatRoom(models.Model):
     form = models.ForeignKey(
-        Form,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="communication_comment",
+        Form, on_delete=models.CASCADE, related_name="form_chatroom"
     )
+    title = models.CharField(max_length=30)
+    created_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self) -> str:
+        return f"{self.form}의 채팅방"
+
+
+class FormMessage(models.Model):
+    form_chatroom = models.ForeignKey(
+        FormChatRoom, on_delete=models.CASCADE, related_name="form_message"
+    )
+    author_id = models.IntegerField()
+    author_name = models.CharField(max_length=30)
+    author_logo = models.URLField(max_length=300)
+    content = models.TextField()
     STUDENT, COMPANY = "student", "company"
-    USER_TYPE_CHOICES = (
+    USER_TYPE_CHOICES = [
         (STUDENT, "학생유저"),
         (COMPANY, "기업유저"),
-    )
-    content = models.TextField()
+    ]
     user_type = models.CharField(
-        max_length=10, choices=USER_TYPE_CHOICES, default=COMPANY
+        max_length=30, choices=USER_TYPE_CHOICES, default=STUDENT
     )
+    is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self) -> str:
+        return f"{self.form_chatroom} 메시지"

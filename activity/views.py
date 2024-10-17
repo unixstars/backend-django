@@ -27,6 +27,8 @@ from .serializers import (
     CompanyStudentPortfolioDetailSerializer,
     SuggestionSerializer,
     SuggestionListSerializer,
+    FormChatRoomSerializer,
+    FormMessageSerializer,
 )
 from api.permissions import (
     IsCompanyUser,

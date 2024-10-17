@@ -45,6 +45,7 @@ urlpatterns = [
         BoardDetailView.as_view(),
         name="board-detail",
     ),
+    # 홈/배너이미지
     ##학생
     # 지원관리/스크랩 : 스크랩 한 게시글 리스트
     path(
@@ -95,7 +96,7 @@ urlpatterns = [
         FormBoardDetailView.as_view(),
         name="form-board-detail",
     ),
-    # N: 대외활동 게시글/지원완료/기업 소통 댓글창 열기 : 해당 대외활동 기업 및 지원자 댓글 리스트 전부 반환
+    # 홈 댓글 개수
     # N: 대외활동 게시글/지원완료/기업 소통 댓글창/등록 : 학생 댓글 작성
     # 제출완료 지원서 : 제출완료한 지원서
     path(

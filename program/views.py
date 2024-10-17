@@ -12,7 +12,6 @@ from api.permissions import (
 from .models import (
     AcceptedApplicant,
     ApplicantWarning,
-    ApplicantComment,
     Notice,
     Assignment,
     Submit,
@@ -21,8 +20,6 @@ from activity.models import Activity
 from .serializers import (
     ProgramListSerializer,
     ProgramDetailSerializer,
-    ApplicantCommentListSerializer,
-    ApplicantCommentCreateSerializer,
     NoticeDetailSerializer,
     AssignmentDetailSerializer,
     SubmitCreateSerializer,
@@ -33,8 +30,6 @@ from .serializers import (
     CompanyProgramDetailSerializer,
     CompanyProgramWarningSerializer,
     CompanyProgramWarningCreateSerializer,
-    CompanyApplicantCommentListSerializer,
-    CompanyApplicantCommentCreateSerializer,
     CompanyProgramNoticeDetailSerializer,
     CompanyProgramNoticeCreateSerializer,
     CompanyProgramAssignmentSubmitListSerializer,
@@ -72,41 +67,6 @@ class ProgramDetailView(generics.RetrieveAPIView):
                 "form__activity__notice",
                 "form__activity__assignment",
             )
-        )
-
-
-# 나의활동/활동1/소통댓글창
-class ApplicantCommentListView(generics.ListAPIView):
-    serializer_class = ApplicantCommentListSerializer
-    permission_classes = [IsAuthenticated, IsStudentUser]
-
-    def get_queryset(self):
-        program_id = self.kwargs.get("program_id")
-        activity = Activity.objects.get(form__accepted_applicant__pk=program_id)
-        return (
-            ApplicantComment.objects.filter(activity=activity)
-            .select_related(
-                "accepted_applicant__form__student_user__student_user_profile",
-                "activity__board__company_user",
-            )
-            .order_by("created_at")
-        )
-
-
-# 나의활동/활동1/소통댓글창/등록 : 학생 댓글 등록
-class ApplicantCommentCreateView(generics.CreateAPIView):
-    serializer_class = ApplicantCommentCreateSerializer
-    permission_classes = [IsAuthenticated, IsStudentUser]
-
-    def perform_create(self, serializer):
-        user = self.request.user.student_user
-        program_id = self.kwargs.get("program_id")
-        activity = Activity.objects.get(form__accepted_applicant__pk=program_id)
-        applicant = AcceptedApplicant.objects.get(form__student_user=user)
-        return serializer.save(
-            activity=activity,
-            accepted_applicant=applicant,
-            user_type=ApplicantComment.STUDENT,
         )
 
 
@@ -326,47 +286,6 @@ class CompanyProgramWarningCreateView(generics.CreateAPIView):
         activity_id = self.kwargs.get("activity_id")
         return ApplicantWarning.objects.filter(
             accepted_applicant__form__activity__pk=activity_id
-        )
-
-
-# 활동관리/활동1/소통 댓글창: 해당 대외활동 참여자 및 기업 댓글 리스트
-class CompanyApplicantCommentListView(generics.ListAPIView):
-    serializer_class = CompanyApplicantCommentListSerializer
-    permission_classes = [IsAuthenticated, IsCompanyUser]
-
-    def get_queryset(self):
-        activity_id = self.kwargs.get("activity_id")
-        return (
-            ApplicantComment.objects.filter(activity__pk=activity_id)
-            .select_related(
-                "accepted_applicant__form__student_user__student_user_profile",
-                "activity__board__company_user",
-            )
-            .order_by("created_at")
-        )
-
-
-# 활동관리/활동1/소통 댓글창/등록: 기업 댓글 등록
-class CompanyApplicantCommentCreateView(generics.CreateAPIView):
-    serializer_class = CompanyApplicantCommentCreateSerializer
-    permission_classes = [IsAuthenticated, IsCompanyUser]
-
-    def perform_create(self, serializer):
-        company_user = self.request.user.company_user
-        activity_id = self.kwargs.get("activity_id")
-        try:
-            activity = Activity.objects.get(
-                pk=activity_id, board__company_user=company_user
-            )
-        except Activity.DoesNotExist:
-            raise NotFound(
-                detail="해당 대외활동을 가진 기업만 댓글을 작성할 수 있습니다.",
-                code=404,
-            )
-
-        return serializer.save(
-            activity=activity,
-            user_type=ApplicantComment.COMPANY,
         )
 
 

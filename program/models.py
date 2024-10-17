@@ -36,33 +36,6 @@ class ApplicantWarning(models.Model):
         return f"{self.accepted_applicant} 경고"
 
 
-class ApplicantComment(models.Model):
-    activity = models.ForeignKey(
-        Activity,
-        on_delete=models.CASCADE,
-        related_name="applicant_comment",
-    )
-
-    accepted_applicant = models.ForeignKey(
-        AcceptedApplicant,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="applicant_comment",
-    )
-
-    STUDENT, COMPANY = "student", "company"
-    USER_TYPE_CHOICES = (
-        (STUDENT, "학생유저"),
-        (COMPANY, "기업유저"),
-    )
-    content = models.TextField()
-    user_type = models.CharField(
-        max_length=10, choices=USER_TYPE_CHOICES, default=COMPANY
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-
 class Notice(models.Model):
 
     activity = models.ForeignKey(
@@ -161,3 +134,37 @@ class SubmitFile(models.Model):
 
     def __str__(self) -> str:
         return f"{self.submit} 파일:{self.file}"
+
+
+class AcceptedChatRoom(models.Model):
+    accepted_applicant = models.ForeignKey(
+        AcceptedApplicant, on_delete=models.CASCADE, related_name="accepted_chatroom"
+    )
+    title = models.CharField(max_length=30)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"{self.accepted_applicant}의 채팅방"
+
+
+class AcceptedMessage(models.Model):
+    accepted_chatroom = models.ForeignKey(
+        AcceptedChatRoom, on_delete=models.CASCADE, related_name="accepted_message"
+    )
+    author_id = models.IntegerField()
+    author_name = models.CharField(max_length=30)
+    author_logo = models.URLField(max_length=300)
+    content = models.TextField()
+    STUDENT, COMPANY = "student", "company"
+    USER_TYPE_CHOICES = [
+        (STUDENT, "학생유저"),
+        (COMPANY, "기업유저"),
+    ]
+    user_type = models.CharField(
+        max_length=30, choices=USER_TYPE_CHOICES, default=STUDENT
+    )
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return f"{self.accepted_chatroom} 채팅방 메시지"
