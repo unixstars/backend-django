@@ -3,7 +3,7 @@ Description=uWSGI service
 After=syslog.target
 
 [Service]
-ExecStart=/home/ubuntu/.local/share/virtualenvs/backend-django-vwrAHsUq/bin/uwsgi -i /srv/backend-django/config/uwsgi/unistar.ini
+ExecStart=/home/ubuntu/.local/share/virtualenvs/backend-django-mBWSQ3I4/bin/uwsgi -i /srv/backend-django/config/uwsgi/unistar.ini
 
 Restart=always
 KillSignal=SIGQUIT
