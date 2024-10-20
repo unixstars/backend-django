@@ -7,6 +7,8 @@ from .models import (
     Assignment,
     Submit,
     SubmitFile,
+    AcceptedChatRoom,
+    AcceptedMessage,
 )
 from activity.models import Activity, Form
 from api.serializers import DurationFieldInISOFormat
@@ -589,3 +591,76 @@ class CompanyProgramAssignmentSubmitDetailSerializer(serializers.ModelSerializer
     def get_title(self, obj):
         title = obj.assignment.title
         return title
+
+
+class AcceptedMessageSerializer(serializers.ModelSerializer):
+    author_logo = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AcceptedMessage
+        fields = [
+            "id",
+            "author_id",
+            "author_name",
+            "author_logo",
+            "content",
+            "user_type",
+            "is_read",
+            "created_at",
+        ]
+        read_only_fields = [
+            "author_id",
+            "author_name",
+            "author_logo",
+            "user_type",
+            "is_read",
+            "created_at",
+        ]
+
+    def get_author_logo(self, obj):
+        if obj.author_logo:
+            return f"{settings.MEDIA_URL}{obj.author_logo}"
+        return None
+
+
+class AcceptedChatRoomSerializer(serializers.ModelSerializer):
+    last_message = serializers.SerializerMethodField()
+    non_read = serializers.SerializerMethodField()
+
+    class Meta:
+        model = AcceptedChatRoom
+        fields = [
+            "id",
+            "title",
+            "participants",
+            "last_message",
+            "non_read",
+        ]
+
+    def get_participants(self, obj):
+        accepted_applicant_exists = AcceptedApplicant.objects.filter(
+            form__activity=obj.activity
+        ).exists()
+        if accepted_applicant_exists:
+            return (
+                AcceptedApplicant.objects.filter(form__activity=obj.activity).count()
+                + 1
+            )
+        else:
+            return 1
+
+    def get_last_message(self, obj):
+        last_message = obj.accepted_message.order_by("-created_at").first()
+        if last_message:
+            return AcceptedMessageSerializer(last_message).data
+        return None
+
+    def get_non_read(self, obj):
+        if AcceptedMessage.objects.filter(accepted_chatroom=obj).exists():
+            return (
+                AcceptedMessage.objects.filter(accepted_chatroom=obj)
+                .filter(is_read=False)
+                .count()
+            )
+        else:
+            return 0

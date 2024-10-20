@@ -1,8 +1,14 @@
 from rest_framework import views, generics, status, parsers, filters
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.exceptions import PermissionDenied, APIException
-from .models import Board, Scrap, Form, Activity, Suggestion
-from .paginations import BoardListPagination, ProfileListPagination
+
+from .models import Board, Scrap, Form, Activity, Suggestion, FormMessage, FormChatRoom
+from .paginations import (
+    BoardListPagination,
+    ProfileListPagination,
+    MessageListPagination,
+)
+from .permissions import IsFormMessageUser, IsFormChatRoomUser
 from user.models import (
     StudentUser,
     CompanyUser,
@@ -655,3 +661,79 @@ class FormExcelExportView(views.APIView):
         response["Content-Disposition"] = 'attachment; filename="지원자_정보.xlsx"'
 
         return response
+
+
+class FormMessageListCreateView(generics.ListCreateAPIView):
+    serializer_class = FormMessageSerializer
+    permission_classes = [IsAuthenticated, IsFormMessageUser]
+    pagination_class = MessageListPagination
+
+    def get_queryset(self):
+        form_chatroom_id = self.kwargs.get("chatroom_id")
+        return FormMessage.objects.filter(form_chatroom__pk=form_chatroom_id).order_by(
+            "created_at"
+        )
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+
+        form_chatroom_id = self.kwargs.get("chatroom_id")
+        user = request.user
+
+        # 현재 채팅방에서 is_read=False이고, author가 현재 사용자가 아닌 메시지들 찾기
+        unread_messages = FormMessage.objects.filter(
+            form_chatroom__pk=form_chatroom_id, is_read=False
+        ).exclude(author_id=user.id)
+
+        unread_messages.update(is_read=True)
+
+        return response
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        form_chatroom_id = self.kwargs.get("chatroom_id")
+        chatroom = FormChatRoom.objects.get(pk=form_chatroom_id)
+
+        if user.is_company_user:
+            author_id = user.pk
+            author_name = user.company_user.board.company_name
+            author_logo = (
+                user.company_user.board.logo
+                if hasattr(user.company_user, "board.logo")
+                else None
+            )
+            user_type = "company"
+        else:
+            author_id = user.pk
+            author_name = user.student_user.profile.name
+            author_logo = (
+                user.student_user.profile.profile_image
+                if hasattr(user.student_user, "profile.profile_image")
+                else None
+            )
+            user_type = "student"
+
+        serializer.save(
+            form_chatroom=chatroom,
+            author_id=author_id,
+            author_name=author_name,
+            author_logo=author_logo,
+            user_type=user_type,
+        )
+
+
+class FormChatRoomListView(generics.ListAPIView):
+    serializer_class = FormChatRoomSerializer
+    permission_classes = [IsAuthenticated, IsFormChatRoomUser]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_company_user:
+            return FormChatRoom.objects.filter(
+                activity__board__company_user=user.company_user
+            )
+        else:
+            return FormChatRoom.objects.filter(
+                activity__form__student_user=user.student_user
+            )

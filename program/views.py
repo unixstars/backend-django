@@ -5,6 +5,7 @@ from rest_framework.exceptions import NotFound
 from django.db.models import Exists, OuterRef
 from django.utils import timezone
 from datetime import timedelta
+from .permissions import IsAcceptedMessageUser, IsAcceptedChatRoomUser
 from api.permissions import (
     IsStudentUser,
     IsCompanyUser,
@@ -15,7 +16,10 @@ from .models import (
     Notice,
     Assignment,
     Submit,
+    AcceptedChatRoom,
+    AcceptedMessage,
 )
+from .paginations import MessageListPagination
 from activity.models import Activity
 from .serializers import (
     ProgramListSerializer,
@@ -36,6 +40,8 @@ from .serializers import (
     CompanyProgramAssignmentSubmitDetailSerializer,
     CompanyProgramAssignmentDetailSerializer,
     CompanyProgramAssignmentCreateSerializer,
+    AcceptedChatRoomSerializer,
+    AcceptedMessageSerializer,
 )
 
 
@@ -427,3 +433,79 @@ class CompanyProgramSubmitApprovalView(generics.UpdateAPIView):
         submit.save()
 
         return Response(status=status.HTTP_200_OK)
+
+
+class AcceptedMessageListCreateView(generics.ListCreateAPIView):
+    serializer_class = AcceptedMessageSerializer
+    permission_classes = [IsAuthenticated, IsAcceptedMessageUser]
+    pagination_class = MessageListPagination
+
+    def get_queryset(self):
+        accepted_chatroom_id = self.kwargs.get("chatroom_id")
+        return AcceptedMessage.objects.filter(
+            accepted_chatroom__pk=accepted_chatroom_id
+        ).order_by("created_at")
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+
+        accepted_chatroom_id = self.kwargs.get("chatroom_id")
+        user = request.user
+
+        # 현재 채팅방에서 is_read=False이고, author가 현재 사용자가 아닌 메시지들 찾기
+        unread_messages = AcceptedMessage.objects.filter(
+            accepted_chatroom__pk=accepted_chatroom_id, is_read=False
+        ).exclude(author_id=user.id)
+
+        unread_messages.update(is_read=True)
+
+        return response
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        accepted_chatroom_id = self.kwargs.get("chatroom_id")
+        chatroom = AcceptedChatRoom.objects.get(pk=accepted_chatroom_id)
+
+        if user.is_company_user:
+            author_id = user.pk
+            author_name = user.company_user.board.company_name
+            author_logo = (
+                user.company_user.board.logo
+                if hasattr(user.company_user, "board.logo")
+                else None
+            )
+            user_type = "company"
+        else:
+            author_id = user.pk
+            author_name = user.student_user.profile.name
+            author_logo = (
+                user.student_user.profile.profile_image
+                if hasattr(user.student_user, "profile.profile_image")
+                else None
+            )
+            user_type = "student"
+
+        serializer.save(
+            accepted_chatroom=chatroom,
+            author_id=author_id,
+            author_name=author_name,
+            author_logo=author_logo,
+            user_type=user_type,
+        )
+
+
+class AcceptedChatRoomListView(generics.ListAPIView):
+    serializer_class = AcceptedChatRoomSerializer
+    permission_classes = [IsAuthenticated, IsAcceptedChatRoomUser]
+
+    def get_queryset(self):
+        user = self.request.user
+
+        if user.is_company_user:
+            return AcceptedChatRoom.objects.filter(
+                activity__board__company_user=user.company_user
+            )
+        else:
+            return AcceptedChatRoom.objects.filter(
+                activity__form__student_user=user.student_user
+            )

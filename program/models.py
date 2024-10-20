@@ -137,14 +137,14 @@ class SubmitFile(models.Model):
 
 
 class AcceptedChatRoom(models.Model):
-    accepted_applicant = models.ForeignKey(
-        AcceptedApplicant, on_delete=models.CASCADE, related_name="accepted_chatroom"
+    activity = models.OneToOneField(
+        Activity, on_delete=models.CASCADE, related_name="accepted_chatroom"
     )
     title = models.CharField(max_length=30)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return f"{self.accepted_applicant}의 채팅방"
+        return f"{self.activity.title} 합격자 채팅방"
 
 
 class AcceptedMessage(models.Model):

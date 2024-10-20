@@ -16,7 +16,6 @@ settings/__pycache__/
 
 # 데몬과 실행 파일
 *.pid
-*.pyc
 
 # 패키지 파일
 *.egg-info/

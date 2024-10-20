@@ -19,7 +19,6 @@ from .ncloud import get_api_keys
 from dj_rest_auth.registration.views import RegisterView
 from rest_framework.permissions import AllowAny
 
-from django.utils.translation import gettext_lazy as _
 from dj_rest_auth.views import LoginView, PasswordChangeView
 
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -54,7 +53,10 @@ class CompanyVerificationView(views.APIView):
             data_b_status = response_b_status.json()
             item_b_status = data_b_status["data"][0]
             if not item_b_status["b_stt"] == "계속사업자":
-                return Response({"detail": "기업 정보가 유효하지 않습니다. 계속사업자가 아님."}, status=400)
+                return Response(
+                    {"detail": "기업 정보가 유효하지 않습니다. 계속사업자가 아님."},
+                    status=400,
+                )
 
             # 사업자등록 진위여부 API
             data = {
@@ -275,7 +277,10 @@ class CompanyUserInfoFindPhoneSendView(views.APIView):
         try:
             CompanyUser.objects.get(manager_phone=register_phone)
         except CompanyUser.DoesNotExist:
-            return Response({"detail": "등록 번호와 일치하는 기업 유저가 존재하지 않습니다."}, status=400)
+            return Response(
+                {"detail": "등록 번호와 일치하는 기업 유저가 존재하지 않습니다."},
+                status=400,
+            )
 
         # 네이버 클라우드 SMS API
         try:
@@ -465,7 +470,8 @@ class AppleLoginView(views.APIView):
         apple_key = next((key for key in key_data if key["kid"] == kid), None)
         if not apple_key:
             return Response(
-                {"error": "유효하지 않은 key ID 입니다."}, status=status.HTTP_400_BAD_REQUEST
+                {"error": "유효하지 않은 key ID 입니다."},
+                status=status.HTTP_400_BAD_REQUEST,
             )
 
         # 공개키로부터 idToken 복호화 및 검증
@@ -615,4 +621,6 @@ class UserDeactivateView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         request.user.is_active = False
         request.user.save()
-        return Response({"message": "회원탈퇴가 완료되었습니다."}, status=status.HTTP_200_OK)
+        return Response(
+            {"message": "회원탈퇴가 완료되었습니다."}, status=status.HTTP_200_OK
+        )

@@ -36,7 +36,7 @@ class Board(models.Model):
         null=True,
         blank=True,
     )
-    company_name = models.CharField(max_length=30)
+    company_name = models.CharField(max_length=20)
     introduction = models.TextField()
     vision = models.TextField()
     pride = models.CharField(
@@ -162,14 +162,14 @@ class Suggestion(models.Model):
 
 
 class FormChatRoom(models.Model):
-    form = models.ForeignKey(
-        Form, on_delete=models.CASCADE, related_name="form_chatroom"
+    activity = models.OneToOneField(
+        Activity, on_delete=models.CASCADE, related_name="form_chatroom"
     )
     title = models.CharField(max_length=30)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return f"{self.form}의 채팅방"
+        return f"{self.activity.title} 지원자 채팅방"
 
 
 class FormMessage(models.Model):

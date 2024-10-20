@@ -597,24 +597,54 @@ class FormMessageSerializer(serializers.ModelSerializer):
             "is_read",
             "created_at",
         ]
+        read_only_fields = [
+            "author_id",
+            "author_name",
+            "author_logo",
+            "user_type",
+            "is_read",
+            "created_at",
+        ]
 
     def get_author_logo(self, obj):
         if obj.author_logo:
             return f"{settings.MEDIA_URL}{obj.author_logo}"
+        return None
 
 
 class FormChatRoomSerializer(serializers.ModelSerializer):
     last_message = serializers.SerializerMethodField()
+    non_read = serializers.SerializerMethodField()
 
     class Meta:
         model = FormChatRoom
         fields = [
+            "id",
             "title",
+            "participants",
             "last_message",
+            "non_read",
         ]
+
+    def get_participants(self, obj):
+        form_exists = Form.objects.filter(activity=obj.activity).exists()
+        if form_exists:
+            return Form.objects.filter(activity=obj.activity).count() + 1
+        else:
+            return 1
 
     def get_last_message(self, obj):
         last_message = obj.form_message.order_by("-created_at").first()
         if last_message:
             return FormMessageSerializer(last_message).data
         return None
+
+    def get_non_read(self, obj):
+        if FormMessage.objects.filter(form_chatroom=obj).exists():
+            return (
+                FormMessage.objects.filter(form_chatroom=obj)
+                .filter(is_read=False)
+                .count()
+            )
+        else:
+            return 0

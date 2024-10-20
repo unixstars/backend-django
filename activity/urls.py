@@ -29,6 +29,8 @@ from .views import (
     CompanyStudentSuggestionCreateView,
     SuggestionListView,
     FormExcelExportView,
+    FormMessageListCreateView,
+    FormChatRoomListView,
 )
 
 urlpatterns = [
@@ -216,5 +218,13 @@ urlpatterns = [
         "company/profile/<int:profile_id>/suggest/",
         CompanyStudentSuggestionCreateView.as_view(),
         name="company-profile-suggest",
+    ),
+    # 지원 채팅방 리스트 불러오기
+    path("form_chatroom/", FormChatRoomListView.as_view(), name="form_chatroom-list"),
+    # 지원 채팅방 메시지 리스트 불러오기&생성(GET&POST)
+    path(
+        "form_chatroom/<int:chatroom_id>/message/",
+        FormMessageListCreateView.as_view(),
+        name="form_chatroom-message",
     ),
 ]
